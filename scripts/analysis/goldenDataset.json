@@ -1,0 +1,4333 @@
+{
+  "metadata": {
+    "created_at": "2025-11-15T11:17:09.684Z",
+    "sprint": "Sprint 24",
+    "purpose": "Regression testing and rule engine validation",
+    "total_examples": 50,
+    "source_decisions": 959,
+    "selection_criteria": [
+      "High confidence scores (≥0.85)",
+      "Representative coverage across scenarios",
+      "Diverse company sizes, industries, seniority levels",
+      "Edge cases and boundary conditions",
+      "Shadow mode validated where applicable"
+    ]
+  },
+  "tools": {
+    "CompanyQualityTool": {
+      "total_examples": 28,
+      "examples": [
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "realestate.ae",
+            "sector": "Private",
+            "industry": "Real Estate",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Real Estate Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 45,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Real Estate industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "3ea779c9-cb26-4fdf-9521-7d53405ec917",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:16.371Z",
+              "confidence": 1,
+              "quality_score": 50,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 45,
+              "score_diff": 5,
+              "inline_score": 50,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "3ea779c9-cb26-4fdf-9521-7d53405ec917"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "education.ae",
+            "sector": "Private",
+            "industry": "Education",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Education Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 45,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Education industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "adf73198-ce5d-4fe4-8ee4-df4116efaca0",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:16.003Z",
+              "confidence": 1,
+              "quality_score": 50,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 45,
+              "score_diff": 5,
+              "inline_score": 50,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "adf73198-ce5d-4fe4-8ee4-df4116efaca0"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "manufacturing.ae",
+            "sector": "Private",
+            "industry": "Manufacturing",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Manufacturing Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 45,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Manufacturing industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "9b535ae9-c2c5-4932-a073-92b557847872",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:15.666Z",
+              "confidence": 1,
+              "quality_score": 50,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 45,
+              "score_diff": 5,
+              "inline_score": 50,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "9b535ae9-c2c5-4932-a073-92b557847872"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "retail.ae",
+            "sector": "Private",
+            "industry": "Retail",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Retail Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 45,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Retail industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "f84c4015-5009-4bd0-a8df-a140a0a819d9",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:15.321Z",
+              "confidence": 1,
+              "quality_score": 50,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 45,
+              "score_diff": 5,
+              "inline_score": 50,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": -1
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "f84c4015-5009-4bd0-a8df-a140a0a819d9"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "healthcare.ae",
+            "sector": "Private",
+            "industry": "Healthcare",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Healthcare Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 60,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Healthcare - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Healthcare industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "a300f046-a899-48a2-804c-93e1bfbfb96c",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "HEALTHCARE_SECTOR",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Healthcare sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:14.956Z",
+              "confidence": 1,
+              "quality_score": 65,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 60,
+              "score_diff": 5,
+              "inline_score": 65,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "a300f046-a899-48a2-804c-93e1bfbfb96c"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "finance.ae",
+            "sector": "Private",
+            "industry": "Finance",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Finance Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 45,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Finance industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "9991c98b-9e52-4e6f-9df7-3e8689408de6",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:14.580Z",
+              "confidence": 1,
+              "quality_score": 50,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 45,
+              "score_diff": 5,
+              "inline_score": 50,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "9991c98b-9e52-4e6f-9df7-3e8689408de6"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 150,
+            "domain": "technology.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Technology Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "medium"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 60,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "150 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Technology industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "622579d0-befc-451e-8a98-ecc18d2cbb20",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:14.241Z",
+              "confidence": 1,
+              "quality_score": 65,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 60,
+              "score_diff": 5,
+              "inline_score": 65,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "622579d0-befc-451e-8a98-ecc18d2cbb20"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 100,
+            "domain": "test.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "scaleup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Salary Test 25000",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "avg_salary": 25000
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 85,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "100 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "scaleup category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "ab4d4071-921c-4550-a228-e6e94b230346",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:13.834Z",
+              "confidence": 1,
+              "quality_score": 85,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 85,
+              "score_diff": 0,
+              "inline_score": 85,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "ab4d4071-921c-4550-a228-e6e94b230346"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 100,
+            "domain": "test.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "scaleup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Salary Test 18000",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "avg_salary": 18000
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 85,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "100 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "scaleup category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "c653168d-183e-4ad4-b45c-4575eaefedf3",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:13.387Z",
+              "confidence": 1,
+              "quality_score": 85,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 85,
+              "score_diff": 0,
+              "inline_score": 85,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "c653168d-183e-4ad4-b45c-4575eaefedf3"
+        },
+        {
+          "category": "midsize_companies",
+          "scenario": "Midsize company (sweet spot segment)",
+          "input": {
+            "size": 100,
+            "domain": "test.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "scaleup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Salary Test 15000",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "avg_salary": 15000
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 85,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "100 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "scaleup category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "e4525aa6-6e82-4397-93e9-fd63a0bf9b28",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:13.050Z",
+              "confidence": 1,
+              "quality_score": 85,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 85,
+              "score_diff": 0,
+              "inline_score": 85,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "e4525aa6-6e82-4397-93e9-fd63a0bf9b28"
+        },
+        {
+          "category": "large_companies",
+          "scenario": "Large company (200-1000 employees)",
+          "input": {
+            "size": 250,
+            "domain": "emiratestech.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true,
+              "linkedin_location": "Dubai, UAE"
+            },
+            "company_name": "Emirates Tech Solutions",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "avg_salary": 15000,
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 11,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "250 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -76,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION",
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "6aa30c8d-3dfb-4866-877d-f6dadd40f1f1",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "ENTERPRISE_BRAND",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION",
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment. Emirates Tech Solutions is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-15T09:58:33.076Z",
+              "confidence": 0.95,
+              "quality_score": 11,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 11,
+              "score_diff": 0,
+              "inline_score": 11,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "6aa30c8d-3dfb-4866-877d-f6dadd40f1f1"
+        },
+        {
+          "category": "large_companies",
+          "scenario": "Large company (200-1000 employees)",
+          "input": {
+            "size": 250,
+            "domain": "emiratestech.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true,
+              "linkedin_location": "Dubai, UAE"
+            },
+            "company_name": "Emirates Tech Solutions",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "avg_salary": 15000,
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 11,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "250 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -76,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION",
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "b2750304-4bab-4cb4-80d3-6676b3656c1d",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "ENTERPRISE_BRAND",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION",
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment. Emirates Tech Solutions is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-15T09:58:33.068Z",
+              "confidence": 0.95,
+              "quality_score": 11,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 11,
+              "score_diff": 0,
+              "inline_score": 11,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "b2750304-4bab-4cb4-80d3-6676b3656c1d"
+        },
+        {
+          "category": "large_companies",
+          "scenario": "Large company (200-1000 employees)",
+          "input": {
+            "size": 250,
+            "domain": "emiratestech.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true,
+              "linkedin_location": "Dubai, UAE"
+            },
+            "company_name": "Emirates Tech Solutions",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "avg_salary": 15000,
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 11,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "250 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -76,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION",
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "6495ad85-90e9-4822-9e39-3015a6b3fbc7",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "ENTERPRISE_BRAND",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION",
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment. Emirates Tech Solutions is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-15T09:58:33.065Z",
+              "confidence": 0.95,
+              "quality_score": 11,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 11,
+              "score_diff": 0,
+              "inline_score": 11,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "6495ad85-90e9-4822-9e39-3015a6b3fbc7"
+        },
+        {
+          "category": "large_companies",
+          "scenario": "Large company (200-1000 employees)",
+          "input": {
+            "size": 250,
+            "domain": "emiratestech.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true,
+              "linkedin_location": "Dubai, UAE"
+            },
+            "company_name": "Emirates Tech Solutions",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "avg_salary": 15000,
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 11,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "250 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -76,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION",
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "52fbff8b-47e9-4653-ae9c-257bd377f7c2",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "ENTERPRISE_BRAND",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION",
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment. Emirates Tech Solutions is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-15T09:58:32.968Z",
+              "confidence": 0.95,
+              "quality_score": 11,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 11,
+              "score_diff": 0,
+              "inline_score": 11,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "52fbff8b-47e9-4653-ae9c-257bd377f7c2"
+        },
+        {
+          "category": "large_companies",
+          "scenario": "Large company (200-1000 employees)",
+          "input": {
+            "size": 250,
+            "domain": "emiratestech.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true,
+              "linkedin_location": "Dubai, UAE"
+            },
+            "company_name": "Emirates Tech Solutions",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "avg_salary": 15000,
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 11,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "250 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -76,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION",
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "c2dfe9d2-ee40-4800-9985-f4ebc765821c",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "ENTERPRISE_BRAND",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION",
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment. Emirates Tech Solutions is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-15T09:58:32.953Z",
+              "confidence": 0.95,
+              "quality_score": 11,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 11,
+              "score_diff": 0,
+              "inline_score": 11,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "c2dfe9d2-ee40-4800-9985-f4ebc765821c"
+        },
+        {
+          "category": "small_companies",
+          "scenario": "Small company (10-50 employees)",
+          "input": {
+            "size": 25,
+            "domain": "company25.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "startup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 25",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 100,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "25 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Small",
+                  "points": 10,
+                  "explanation": "25 employees - small but acceptable"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 24,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "f2a15b44-c59d-4827-87f5-f589458b44cb",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_SMALL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Small company size provides good accessibility to decision makers. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:07.136Z",
+              "confidence": 1,
+              "quality_score": 98,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 100,
+              "score_diff": 2,
+              "inline_score": 98,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "f2a15b44-c59d-4827-87f5-f589458b44cb"
+        },
+        {
+          "category": "small_companies",
+          "scenario": "Small company (10-50 employees)",
+          "input": {
+            "size": 10,
+            "domain": "company10.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "startup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 10",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 100,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "10 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Small",
+                  "points": 10,
+                  "explanation": "10 employees - small but acceptable"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 24,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 1,
+                "decision_id": "1973a056-d992-453b-b612-99547d1b9f4b",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_SMALL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Small company size provides good accessibility to decision makers. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:06.791Z",
+              "confidence": 1,
+              "quality_score": 98,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 100,
+              "score_diff": 2,
+              "inline_score": 98,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": 1
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "1973a056-d992-453b-b612-99547d1b9f4b"
+        },
+        {
+          "category": "small_companies",
+          "scenario": "Small company (10-50 employees)",
+          "input": {
+            "size": 35,
+            "domain": "agency.ae",
+            "sector": "Private",
+            "industry": "Marketing",
+            "size_bucket": "startup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Boutique Agency",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "avg_salary": 12000
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 40,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "35 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Small",
+                  "points": 10,
+                  "explanation": "35 employees - small but acceptable"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 1,
+              "key_factors": [
+                "SIZE_OPTIMAL",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, medium salary level, and Marketing industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "2317c89d-6038-4583-bb8a-92a0b7073f7a",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "SIZE_SMALL",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint. Small company size provides good accessibility to decision makers. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:05.765Z",
+              "confidence": 1,
+              "quality_score": 40,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 40,
+              "score_diff": 0,
+              "inline_score": 40,
+              "confidence_diff": 0,
+              "rule_confidence": 1,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "2317c89d-6038-4583-bb8a-92a0b7073f7a"
+        },
+        {
+          "category": "technology_industry",
+          "scenario": "Technology company (dominant industry)",
+          "input": {
+            "size": 5000,
+            "domain": "company5000.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "enterprise",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 5000",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 95,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Enterprise",
+                  "points": 5,
+                  "explanation": "Enterprise size - may have complex processes"
+                },
+                {
+                  "factor": "Company Size - Large (500+)",
+                  "points": 18,
+                  "explanation": "5000 employees - large organization"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 22,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.8,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_LARGE",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "1b24079d-5a45-46c8-b02b-6343b56139c2",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_LARGE",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Large organization with potentially complex procurement processes. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:10.861Z",
+              "confidence": 0.95,
+              "quality_score": 91,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": false,
+              "rule_score": 95,
+              "score_diff": 4,
+              "inline_score": 91,
+              "confidence_diff": 0.1499999999999999,
+              "rule_confidence": 0.8,
+              "inline_confidence": 0.95,
+              "execution_time_diff": -1
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "1b24079d-5a45-46c8-b02b-6343b56139c2"
+        },
+        {
+          "category": "technology_industry",
+          "scenario": "Technology company (dominant industry)",
+          "input": {
+            "size": 1000,
+            "domain": "company1000.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "enterprise",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 1000",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 95,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Enterprise",
+                  "points": 5,
+                  "explanation": "Enterprise size - may have complex processes"
+                },
+                {
+                  "factor": "Company Size - Large (500+)",
+                  "points": 18,
+                  "explanation": "1000 employees - large organization"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 22,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.8,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_LARGE",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "1f7c5d28-dd29-40d0-ac76-c655b3eb548e",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_LARGE",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Large organization with potentially complex procurement processes. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:10.521Z",
+              "confidence": 0.95,
+              "quality_score": 91,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": false,
+              "rule_score": 95,
+              "score_diff": 4,
+              "inline_score": 91,
+              "confidence_diff": 0.1499999999999999,
+              "rule_confidence": 0.8,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "1f7c5d28-dd29-40d0-ac76-c655b3eb548e"
+        },
+        {
+          "category": "technology_industry",
+          "scenario": "Technology company (dominant industry)",
+          "input": {
+            "size": 750,
+            "domain": "company750.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "enterprise",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 750",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 95,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Enterprise",
+                  "points": 5,
+                  "explanation": "Enterprise size - may have complex processes"
+                },
+                {
+                  "factor": "Company Size - Large (500+)",
+                  "points": 18,
+                  "explanation": "750 employees - large organization"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 22,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.8,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_LARGE",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "275fef76-f9dd-4095-8ea3-f5ba5eeb20fa",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_LARGE",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Large organization with potentially complex procurement processes. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:10.182Z",
+              "confidence": 0.95,
+              "quality_score": 91,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": false,
+              "rule_score": 95,
+              "score_diff": 4,
+              "inline_score": 91,
+              "confidence_diff": 0.1499999999999999,
+              "rule_confidence": 0.8,
+              "inline_confidence": 0.95,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "275fef76-f9dd-4095-8ea3-f5ba5eeb20fa"
+        },
+        {
+          "category": "technology_industry",
+          "scenario": "Technology company (dominant industry)",
+          "input": {
+            "size": 500,
+            "domain": "company500.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "enterprise",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 500",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 98,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "500 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Enterprise",
+                  "points": 5,
+                  "explanation": "Enterprise size - may have complex processes"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 23,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.85,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "9079c848-021b-44de-99c1-90c17cf7425a",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:09.845Z",
+              "confidence": 1,
+              "quality_score": 100,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": false,
+              "rule_score": 98,
+              "score_diff": 2,
+              "inline_score": 100,
+              "confidence_diff": 0.15000000000000002,
+              "rule_confidence": 0.85,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "9079c848-021b-44de-99c1-90c17cf7425a"
+        },
+        {
+          "category": "technology_industry",
+          "scenario": "Technology company (dominant industry)",
+          "input": {
+            "size": 300,
+            "domain": "company300.ae",
+            "sector": "Private",
+            "industry": "Technology",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Company 300",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 100,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "300 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Technology - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Technology industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "7132e270-63bd-41c4-a1a2-0817c11ba579",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "TECHNOLOGY_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:09.415Z",
+              "confidence": 1,
+              "quality_score": 100,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 100,
+              "score_diff": 0,
+              "inline_score": 100,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": 0
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "7132e270-63bd-41c4-a1a2-0817c11ba579"
+        },
+        {
+          "category": "other_industries",
+          "scenario": "Oil & Gas industry",
+          "input": {
+            "size": 100000,
+            "domain": "adnoc.ae",
+            "sector": "Private",
+            "industry": "Oil & Gas",
+            "size_bucket": "enterprise",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "ADNOC",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 6,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Enterprise",
+                  "points": 5,
+                  "explanation": "Enterprise size - may have complex processes"
+                },
+                {
+                  "factor": "Company Size - Large (500+)",
+                  "points": 18,
+                  "explanation": "100000 employees - large organization"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -52,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_LARGE",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Oil & Gas industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "45266bc0-54d7-4723-9394-d3bdf3456bec",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_LARGE",
+                  "DOMAIN_VERIFIED",
+                  "ENTERPRISE_BRAND"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Large organization with potentially complex procurement processes. Domain verification confirms UAE business registration. ADNOC is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-14T18:04:06.449Z",
+              "confidence": 0.95,
+              "quality_score": 6,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 6,
+              "score_diff": 0,
+              "inline_score": 6,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": -1
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "45266bc0-54d7-4723-9394-d3bdf3456bec"
+        },
+        {
+          "category": "other_industries",
+          "scenario": "Healthcare industry",
+          "input": {
+            "size": 200,
+            "domain": "clinic.ae",
+            "sector": "Private",
+            "industry": "Healthcare",
+            "size_bucket": "midsize",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "Medical Clinic",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "avg_salary": 16000
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 85,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "200 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "midsize category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "Healthcare - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Healthcare industry",
+              "edge_cases_applied": []
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "62a560fe-968f-43eb-a620-9124a23d16cb",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "HEALTHCARE_SECTOR",
+                  "DOMAIN_VERIFIED"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. Healthcare sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+              "timestamp": "2025-11-14T18:04:05.423Z",
+              "confidence": 1,
+              "quality_score": 85,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 85,
+              "score_diff": 0,
+              "inline_score": 85,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": -4
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "62a560fe-968f-43eb-a620-9124a23d16cb"
+        },
+        {
+          "category": "other_industries",
+          "scenario": "FinTech industry",
+          "input": {
+            "size": 120,
+            "domain": "fintech.ae",
+            "sector": "Private",
+            "industry": "FinTech",
+            "size_bucket": "scaleup",
+            "uae_signals": {
+              "has_ae_domain": true,
+              "has_uae_address": true
+            },
+            "company_name": "FinTech Innovations",
+            "license_type": "Free Zone",
+            "salary_indicators": {
+              "avg_salary": 20000,
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 100,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "120 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Scaleup/Midsize",
+                  "points": 15,
+                  "explanation": "scaleup category - good fit"
+                },
+                {
+                  "factor": "Industry - High Value",
+                  "points": 15,
+                  "explanation": "FinTech - high-value industry with quality hiring needs"
+                },
+                {
+                  "factor": "Domain - UAE Verified",
+                  "points": 10,
+                  "explanation": "UAE domain (.ae) verified"
+                },
+                {
+                  "factor": "Edge Case: FREE_ZONE_BONUS",
+                  "points": 26,
+                  "explanation": "Free Zone license - 30% quality bonus (×1.3)"
+                }
+              ],
+              "confidence": 0.9,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_OPTIMAL",
+                "HIGH_VALUE_INDUSTRY",
+                "DOMAIN_VERIFIED"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and FinTech industry",
+              "edge_cases_applied": [
+                "FREE_ZONE_BONUS"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "1a6ebf1a-134b-43db-a105-5b5a1a2a41bc",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "UAE_VERIFIED",
+                  "HIGH_SALARY",
+                  "SIZE_OPTIMAL",
+                  "FINTECH_SECTOR",
+                  "DOMAIN_VERIFIED",
+                  "FREE_ZONE"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "FREE_ZONE_BONUS"
+                ]
+              },
+              "reasoning": "Strong UAE operational presence with verified local footprint and high-quality salary indicators. Company size aligns well with relationship banking model. FinTech sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+              "timestamp": "2025-11-14T18:04:05.073Z",
+              "confidence": 1,
+              "quality_score": 100,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 100,
+              "score_diff": 0,
+              "inline_score": 100,
+              "confidence_diff": 0.09999999999999998,
+              "rule_confidence": 0.9,
+              "inline_confidence": 1,
+              "execution_time_diff": -2
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "1a6ebf1a-134b-43db-a105-5b5a1a2a41bc"
+        },
+        {
+          "category": "other_industries",
+          "scenario": "Aviation industry",
+          "input": {
+            "size": 50000,
+            "domain": "emirates.com",
+            "sector": "Private",
+            "industry": "Aviation",
+            "size_bucket": "enterprise",
+            "uae_signals": {
+              "has_ae_domain": false,
+              "has_uae_address": true
+            },
+            "company_name": "Emirates Airlines",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "salary_level": "high"
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 5,
+              "reasoning": [
+                {
+                  "factor": "Salary Level",
+                  "points": 25,
+                  "explanation": "High salary level without confirmed UAE presence"
+                },
+                {
+                  "factor": "Company Size - Enterprise",
+                  "points": 5,
+                  "explanation": "Enterprise size - may have complex processes"
+                },
+                {
+                  "factor": "Company Size - Large (500+)",
+                  "points": 18,
+                  "explanation": "50000 employees - large organization"
+                },
+                {
+                  "factor": "Edge Case: ENTERPRISE_BRAND_EXCLUSION",
+                  "points": -43,
+                  "explanation": "Major enterprise brand - auto-skip (×0.1)"
+                }
+              ],
+              "confidence": 0.95,
+              "key_factors": [
+                "HIGH_SALARY",
+                "SIZE_LARGE"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, high salary level, and Aviation industry",
+              "edge_cases_applied": [
+                "ENTERPRISE_BRAND_EXCLUSION"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "9532dede-9a98-4e5e-9517-b99bf6c5a77f",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "HIGH_SALARY",
+                  "SIZE_LARGE",
+                  "DOMAIN_PRESENT",
+                  "ENTERPRISE_BRAND"
+                ],
+                "confidenceLevel": "HIGH",
+                "edgeCasesApplied": [
+                  "ENTERPRISE_BRAND_EXCLUSION"
+                ]
+              },
+              "reasoning": "High-quality salary indicators suggest strong employee value proposition. Large organization with potentially complex procurement processes. Emirates Airlines is a major enterprise brand - existing banking relationships likely, conversion probability low.",
+              "timestamp": "2025-11-14T18:04:04.334Z",
+              "confidence": 0.95,
+              "quality_score": 4,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 5,
+              "score_diff": 1,
+              "inline_score": 4,
+              "confidence_diff": 0,
+              "rule_confidence": 0.95,
+              "inline_confidence": 0.95,
+              "execution_time_diff": -1
+            }
+          },
+          "confidence": "0.95",
+          "source": "production",
+          "decision_id": "9532dede-9a98-4e5e-9517-b99bf6c5a77f"
+        },
+        {
+          "category": "other_industries",
+          "scenario": "Consulting industry",
+          "input": {
+            "size": 20,
+            "domain": "remote.com",
+            "sector": "Private",
+            "industry": "Consulting",
+            "size_bucket": "startup",
+            "uae_signals": {
+              "has_ae_domain": false,
+              "has_uae_address": false
+            },
+            "company_name": "Remote Company",
+            "license_type": "Mainland",
+            "salary_indicators": {
+              "avg_salary": 5000
+            }
+          },
+          "expected_output": {
+            "rule": {
+              "score": 15,
+              "reasoning": [
+                {
+                  "factor": "Company Size - Sweet Spot",
+                  "points": 20,
+                  "explanation": "20 employees - ideal sweet spot (50-500)"
+                },
+                {
+                  "factor": "Company Size - Small",
+                  "points": 10,
+                  "explanation": "20 employees - small but acceptable"
+                },
+                {
+                  "factor": "Edge Case: UNKNOWN_INDUSTRY_PENALTY",
+                  "points": -15,
+                  "explanation": "Unknown/Consulting industry - reduced quality (×0.5)"
+                }
+              ],
+              "confidence": 0.85,
+              "key_factors": [
+                "SIZE_OPTIMAL"
+              ],
+              "reasoning_text": "Company quality score based on weak UAE presence, low salary level, and Consulting industry",
+              "edge_cases_applied": [
+                "UNKNOWN_INDUSTRY_PENALTY"
+              ]
+            },
+            "inline": {
+              "_meta": {
+                "tool_name": "evaluate_company_quality",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "decision_id": "b2bcda24-a795-4aab-ae19-a3b50707a10a",
+                "policy_version": "v2.0",
+                "shadow_mode_active": true
+              },
+              "metadata": {
+                "keyFactors": [
+                  "SIZE_SMALL",
+                  "DOMAIN_PRESENT"
+                ],
+                "confidenceLevel": "MEDIUM",
+                "edgeCasesApplied": []
+              },
+              "reasoning": "Small company size provides good accessibility to decision makers.",
+              "timestamp": "2025-11-14T18:04:03.991Z",
+              "confidence": 0.85,
+              "quality_score": 15,
+              "policy_version": "v2.0"
+            },
+            "comparison": {
+              "match": true,
+              "rule_score": 15,
+              "score_diff": 0,
+              "inline_score": 15,
+              "confidence_diff": 0,
+              "rule_confidence": 0.85,
+              "inline_confidence": 0.85,
+              "execution_time_diff": -1
+            }
+          },
+          "confidence": "0.85",
+          "source": "production",
+          "decision_id": "b2bcda24-a795-4aab-ae19-a3b50707a10a"
+        }
+      ]
+    },
+    "ContactTierTool": {
+      "total_examples": 14,
+      "examples": [
+        {
+          "category": "c_level_contacts",
+          "scenario": "C-Level contact (highest priority)",
+          "input": {
+            "title": "CEO",
+            "department": "C-Suite",
+            "company_size": 150,
+            "seniority_level": "C-Level",
+            "company_maturity_years": 3,
+            "hiring_velocity_monthly": 5
+          },
+          "expected_output": {
+            "rule": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "scores": {
+                  "total": 95,
+                  "seniority": 40,
+                  "department": 30,
+                  "company_size": 25
+                },
+                "version": "v2.0",
+                "breakdown": [
+                  {
+                    "max": 40,
+                    "step": "seniority_score",
+                    "value": 40,
+                    "reason": "\"C-Level\" seniority level"
+                  },
+                  {
+                    "max": 30,
+                    "step": "department_score",
+                    "value": 30,
+                    "reason": "\"C-Suite\" department"
+                  },
+                  {
+                    "max": 30,
+                    "step": "company_size_score",
+                    "value": 25,
+                    "reason": "Small companies - accessible"
+                  },
+                  {
+                    "max": 100,
+                    "step": "total_score",
+                    "value": 95,
+                    "reason": "Sum of seniority + department + company size scores",
+                    "formula": "40 + 30 + 25"
+                  },
+                  {
+                    "step": "tier_classification",
+                    "value": "STRATEGIC",
+                    "reason": "Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+                    "priority": 1
+                  },
+                  {
+                    "rule": "scale_ups_midsize",
+                    "step": "target_titles",
+                    "reason": "Matched rule: scale_ups_midsize",
+                    "target_titles": [
+                      "HR Director",
+                      "Director of HR",
+                      "HR Manager",
+                      "People Director"
+                    ],
+                    "fallback_titles": [
+                      "HR Business Partner",
+                      "Senior HR Manager",
+                      "VP HR"
+                    ]
+                  },
+                  {
+                    "base": 1,
+                    "step": "confidence_adjustments",
+                    "final": 0.9,
+                    "reason": "Applied 1 confidence penalties",
+                    "penalties": [
+                      {
+                        "reason": "Title has ≤1 word (ambiguous)",
+                        "penalty": 0.1,
+                        "condition": "short_title"
+                      }
+                    ]
+                  }
+                ],
+                "reasoning": [
+                  "Seniority \"C-Level\" provided explicitly",
+                  "Department \"C-Suite\" provided explicitly",
+                  "Seniority score: 40/40 (C-Level)",
+                  "Department score: 30/30 (C-Suite)",
+                  "Company size score: 25/30 (150 employees - Small companies - accessible)",
+                  "Total score: 95/100",
+                  "Classified as \"STRATEGIC\" tier (priority 1): Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+                  "Target titles recommended based on scale_ups_midsize profile",
+                  "Confidence: 0.90 (-0.1 for short_title)"
+                ],
+                "latency_ms": 1,
+                "enriched_input": {
+                  "title": "CEO",
+                  "department": "C-Suite",
+                  "company_size": 150,
+                  "seniority_level": "C-Level",
+                  "_seniority_inferred": false,
+                  "_department_inferred": false,
+                  "company_maturity_years": 3,
+                  "hiring_velocity_monthly": 5
+                }
+              },
+              "priority": 1,
+              "confidence": 0.9,
+              "target_titles": [
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T10:59:44.374Z",
+              "confidence": 0.9,
+              "target_titles": [
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": {
+              "match": true,
+              "rule_tier": "STRATEGIC",
+              "tier_match": true,
+              "inline_tier": "STRATEGIC",
+              "rule_priority": 1,
+              "priority_match": true,
+              "confidence_diff": 0,
+              "inline_priority": 1,
+              "rule_confidence": 0.9,
+              "title_similarity": 1,
+              "inline_confidence": 0.9
+            }
+          },
+          "confidence": "0.90",
+          "source": "production",
+          "decision_id": "428526b9-da74-40eb-a7fc-a892c50c4e15"
+        },
+        {
+          "category": "vp_contacts",
+          "scenario": "VP level contact",
+          "input": {
+            "title": "VP Engineering",
+            "department": "Engineering",
+            "company_size": 500,
+            "seniority_level": "VP",
+            "company_maturity_years": 7,
+            "hiring_velocity_monthly": 8
+          },
+          "expected_output": {
+            "rule": {
+              "tier": "PRIMARY",
+              "_meta": {
+                "scores": {
+                  "total": 60,
+                  "seniority": 35,
+                  "department": 10,
+                  "company_size": 15
+                },
+                "version": "v2.0",
+                "breakdown": [
+                  {
+                    "max": 40,
+                    "step": "seniority_score",
+                    "value": 35,
+                    "reason": "\"VP\" seniority level"
+                  },
+                  {
+                    "max": 30,
+                    "step": "department_score",
+                    "value": 10,
+                    "reason": "\"Engineering\" department"
+                  },
+                  {
+                    "max": 30,
+                    "step": "company_size_score",
+                    "value": 15,
+                    "reason": "Large - less accessible"
+                  },
+                  {
+                    "max": 100,
+                    "step": "total_score",
+                    "value": 60,
+                    "reason": "Sum of seniority + department + company size scores",
+                    "formula": "35 + 10 + 15"
+                  },
+                  {
+                    "step": "tier_classification",
+                    "value": "PRIMARY",
+                    "reason": "High value contacts - VP/Director in other departments or Managers in key departments",
+                    "priority": 2
+                  },
+                  {
+                    "rule": "large_companies",
+                    "step": "target_titles",
+                    "reason": "Matched rule: large_companies",
+                    "target_titles": [
+                      "Payroll Manager",
+                      "Benefits Manager",
+                      "Compensation & Benefits Manager"
+                    ],
+                    "fallback_titles": [
+                      "HR Operations Manager",
+                      "Benefits Coordinator",
+                      "Payroll Director"
+                    ]
+                  },
+                  {
+                    "base": 1,
+                    "step": "confidence_adjustments",
+                    "final": 1,
+                    "reason": "No confidence penalties applied",
+                    "penalties": []
+                  }
+                ],
+                "reasoning": [
+                  "Seniority \"VP\" provided explicitly",
+                  "Department \"Engineering\" provided explicitly",
+                  "Seniority score: 35/40 (VP)",
+                  "Department score: 10/30 (Engineering)",
+                  "Company size score: 15/30 (500 employees - Large - less accessible)",
+                  "Total score: 60/100",
+                  "Classified as \"PRIMARY\" tier (priority 2): High value contacts - VP/Director in other departments or Managers in key departments",
+                  "Target titles recommended based on large_companies profile",
+                  "Confidence: 1.00 (no penalties)"
+                ],
+                "latency_ms": 0,
+                "enriched_input": {
+                  "title": "VP Engineering",
+                  "department": "Engineering",
+                  "company_size": 500,
+                  "seniority_level": "VP",
+                  "_seniority_inferred": false,
+                  "_department_inferred": false,
+                  "company_maturity_years": 7,
+                  "hiring_velocity_monthly": 8
+                }
+              },
+              "priority": 2,
+              "confidence": 1,
+              "target_titles": [
+                "Payroll Manager",
+                "Benefits Manager",
+                "Compensation & Benefits Manager"
+              ],
+              "fallback_titles": [
+                "HR Operations Manager",
+                "Benefits Coordinator",
+                "Payroll Director"
+              ]
+            },
+            "inline": {
+              "tier": "PRIMARY",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 2,
+              "timestamp": "2025-11-15T10:59:45.323Z",
+              "confidence": 1,
+              "target_titles": [
+                "Payroll Manager",
+                "Benefits Manager",
+                "Compensation & Benefits Manager"
+              ],
+              "fallback_titles": [
+                "HR Operations Manager",
+                "Benefits Coordinator",
+                "Payroll Director"
+              ]
+            },
+            "comparison": {
+              "match": true,
+              "rule_tier": "PRIMARY",
+              "tier_match": true,
+              "inline_tier": "PRIMARY",
+              "rule_priority": 2,
+              "priority_match": true,
+              "confidence_diff": 0,
+              "inline_priority": 2,
+              "rule_confidence": 1,
+              "title_similarity": 1,
+              "inline_confidence": 1
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "119eb3d9-50cc-489f-b125-2d7a533822b0"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "scores": {
+                  "total": 80,
+                  "seniority": 30,
+                  "department": 30,
+                  "company_size": 20
+                },
+                "version": "v2.0",
+                "breakdown": [
+                  {
+                    "max": 40,
+                    "step": "seniority_score",
+                    "value": 30,
+                    "reason": "\"Director\" seniority level"
+                  },
+                  {
+                    "max": 30,
+                    "step": "department_score",
+                    "value": 30,
+                    "reason": "\"HR\" department"
+                  },
+                  {
+                    "max": 30,
+                    "step": "company_size_score",
+                    "value": 20,
+                    "reason": "Mid-size - moderate"
+                  },
+                  {
+                    "max": 100,
+                    "step": "total_score",
+                    "value": 80,
+                    "reason": "Sum of seniority + department + company size scores",
+                    "formula": "30 + 30 + 20"
+                  },
+                  {
+                    "step": "tier_classification",
+                    "value": "STRATEGIC",
+                    "reason": "Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+                    "priority": 1
+                  },
+                  {
+                    "rule": "scale_ups_midsize",
+                    "step": "target_titles",
+                    "reason": "Matched rule: scale_ups_midsize",
+                    "target_titles": [
+                      "Head of Talent Acquisition",
+                      "VP Talent Acquisition",
+                      "HR Director",
+                      "Director of HR",
+                      "HR Manager",
+                      "People Director"
+                    ],
+                    "fallback_titles": [
+                      "Talent Acquisition Manager",
+                      "HR Ops Manager",
+                      "HR Business Partner",
+                      "Senior HR Manager",
+                      "VP HR"
+                    ]
+                  },
+                  {
+                    "base": 1,
+                    "step": "confidence_adjustments",
+                    "final": 1,
+                    "reason": "No confidence penalties applied",
+                    "penalties": []
+                  }
+                ],
+                "reasoning": [
+                  "Seniority \"Director\" provided explicitly",
+                  "Department \"HR\" provided explicitly",
+                  "Seniority score: 30/40 (Director)",
+                  "Department score: 30/30 (HR)",
+                  "Company size score: 20/30 (250 employees - Mid-size - moderate)",
+                  "Total score: 80/100",
+                  "Classified as \"STRATEGIC\" tier (priority 1): Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+                  "High hiring velocity (12/month) - added talent acquisition titles",
+                  "Target titles recommended based on scale_ups_midsize profile",
+                  "Confidence: 1.00 (no penalties)"
+                ],
+                "latency_ms": 1,
+                "enriched_input": {
+                  "title": "HR Director",
+                  "department": "HR",
+                  "company_size": 250,
+                  "seniority_level": "Director",
+                  "_seniority_inferred": false,
+                  "_department_inferred": false,
+                  "company_maturity_years": 5,
+                  "hiring_velocity_monthly": 12
+                }
+              },
+              "priority": 1,
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 1,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T10:59:44.838Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": {
+              "match": true,
+              "rule_tier": "STRATEGIC",
+              "tier_match": true,
+              "inline_tier": "STRATEGIC",
+              "rule_priority": 1,
+              "priority_match": true,
+              "confidence_diff": 0,
+              "inline_priority": 1,
+              "rule_confidence": 1,
+              "title_similarity": 1,
+              "inline_confidence": 1
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "266c4bc3-a329-4575-8ebb-e6d2303424f3"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:33.083Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "91c7a36e-3ee2-4062-aed7-ce34a8028975"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:33.048Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "9b37a5f1-cbde-4c6a-b939-430980d2b207"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:33.037Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "bf4c8104-b042-4248-8ca0-1f3869fff3b4"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:33.034Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "b75bf1b3-5999-4449-8d03-cc598d02bc27"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:32.893Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "03f54c3a-630b-492d-9f38-c366c5267e2c"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:32.927Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "5dfcf6fc-0902-4bca-a1d6-b1b8bd0794df"
+        },
+        {
+          "category": "director_contacts",
+          "scenario": "Director level contact",
+          "input": {
+            "title": "HR Director",
+            "department": "HR",
+            "company_size": 250,
+            "seniority_level": "Director",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T09:58:32.881Z",
+              "confidence": 1,
+              "target_titles": [
+                "Head of Talent Acquisition",
+                "VP Talent Acquisition",
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "Talent Acquisition Manager",
+                "HR Ops Manager",
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "a4d5cf06-3773-449e-8038-c770cfb69970"
+        },
+        {
+          "category": "manager_contacts",
+          "scenario": "Manager level contact",
+          "input": {
+            "title": "Operations Manager",
+            "department": "Admin",
+            "company_size": 800,
+            "seniority_level": "Manager",
+            "company_maturity_years": 10,
+            "hiring_velocity_monthly": 3
+          },
+          "expected_output": {
+            "rule": {
+              "tier": "PRIMARY",
+              "_meta": {
+                "scores": {
+                  "total": 55,
+                  "seniority": 20,
+                  "department": 20,
+                  "company_size": 15
+                },
+                "version": "v2.0",
+                "breakdown": [
+                  {
+                    "max": 40,
+                    "step": "seniority_score",
+                    "value": 20,
+                    "reason": "\"Manager\" seniority level"
+                  },
+                  {
+                    "max": 30,
+                    "step": "department_score",
+                    "value": 20,
+                    "reason": "\"Admin\" department"
+                  },
+                  {
+                    "max": 30,
+                    "step": "company_size_score",
+                    "value": 15,
+                    "reason": "Large - less accessible"
+                  },
+                  {
+                    "max": 100,
+                    "step": "total_score",
+                    "value": 55,
+                    "reason": "Sum of seniority + department + company size scores",
+                    "formula": "20 + 20 + 15"
+                  },
+                  {
+                    "step": "tier_classification",
+                    "value": "PRIMARY",
+                    "reason": "High value contacts - VP/Director in other departments or Managers in key departments",
+                    "priority": 2
+                  },
+                  {
+                    "rule": "large_companies",
+                    "step": "target_titles",
+                    "reason": "Matched rule: large_companies",
+                    "target_titles": [
+                      "Payroll Manager",
+                      "Benefits Manager",
+                      "Compensation & Benefits Manager"
+                    ],
+                    "fallback_titles": [
+                      "HR Operations Manager",
+                      "Benefits Coordinator",
+                      "Payroll Director"
+                    ]
+                  },
+                  {
+                    "base": 1,
+                    "step": "confidence_adjustments",
+                    "final": 1,
+                    "reason": "No confidence penalties applied",
+                    "penalties": []
+                  }
+                ],
+                "reasoning": [
+                  "Seniority \"Manager\" provided explicitly",
+                  "Department \"Admin\" provided explicitly",
+                  "Seniority score: 20/40 (Manager)",
+                  "Department score: 20/30 (Admin)",
+                  "Company size score: 15/30 (800 employees - Large - less accessible)",
+                  "Total score: 55/100",
+                  "Classified as \"PRIMARY\" tier (priority 2): High value contacts - VP/Director in other departments or Managers in key departments",
+                  "Target titles recommended based on large_companies profile",
+                  "Confidence: 1.00 (no penalties)"
+                ],
+                "latency_ms": 1,
+                "enriched_input": {
+                  "title": "Operations Manager",
+                  "department": "Admin",
+                  "company_size": 800,
+                  "seniority_level": "Manager",
+                  "_seniority_inferred": false,
+                  "_department_inferred": false,
+                  "company_maturity_years": 10,
+                  "hiring_velocity_monthly": 3
+                }
+              },
+              "priority": 2,
+              "confidence": 1,
+              "target_titles": [
+                "Payroll Manager",
+                "Benefits Manager",
+                "Compensation & Benefits Manager"
+              ],
+              "fallback_titles": [
+                "HR Operations Manager",
+                "Benefits Coordinator",
+                "Payroll Director"
+              ]
+            },
+            "inline": {
+              "tier": "PRIMARY",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "HIGH"
+              },
+              "priority": 2,
+              "timestamp": "2025-11-15T10:59:45.565Z",
+              "confidence": 1,
+              "target_titles": [
+                "Payroll Manager",
+                "Benefits Manager",
+                "Compensation & Benefits Manager"
+              ],
+              "fallback_titles": [
+                "HR Operations Manager",
+                "Benefits Coordinator",
+                "Payroll Director"
+              ]
+            },
+            "comparison": {
+              "match": true,
+              "rule_tier": "PRIMARY",
+              "tier_match": true,
+              "inline_tier": "PRIMARY",
+              "rule_priority": 2,
+              "priority_match": true,
+              "confidence_diff": 0,
+              "inline_priority": 2,
+              "rule_confidence": 1,
+              "title_similarity": 1,
+              "inline_confidence": 1
+            }
+          },
+          "confidence": "1.00",
+          "source": "production",
+          "decision_id": "64ab5da9-6a24-4a13-a1ea-7b8c681bd5cd"
+        },
+        {
+          "category": "other_departments",
+          "scenario": "undefined department contact",
+          "input": {
+            "title": "Founder",
+            "company_size": 30,
+            "company_maturity_years": 1,
+            "hiring_velocity_monthly": 2
+          },
+          "expected_output": {
+            "rule": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "scores": {
+                  "total": 100,
+                  "seniority": 40,
+                  "department": 30,
+                  "company_size": 30
+                },
+                "version": "v2.0",
+                "breakdown": [
+                  {
+                    "step": "infer_seniority",
+                    "value": "C-Level",
+                    "reason": "Inferred from title \"Founder\"",
+                    "keywords_matched": [
+                      "founder"
+                    ]
+                  },
+                  {
+                    "step": "infer_department",
+                    "value": "C-Suite",
+                    "reason": "Inferred from title \"Founder\"",
+                    "keywords_matched": [
+                      "founder"
+                    ]
+                  },
+                  {
+                    "max": 40,
+                    "step": "seniority_score",
+                    "value": 40,
+                    "reason": "\"C-Level\" seniority level"
+                  },
+                  {
+                    "max": 30,
+                    "step": "department_score",
+                    "value": 30,
+                    "reason": "\"C-Suite\" department"
+                  },
+                  {
+                    "max": 30,
+                    "step": "company_size_score",
+                    "value": 30,
+                    "reason": "Startups - very accessible"
+                  },
+                  {
+                    "max": 100,
+                    "step": "total_score",
+                    "value": 100,
+                    "reason": "Sum of seniority + department + company size scores",
+                    "formula": "40 + 30 + 30"
+                  },
+                  {
+                    "step": "tier_classification",
+                    "value": "STRATEGIC",
+                    "reason": "Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+                    "priority": 1
+                  },
+                  {
+                    "rule": "small_startups",
+                    "step": "target_titles",
+                    "reason": "Matched rule: small_startups",
+                    "target_titles": [
+                      "Founder",
+                      "Co-Founder",
+                      "COO",
+                      "CEO"
+                    ],
+                    "fallback_titles": [
+                      "Operations Manager",
+                      "Office Manager",
+                      "CFO"
+                    ]
+                  },
+                  {
+                    "base": 1,
+                    "step": "confidence_adjustments",
+                    "final": 0.65,
+                    "reason": "Applied 3 confidence penalties",
+                    "penalties": [
+                      {
+                        "reason": "Had to infer seniority from title",
+                        "penalty": 0.15,
+                        "condition": "seniority_inferred"
+                      },
+                      {
+                        "reason": "Had to infer department from title",
+                        "penalty": 0.1,
+                        "condition": "department_inferred"
+                      },
+                      {
+                        "reason": "Title has ≤1 word (ambiguous)",
+                        "penalty": 0.1,
+                        "condition": "short_title"
+                      }
+                    ]
+                  }
+                ],
+                "reasoning": [
+                  "Seniority \"C-Level\" inferred from title keywords: founder",
+                  "Department \"C-Suite\" inferred from title keywords: founder",
+                  "Seniority score: 40/40 (C-Level)",
+                  "Department score: 30/30 (C-Suite)",
+                  "Company size score: 30/30 (30 employees - Startups - very accessible)",
+                  "Total score: 100/100",
+                  "Classified as \"STRATEGIC\" tier (priority 1): Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+                  "Target titles recommended based on small_startups profile",
+                  "Confidence: 0.65 (-0.15 for seniority_inferred, -0.1 for department_inferred, -0.1 for short_title)"
+                ],
+                "latency_ms": 0,
+                "enriched_input": {
+                  "title": "Founder",
+                  "department": "C-Suite",
+                  "company_size": 30,
+                  "seniority_level": "C-Level",
+                  "_seniority_inferred": true,
+                  "_department_inferred": true,
+                  "company_maturity_years": 1,
+                  "hiring_velocity_monthly": 2
+                }
+              },
+              "priority": 1,
+              "confidence": 0.65,
+              "target_titles": [
+                "Founder",
+                "Co-Founder",
+                "COO",
+                "CEO"
+              ],
+              "fallback_titles": [
+                "Operations Manager",
+                "Office Manager",
+                "CFO"
+              ]
+            },
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 1,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "LOW",
+                "inferred_seniority": "C-Level",
+                "inferred_department": "C-Suite"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T10:59:45.080Z",
+              "confidence": 0.65,
+              "target_titles": [
+                "Founder",
+                "Co-Founder",
+                "COO",
+                "CEO"
+              ],
+              "fallback_titles": [
+                "Operations Manager",
+                "Office Manager",
+                "CFO"
+              ]
+            },
+            "comparison": {
+              "match": true,
+              "rule_tier": "STRATEGIC",
+              "tier_match": true,
+              "inline_tier": "STRATEGIC",
+              "rule_priority": 1,
+              "priority_match": true,
+              "confidence_diff": 0,
+              "inline_priority": 1,
+              "rule_confidence": 0.65,
+              "title_similarity": 1,
+              "inline_confidence": 0.65
+            }
+          },
+          "confidence": "0.65",
+          "source": "production",
+          "decision_id": "6ef574d0-10ab-4eb5-9158-dc1598046926"
+        },
+        {
+          "category": "other_departments",
+          "scenario": "undefined department contact",
+          "input": {
+            "title": "CEO",
+            "company_size": 50,
+            "company_maturity_years": 2,
+            "hiring_velocity_monthly": 3
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 0,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "LOW",
+                "inferred_seniority": "C-Level",
+                "inferred_department": "C-Suite"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T08:00:21.677Z",
+              "confidence": 0.65,
+              "target_titles": [
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "0.65",
+          "source": "production",
+          "decision_id": "da552baa-94f2-45eb-8379-ae9b60785c23"
+        },
+        {
+          "category": "other_departments",
+          "scenario": "undefined department contact",
+          "input": {
+            "title": "CEO",
+            "company_size": 50,
+            "company_maturity_years": 2,
+            "hiring_velocity_monthly": 3
+          },
+          "expected_output": {
+            "rule": null,
+            "inline": {
+              "tier": "STRATEGIC",
+              "_meta": {
+                "tool_name": "select_contact_tier",
+                "tool_type": "STRICT",
+                "latency_ms": 1,
+                "policy_version": "v2.0"
+              },
+              "metadata": {
+                "confidenceLevel": "LOW",
+                "inferred_seniority": "C-Level",
+                "inferred_department": "C-Suite"
+              },
+              "priority": 1,
+              "timestamp": "2025-11-15T08:00:21.303Z",
+              "confidence": 0.65,
+              "target_titles": [
+                "HR Director",
+                "Director of HR",
+                "HR Manager",
+                "People Director"
+              ],
+              "fallback_titles": [
+                "HR Business Partner",
+                "Senior HR Manager",
+                "VP HR"
+              ]
+            },
+            "comparison": null
+          },
+          "confidence": "0.65",
+          "source": "production",
+          "decision_id": "47a2d2bc-7efd-4d74-a3ff-75dbfcd478e4"
+        }
+      ]
+    },
+    "TimingScoreTool": {
+      "total_examples": 5,
+      "examples": [
+        {
+          "category": "fresh_signals",
+          "scenario": "Fresh signal (≤7 days) - HOT priority",
+          "input": {
+            "signal_age_days": 3,
+            "signals": [
+              "new_hire",
+              "job_posting"
+            ],
+            "fiscal_context": "mid_year"
+          },
+          "expected_output": {
+            "priority": "HOT",
+            "timing_score": 90,
+            "urgency": "immediate"
+          },
+          "confidence": 0.95,
+          "source": "synthetic"
+        },
+        {
+          "category": "recent_signals",
+          "scenario": "Recent signal (8-30 days) - WARM priority",
+          "input": {
+            "signal_age_days": 15,
+            "signals": [
+              "new_hire"
+            ],
+            "fiscal_context": "mid_year"
+          },
+          "expected_output": {
+            "priority": "WARM",
+            "timing_score": 70,
+            "urgency": "high"
+          },
+          "confidence": 0.9,
+          "source": "synthetic"
+        },
+        {
+          "category": "stale_signals",
+          "scenario": "Stale signal (31-90 days) - COOL priority",
+          "input": {
+            "signal_age_days": 60,
+            "signals": [
+              "new_hire"
+            ],
+            "fiscal_context": "mid_year"
+          },
+          "expected_output": {
+            "priority": "COOL",
+            "timing_score": 40,
+            "urgency": "medium"
+          },
+          "confidence": 0.85,
+          "source": "synthetic"
+        },
+        {
+          "category": "old_signals",
+          "scenario": "Old signal (>90 days) - COLD priority",
+          "input": {
+            "signal_age_days": 120,
+            "signals": [
+              "new_hire"
+            ],
+            "fiscal_context": "mid_year"
+          },
+          "expected_output": {
+            "priority": "COLD",
+            "timing_score": 10,
+            "urgency": "low"
+          },
+          "confidence": 0.8,
+          "source": "synthetic"
+        },
+        {
+          "category": "fiscal_context_boost",
+          "scenario": "Q4 fiscal context (+10 score boost)",
+          "input": {
+            "signal_age_days": 20,
+            "signals": [
+              "new_hire",
+              "expansion"
+            ],
+            "fiscal_context": "q4"
+          },
+          "expected_output": {
+            "priority": "HOT",
+            "timing_score": 80,
+            "urgency": "high"
+          },
+          "confidence": 0.9,
+          "source": "synthetic"
+        }
+      ]
+    },
+    "BankingProductMatchTool": {
+      "total_examples": 3,
+      "examples": [
+        {
+          "category": "startup_profile",
+          "scenario": "Early-stage startup (10-50 employees)",
+          "input": {
+            "company_size": 30,
+            "industry": "Technology",
+            "company_maturity_years": 2,
+            "hiring_velocity_monthly": 3
+          },
+          "expected_output": {
+            "recommended_products": [
+              "Startup Business Account",
+              "Merchant Services",
+              "Payroll Services"
+            ],
+            "confidence": 0.9
+          },
+          "confidence": 0.9,
+          "source": "synthetic"
+        },
+        {
+          "category": "midsize_profile",
+          "scenario": "Midsize company (50-200 employees)",
+          "input": {
+            "company_size": 150,
+            "industry": "Technology",
+            "company_maturity_years": 5,
+            "hiring_velocity_monthly": 8
+          },
+          "expected_output": {
+            "recommended_products": [
+              "Business Banking",
+              "Corporate Card",
+              "Treasury Management",
+              "Credit Line"
+            ],
+            "confidence": 0.95
+          },
+          "confidence": 0.95,
+          "source": "synthetic"
+        },
+        {
+          "category": "large_enterprise",
+          "scenario": "Large enterprise (500+ employees)",
+          "input": {
+            "company_size": 750,
+            "industry": "Finance",
+            "company_maturity_years": 15,
+            "hiring_velocity_monthly": 12
+          },
+          "expected_output": {
+            "recommended_products": [
+              "Corporate Banking",
+              "Treasury Services",
+              "Trade Finance",
+              "FX Services"
+            ],
+            "confidence": 0.95
+          },
+          "confidence": 0.95,
+          "source": "synthetic"
+        }
+      ]
+    }
+  }
+}

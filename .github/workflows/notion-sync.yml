@@ -1,0 +1,80 @@
+name: Notion Auto-Sync
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+  workflow_dispatch:
+    inputs:
+      sprint_number:
+        description: 'Sprint number to close (optional)'
+        required: false
+
+jobs:
+  sync-to-notion:
+    name: Sync Sprint Data to Notion
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for commit range tracking
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: scripts/notion/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd scripts/notion
+          npm ci
+
+      - name: Sync sprint log to Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          JOURNAL_DB_ID: ${{ secrets.JOURNAL_DB_ID }}
+          MODULES_DB_ID: ${{ secrets.MODULES_DB_ID }}
+          WORK_ITEMS_DB_ID: ${{ secrets.WORK_ITEMS_DB_ID }}
+        run: |
+          cd scripts/notion
+          npm run sprint:sync
+
+      - name: Calculate and push metrics
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          JOURNAL_DB_ID: ${{ secrets.JOURNAL_DB_ID }}
+          MODULES_DB_ID: ${{ secrets.MODULES_DB_ID }}
+          WORK_ITEMS_DB_ID: ${{ secrets.WORK_ITEMS_DB_ID }}
+        run: |
+          cd scripts/notion
+          node calculateMetrics.js
+
+      - name: Close sprint (if specified)
+        if: github.event.inputs.sprint_number != ''
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          JOURNAL_DB_ID: ${{ secrets.JOURNAL_DB_ID }}
+        run: |
+          cd scripts/notion
+          npm run sprint:close ${{ github.event.inputs.sprint_number }}
+
+      - name: Add Notion comment
+        if: success()
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          echo "🚀 Deployment synced to Notion"
+          echo "   Branch: ${{ github.ref_name }}"
+          echo "   Commit: ${{ github.sha }}"
+          echo "   Workflow: ${{ github.workflow }}"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Notion sync failed"
+          echo "Check the logs above for details"

@@ -1,0 +1,289 @@
+{
+  "version": "v2.0",
+  "created_at": "2025-11-15T00:00:00.000Z",
+  "description": "Executable cognitive rules matching SIVA tool implementations (Sprint 22)",
+  "rules": {
+    "evaluate_company_quality": {
+      "type": "formula",
+      "description": "Score company fit based on UAE presence, salary, size, industry (matches CompanyQualityToolStandalone.js v2.0 logic)",
+      "formula": "uae_salary_score + size_score + industry_score + domain_score",
+      "output_range": [0, 100],
+      "variables": {
+        "uae_salary_score": {
+          "type": "composite",
+          "description": "Combined UAE presence and salary level scoring (0-40 points)",
+          "logic": "if (salary_level == 'high' && uae_presence == 'strong') then 40 else if (salary_level == 'high') then 25 else if (uae_presence == 'strong') then 20 else if (salary_level == 'medium' && uae_presence == 'moderate') then 15 else 0"
+        },
+        "salary_level": {
+          "type": "computed",
+          "description": "Infer salary level from indicators",
+          "logic": "if (input.salary_indicators.salary_level) use it, else if (avg_salary >= 15000) 'high' else if (avg_salary >= 8000) 'medium' else 'low'"
+        },
+        "uae_presence": {
+          "type": "computed",
+          "description": "Calculate UAE presence strength",
+          "logic": "if (has_ae_domain && has_uae_address) 'strong' else if (has_ae_domain || has_uae_address) 'moderate' else if (linkedin_location contains 'uae') 'weak' else 'none'"
+        },
+        "size_score": {
+          "type": "lookup_table",
+          "input": "size",
+          "description": "Company size scoring (0-20 points)",
+          "table": [
+            {"range": [50, 500], "value": 20},
+            {"range": [1, 49], "value": 10},
+            {"range": [501, 999999], "value": 5}
+          ],
+          "fallback_size_bucket": {
+            "scaleup": 15,
+            "midsize": 15,
+            "enterprise": 5
+          }
+        },
+        "industry_score": {
+          "type": "mapping",
+          "input": "industry",
+          "description": "Industry bonus (0-15 points)",
+          "map": {
+            "FinTech": 15,
+            "fintech": 15,
+            "Technology": 15,
+            "technology": 15,
+            "tech": 15,
+            "Healthcare": 15,
+            "healthcare": 15,
+            "Health Tech": 15,
+            "healthtech": 15
+          },
+          "default": 0
+        },
+        "domain_score": {
+          "type": "conditional",
+          "description": "Domain verification (0-10 points)",
+          "logic": "if domain ends with '.ae' then 10 else if domain exists then 5 else 0"
+        }
+      },
+      "edge_cases": [
+        {
+          "name": "Enterprise Brand Exclusion",
+          "condition": {
+            "field": "company_name",
+            "operator": "contains_any_ignore_case",
+            "values": ["Etihad", "Emirates", "ADNOC", "Emaar", "DP World"]
+          },
+          "action": {
+            "multiply": 0.1
+          },
+          "reason": "Major enterprise brand - conversion probability extremely low"
+        },
+        {
+          "name": "Government Sector Exclusion",
+          "condition": {
+            "field": "sector",
+            "operator": "contains_ignore_case",
+            "value": "government"
+          },
+          "action": {
+            "multiply": 0.05
+          },
+          "reason": "Government entity - ENBD policy restricts outreach"
+        },
+        {
+          "name": "Free Zone Bonus",
+          "condition": {
+            "field": "license_type",
+            "operator": "contains_ignore_case",
+            "value": "free zone"
+          },
+          "action": {
+            "multiply": 1.3
+          },
+          "reason": "Free zone license - favorable business environment"
+        }
+      ]
+    },
+    "select_contact_tier": {
+      "type": "decision_tree",
+      "description": "Classify contact into VIP/PRIORITY/QUALIFIED/EXPLORE tiers",
+      "branches": [
+        {
+          "name": "VIP Tier",
+          "condition": {
+            "all": [
+              {"field": "seniority", "operator": "in", "values": ["C-Suite", "VP"]},
+              {"field": "department", "operator": "in", "values": ["Finance", "HR", "Operations"]},
+              {"field": "company_size", "operator": ">=", "value": 100},
+              {"field": "company_quality_score", "operator": ">=", "value": 70}
+            ]
+          },
+          "output": "VIP",
+          "reasoning": "C-level or VP in key department at large high-quality company",
+          "confidence": 0.95
+        },
+        {
+          "name": "Priority Tier",
+          "condition": {
+            "all": [
+              {"field": "seniority", "operator": "in", "values": ["Director", "Manager"]},
+              {"field": "department", "operator": "in", "values": ["Finance", "HR"]},
+              {"field": "company_quality_score", "operator": ">=", "value": 60}
+            ]
+          },
+          "output": "PRIORITY",
+          "reasoning": "Mid-senior level in key department at quality company",
+          "confidence": 0.85
+        },
+        {
+          "name": "Qualified Tier",
+          "condition": {
+            "any": [
+              {"field": "company_quality_score", "operator": ">=", "value": 50},
+              {"field": "department", "operator": "in", "values": ["Finance", "HR", "Operations"]}
+            ]
+          },
+          "output": "QUALIFIED",
+          "reasoning": "Meets minimum quality threshold or in key department",
+          "confidence": 0.70
+        },
+        {
+          "name": "Explore Tier (Default)",
+          "condition": {
+            "always": true
+          },
+          "output": "EXPLORE",
+          "reasoning": "Below qualification thresholds - exploratory outreach only",
+          "confidence": 0.50
+        }
+      ]
+    },
+    "calculate_timing_score": {
+      "type": "formula",
+      "description": "Calculate timing score based on calendar, signal recency, and decision velocity",
+      "formula": "base_score * calendar_multiplier * signal_recency_multiplier * signal_type_modifier",
+      "output_range": [0, 100],
+      "variables": {
+        "base_score": {
+          "type": "constant",
+          "value": 50,
+          "description": "Base timing score"
+        },
+        "calendar_multiplier": {
+          "type": "mapping",
+          "input": "calendar_context",
+          "description": "Calendar timing factor",
+          "map": {
+            "Q1_BUDGET": 1.5,
+            "Q4_PLANNING": 1.2,
+            "REGULAR": 1.0,
+            "SUMMER": 0.7,
+            "RAMADAN": 0.3
+          },
+          "default": 1.0
+        },
+        "signal_recency_multiplier": {
+          "type": "computed",
+          "input": "signal_date",
+          "description": "Signal freshness factor",
+          "logic": "days_ago = (now - signal_date) / 86400000; if days_ago <= 7 then 1.5 else if days_ago <= 30 then 1.3 else if days_ago <= 90 then 1.0 else 0.6"
+        },
+        "signal_type_modifier": {
+          "type": "mapping",
+          "input": "signal_type",
+          "description": "Signal type importance",
+          "map": {
+            "HIRING": 1.2,
+            "FUNDING": 1.3,
+            "EXPANSION": 1.2,
+            "PARTNERSHIP": 1.1,
+            "OTHER": 1.0
+          },
+          "default": 1.0
+        }
+      }
+    },
+    "check_edge_cases": {
+      "type": "rule_list",
+      "description": "Detect blockers, warnings, and special handling requirements",
+      "rules": [
+        {
+          "name": "Enterprise Brand Blocker",
+          "type": "BLOCKER",
+          "condition": {
+            "field": "company_name",
+            "operator": "contains_any_ignore_case",
+            "values": ["Etihad", "Emirates", "ADNOC", "Emaar", "DP World"]
+          },
+          "recommendation": "DO_NOT_CONTACT",
+          "reason": "Major enterprise brand - existing banking relationships likely"
+        },
+        {
+          "name": "Government Sector Blocker",
+          "condition": {
+            "field": "sector",
+            "operator": "contains_ignore_case",
+            "value": "government"
+          },
+          "type": "BLOCKER",
+          "recommendation": "DO_NOT_CONTACT",
+          "reason": "Government entity - ENBD policy restricts outreach"
+        },
+        {
+          "name": "Low Quality Warning",
+          "type": "WARNING",
+          "condition": {
+            "field": "company_quality_score",
+            "operator": "<",
+            "value": 30
+          },
+          "recommendation": "REVIEW_MANUALLY",
+          "reason": "Company quality below threshold"
+        },
+        {
+          "name": "Poor Timing Warning",
+          "type": "WARNING",
+          "condition": {
+            "field": "timing_score",
+            "operator": "<",
+            "value": 40
+          },
+          "recommendation": "DELAY_OUTREACH",
+          "reason": "Timing conditions unfavorable"
+        },
+        {
+          "name": "Free Zone Priority",
+          "type": "SPECIAL_HANDLING",
+          "condition": {
+            "field": "license_type",
+            "operator": "contains_ignore_case",
+            "value": "free zone"
+          },
+          "recommendation": "PRIORITY_QUEUE",
+          "reason": "Free zone license - favorable business environment"
+        },
+        {
+          "name": "VIP + High Quality Executive Review",
+          "type": "SPECIAL_HANDLING",
+          "condition": {
+            "all": [
+              {"field": "contact_tier", "operator": "==", "value": "VIP"},
+              {"field": "company_quality_score", "operator": ">=", "value": 70}
+            ]
+          },
+          "recommendation": "EXECUTIVE_REVIEW",
+          "reason": "VIP contact at high-quality company requires approval"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "sprint": 22,
+    "phase": "SIVA Phase 6 - Rule Engine Integration",
+    "notes": "Executable rules compatible with existing rule-engine.js. Simplified from actual tool implementations but preserves core logic and scoring.",
+    "compatible_with_engine": "rule-engine.js v1.0 (Sprint 21)",
+    "compatible_with_tools": {
+      "CompanyQualityToolStandalone.js": "v2.0 (simplified scoring)",
+      "ContactTierToolStandalone.js": "v2.0",
+      "TimingScoreToolStandalone.js": "v2.0 (simplified factors)",
+      "EdgeCasesToolStandalone.js": "v2.0"
+    }
+  }
+}

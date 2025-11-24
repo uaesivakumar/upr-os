@@ -1,0 +1,182 @@
+{
+  "rule_name": "select_contact_tier",
+  "version": "v2.0",
+  "description": "Contact tier classification and target title recommendation based on seniority, department, and company profile",
+  "input_schema": {
+    "title": "string",
+    "department": "string (optional)",
+    "seniority_level": "string (optional)",
+    "company_size": "number",
+    "hiring_velocity_monthly": "number (optional, default: 0)",
+    "company_maturity_years": "number (optional, default: 0)"
+  },
+  "output_schema": {
+    "tier": "STRATEGIC | PRIMARY | SECONDARY | BACKUP",
+    "priority": "1 | 2 | 3 | 4",
+    "confidence": "number (0.0-1.0)",
+    "target_titles": "array of strings",
+    "fallback_titles": "array of strings"
+  },
+  "inference_rules": {
+    "infer_seniority": {
+      "description": "Infer seniority level from job title if not provided",
+      "keywords": {
+        "C-Level": ["ceo", "cfo", "coo", "cto", "chief", "founder", "president", "managing director"],
+        "VP": ["vp", "vice president", "svp", "senior vice president", "evp", "executive vice president"],
+        "Director": ["director", "head of", "lead"],
+        "Manager": ["manager", "mgr", "supervisor", "team lead"],
+        "Individual": ["specialist", "coordinator", "analyst", "associate", "executive", "officer"]
+      },
+      "default": "Unknown"
+    },
+    "infer_department": {
+      "description": "Infer department from job title if not provided",
+      "keywords": {
+        "HR": ["hr", "human resources", "people", "talent", "recruitment", "recruiting"],
+        "Finance": ["finance", "financial", "accounting", "treasury", "payroll"],
+        "Admin": ["admin", "administration", "operations", "office manager"],
+        "C-Suite": ["ceo", "cfo", "coo", "cto", "founder", "president", "chief"]
+      },
+      "default": "Other"
+    }
+  },
+  "scoring_rules": {
+    "seniority_score": {
+      "description": "Score seniority level (0-40 points)",
+      "weights": {
+        "C-Level": 40,
+        "VP": 35,
+        "Director": 30,
+        "Manager": 20,
+        "Individual": 10,
+        "Unknown": 5
+      }
+    },
+    "department_score": {
+      "description": "Score department (0-30 points)",
+      "weights": {
+        "HR": 30,
+        "C-Suite": 30,
+        "Finance": 25,
+        "Admin": 20,
+        "Other": 10
+      }
+    },
+    "company_size_score": {
+      "description": "Score company size - smaller companies get higher scores (more accessible)",
+      "buckets": [
+        {"range": [0, 50], "score": 30, "label": "Startups - very accessible"},
+        {"range": [50, 200], "score": 25, "label": "Small companies - accessible"},
+        {"range": [200, 500], "score": 20, "label": "Mid-size - moderate"},
+        {"range": [500, 1000], "score": 15, "label": "Large - less accessible"},
+        {"range": [1000, 999999], "score": 10, "label": "Enterprise - difficult"}
+      ]
+    }
+  },
+  "tier_classification_rules": {
+    "STRATEGIC": {
+      "priority": 1,
+      "description": "Highest value contacts - C-Suite or VP/Director in key departments or small companies",
+      "conditions": [
+        {"seniority": "C-Level"},
+        {"seniority": ["VP", "Director"], "department": ["HR", "Finance", "Admin"]},
+        {"company_size": {"max": 200}, "seniority": ["VP", "Director", "Manager"]}
+      ]
+    },
+    "PRIMARY": {
+      "priority": 2,
+      "description": "High value contacts - VP/Director in other departments or Managers in key departments",
+      "conditions": [
+        {"seniority": ["VP", "Director"]},
+        {"seniority": "Manager", "department": ["HR", "Finance", "Admin"]},
+        {"company_size": {"min": 200, "max": 500}, "seniority": "Manager"}
+      ]
+    },
+    "SECONDARY": {
+      "priority": 3,
+      "description": "Medium value contacts - Managers in other departments or Individual contributors in key departments",
+      "conditions": [
+        {"seniority": "Manager"},
+        {"seniority": "Individual", "department": ["HR", "Finance", "Admin"]},
+        {"company_size": {"min": 500, "max": 1000}}
+      ]
+    },
+    "BACKUP": {
+      "priority": 4,
+      "description": "Lower priority contacts - all other contacts",
+      "conditions": [
+        {"default": true}
+      ]
+    }
+  },
+  "target_titles_rules": {
+    "description": "Recommend target job titles based on company profile",
+    "rules": [
+      {
+        "name": "small_startups",
+        "condition": {
+          "company_size": {"max": 50},
+          "company_maturity_years": {"max": 2}
+        },
+        "target_titles": ["Founder", "Co-Founder", "COO", "CEO"],
+        "fallback_titles": ["Operations Manager", "Office Manager", "CFO"]
+      },
+      {
+        "name": "scale_ups_midsize",
+        "condition": {
+          "company_size": {"min": 50, "max": 500}
+        },
+        "target_titles": ["HR Director", "Director of HR", "HR Manager", "People Director"],
+        "fallback_titles": ["HR Business Partner", "Senior HR Manager", "VP HR"]
+      },
+      {
+        "name": "large_companies",
+        "condition": {
+          "company_size": {"min": 500}
+        },
+        "target_titles": ["Payroll Manager", "Benefits Manager", "Compensation & Benefits Manager"],
+        "fallback_titles": ["HR Operations Manager", "Benefits Coordinator", "Payroll Director"]
+      },
+      {
+        "name": "very_small_default",
+        "condition": {
+          "default": true
+        },
+        "target_titles": ["Founder", "CEO", "Operations Manager"],
+        "fallback_titles": ["Office Manager", "Admin Manager"]
+      }
+    ],
+    "high_hiring_velocity_modifier": {
+      "description": "For companies hiring > 10 people/month, add talent acquisition titles to the front",
+      "condition": {
+        "hiring_velocity_monthly": {"min": 10}
+      },
+      "prepend_target_titles": ["Head of Talent Acquisition", "VP Talent Acquisition"],
+      "prepend_fallback_titles": ["Talent Acquisition Manager", "HR Ops Manager"]
+    }
+  },
+  "confidence_adjustments": {
+    "description": "Adjust confidence score based on data quality",
+    "base_confidence": 1.0,
+    "penalties": [
+      {"condition": "seniority_inferred", "penalty": 0.15, "reason": "Had to infer seniority from title"},
+      {"condition": "department_inferred", "penalty": 0.10, "reason": "Had to infer department from title"},
+      {"condition": "short_title", "penalty": 0.10, "reason": "Title has ≤1 word (ambiguous)"}
+    ],
+    "min_confidence": 0.0,
+    "max_confidence": 1.0
+  },
+  "confidence_level_classification": {
+    "HIGH": {"min": 0.90},
+    "MEDIUM": {"min": 0.75, "max": 0.90},
+    "LOW": {"max": 0.75}
+  },
+  "metadata": {
+    "created": "2025-11-15",
+    "author": "SIVA Phase 6 - Sprint 23",
+    "tool_type": "STRICT",
+    "sla_p50_ms": 200,
+    "sla_p95_ms": 600,
+    "notes": "Extracted from ContactTierToolStandalone.js inline logic for shadow mode comparison"
+  }
+}

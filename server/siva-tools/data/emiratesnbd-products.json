@@ -1,0 +1,207 @@
+{
+  "salary_accounts": [
+    {
+      "product_id": "salary_account_basic",
+      "product_name": "Emirates NBD Salary Account",
+      "product_category": "Salary Accounts",
+      "min_salary_aed": 5000,
+      "max_salary_aed": 10000,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "entry_level",
+      "key_benefits": [
+        "Free account opening",
+        "No minimum balance",
+        "Debit card included",
+        "Online/mobile banking"
+      ],
+      "base_fit_score": 60
+    },
+    {
+      "product_id": "salary_account_plus",
+      "product_name": "Emirates NBD Salary Account Plus",
+      "product_category": "Salary Accounts",
+      "min_salary_aed": 10000,
+      "max_salary_aed": null,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "mid_market",
+      "key_benefits": [
+        "Premium debit card",
+        "Higher transaction limits",
+        "Priority customer service",
+        "Insurance coverage"
+      ],
+      "base_fit_score": 75
+    },
+    {
+      "product_id": "salary_account_premium",
+      "product_name": "Emirates NBD Premium Salary Account",
+      "product_category": "Salary Accounts",
+      "min_salary_aed": 25000,
+      "max_salary_aed": null,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "premium",
+      "key_benefits": [
+        "Premium banking privileges",
+        "Dedicated relationship manager",
+        "Preferential rates",
+        "Complimentary services"
+      ],
+      "base_fit_score": 85
+    }
+  ],
+  "credit_cards": [
+    {
+      "product_id": "credit_card_solitaire",
+      "product_name": "Emirates NBD Solitaire Credit Card",
+      "product_category": "Credit Cards",
+      "min_salary_aed": 5000,
+      "max_salary_aed": null,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "entry_level",
+      "key_benefits": [
+        "Cashback on all purchases",
+        "No annual fee first year",
+        "Balance transfer option"
+      ],
+      "base_fit_score": 65
+    },
+    {
+      "product_id": "credit_card_skywards",
+      "product_name": "Emirates NBD Skywards Credit Card",
+      "product_category": "Credit Cards",
+      "min_salary_aed": 10000,
+      "max_salary_aed": 1000000,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "mid_market",
+      "key_benefits": [
+        "Earn Skywards Miles on purchases",
+        "Complimentary lounge access",
+        "Travel insurance included",
+        "Meet & Greet services"
+      ],
+      "base_fit_score": 80,
+      "industry_bonus": {
+        "tech": 10,
+        "fintech": 15,
+        "aviation": 20
+      }
+    },
+    {
+      "product_id": "credit_card_infinite",
+      "product_name": "Emirates NBD Infinite Credit Card",
+      "product_category": "Credit Cards",
+      "min_salary_aed": 25000,
+      "max_salary_aed": 1000000,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "premium",
+      "key_benefits": [
+        "Unlimited airport lounge access",
+        "Concierge services",
+        "Premium travel benefits",
+        "High rewards rate"
+      ],
+      "base_fit_score": 90
+    },
+    {
+      "product_id": "credit_card_marriott",
+      "product_name": "Emirates NBD Marriott Bonvoy Credit Card",
+      "product_category": "Credit Cards",
+      "min_salary_aed": 15000,
+      "max_salary_aed": 1000000,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "mid_market",
+      "key_benefits": [
+        "Earn Marriott Bonvoy points",
+        "Complimentary night certificates",
+        "Elite status benefits"
+      ],
+      "base_fit_score": 75,
+      "industry_bonus": {
+        "hospitality": 15,
+        "travel": 10
+      }
+    }
+  ],
+  "business_accounts": [
+    {
+      "product_id": "business_current_account",
+      "product_name": "Business Current Account",
+      "product_category": "Business Banking",
+      "min_salary_aed": null,
+      "max_salary_aed": null,
+      "company_size_min": 1,
+      "company_size_max": 50,
+      "target_segment": "sme",
+      "key_benefits": [
+        "Free online banking",
+        "Cash management tools",
+        "Multi-currency account option"
+      ],
+      "base_fit_score": 70
+    },
+    {
+      "product_id": "corporate_account",
+      "product_name": "Corporate Banking Account",
+      "product_category": "Business Banking",
+      "min_salary_aed": null,
+      "max_salary_aed": null,
+      "company_size_min": 50,
+      "company_size_max": 1000000,
+      "target_segment": "corporate",
+      "key_benefits": [
+        "Dedicated relationship manager",
+        "Treasury services",
+        "Trade finance solutions",
+        "Cash pooling"
+      ],
+      "base_fit_score": 85
+    }
+  ],
+  "personal_loans": [
+    {
+      "product_id": "personal_loan_standard",
+      "product_name": "Emirates NBD Personal Loan",
+      "product_category": "Personal Loans",
+      "min_salary_aed": 5000,
+      "max_salary_aed": 1000000,
+      "company_size_min": 1,
+      "company_size_max": 1000000,
+      "target_segment": "all",
+      "key_benefits": [
+        "Competitive interest rates",
+        "Flexible repayment terms",
+        "Quick approval process"
+      ],
+      "base_fit_score": 60
+    }
+  ],
+  "insurance_products": [
+    {
+      "product_id": "life_insurance",
+      "product_name": "Life Insurance Coverage",
+      "product_category": "Insurance",
+      "min_salary_aed": 8000,
+      "max_salary_aed": 1000000,
+      "company_size_min": 20,
+      "company_size_max": 1000000,
+      "target_segment": "corporate",
+      "key_benefits": [
+        "Comprehensive life coverage",
+        "Group discounts",
+        "Flexible premium payments"
+      ],
+      "base_fit_score": 70,
+      "industry_bonus": {
+        "healthcare": 10,
+        "construction": 15
+      }
+    }
+  ]
+}

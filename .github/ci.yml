@@ -1,0 +1,39 @@
+# .github/workflows/ci.yml
+name: Continuous Integration
+
+# This workflow will run automatically on every push to the 'main' branch,
+# and on any pull request that targets the 'main' branch.
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Run Frontend Test Suite
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
+
+    - name: Install root dependencies
+      run: npm install
+
+    - name: Install dashboard dependencies
+      run: npm install --prefix dashboard
+
+    - name: Run frontend test suite
+      run: npm test --prefix dashboard

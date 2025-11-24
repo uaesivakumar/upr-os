@@ -1,0 +1,99 @@
+{
+  "totalDecisions": 194,
+  "segmentDistribution": {
+    "sme": 194
+  },
+  "industryDistribution": {
+    "technology": 194
+  },
+  "confidenceLevels": {
+    "HIGH": 194,
+    "MEDIUM": 0,
+    "LOW": 0
+  },
+  "productRecommendationsBySegment": {
+    "sme": {
+      "Emirates NBD Salary Account Plus": {
+        "count": 194,
+        "avgFitScore": "100.0",
+        "avgPriority": "1.0"
+      },
+      "Emirates NBD Skywards Credit Card": {
+        "count": 194,
+        "avgFitScore": "100.0",
+        "avgPriority": "2.0"
+      },
+      "Emirates NBD Marriott Bonvoy Credit Card": {
+        "count": 194,
+        "avgFitScore": "100.0",
+        "avgPriority": "3.0"
+      },
+      "Emirates NBD Solitaire Credit Card": {
+        "count": 194,
+        "avgFitScore": "96.0",
+        "avgPriority": "4.0"
+      },
+      "Emirates NBD Personal Loan": {
+        "count": 194,
+        "avgFitScore": "90.0",
+        "avgPriority": "5.0"
+      }
+    }
+  },
+  "productRecommendationsByIndustry": {
+    "technology": {
+      "Emirates NBD Salary Account Plus": {
+        "count": 194,
+        "avgFitScore": "100.0"
+      },
+      "Emirates NBD Skywards Credit Card": {
+        "count": 194,
+        "avgFitScore": "100.0"
+      },
+      "Emirates NBD Marriott Bonvoy Credit Card": {
+        "count": 194,
+        "avgFitScore": "100.0"
+      },
+      "Emirates NBD Solitaire Credit Card": {
+        "count": 194,
+        "avgFitScore": "96.0"
+      },
+      "Emirates NBD Personal Loan": {
+        "count": 194,
+        "avgFitScore": "90.0"
+      }
+    }
+  },
+  "fitScoreDistribution": {
+    "Salary Accounts": {
+      "count": 194,
+      "avg": "100.0",
+      "min": 100,
+      "max": 100
+    },
+    "Credit Cards": {
+      "count": 582,
+      "avg": "98.7",
+      "min": 96,
+      "max": 100
+    },
+    "Personal Loans": {
+      "count": 194,
+      "avg": "90.0",
+      "min": 90,
+      "max": 90
+    }
+  },
+  "signalImpact": {
+    "expansion": {
+      "count": 194,
+      "avgTopFitScore": "100.0"
+    },
+    "hiring": {
+      "count": 194,
+      "avgTopFitScore": "100.0"
+    }
+  },
+  "edgeCases": [],
+  "extractedAt": "2025-11-16T03:19:21.316Z"
+}

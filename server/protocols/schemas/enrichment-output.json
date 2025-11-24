@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://upr.ai/schemas/enrichment-output.json",
+  "title": "Enrichment Output",
+  "description": "Output schema for enrichment agent",
+  "type": "object",
+  "required": ["leadsFound", "leads", "costUsd", "latencyMs"],
+  "properties": {
+    "leadsFound": {
+      "type": "integer",
+      "description": "Number of leads found",
+      "minimum": 0
+    },
+    "leads": {
+      "type": "array",
+      "description": "Array of enriched leads",
+      "items": {
+        "type": "object",
+        "required": ["name", "designation"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Person's full name",
+            "minLength": 1
+          },
+          "designation": {
+            "type": "string",
+            "description": "Job title/designation",
+            "minLength": 1
+          },
+          "email": {
+            "type": ["string", "null"],
+            "description": "Email address",
+            "format": "email"
+          },
+          "linkedin_url": {
+            "type": ["string", "null"],
+            "description": "LinkedIn profile URL",
+            "format": "uri"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence score (0-1)",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "source": {
+            "type": "string",
+            "description": "Data source",
+            "enum": ["apollo", "rocketreach", "hunter", "linkedin", "manual", "other"]
+          },
+          "email_verified": {
+            "type": ["boolean", "null"],
+            "description": "Email verification status"
+          },
+          "phone": {
+            "type": ["string", "null"],
+            "description": "Phone number"
+          },
+          "location": {
+            "type": ["string", "null"],
+            "description": "Location/city"
+          },
+          "seniority": {
+            "type": ["string", "null"],
+            "description": "Seniority level",
+            "enum": ["Executive", "VP", "Director", "Manager", "Individual Contributor", null]
+          }
+        }
+      }
+    },
+    "companyDomain": {
+      "type": ["string", "null"],
+      "description": "Discovered company domain"
+    },
+    "costUsd": {
+      "type": "number",
+      "description": "Total cost in USD",
+      "minimum": 0
+    },
+    "latencyMs": {
+      "type": "number",
+      "description": "Total latency in milliseconds",
+      "minimum": 0
+    },
+    "errors": {
+      "type": "array",
+      "description": "Errors encountered",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

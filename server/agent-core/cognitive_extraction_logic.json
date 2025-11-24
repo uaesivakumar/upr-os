@@ -1,0 +1,383 @@
+{
+  "version": "v1.0",
+  "created_at": "2025-11-14T02:35:35.936Z",
+  "description": "Extracted cognitive rules from Siva's decision patterns",
+  "rules": {
+    "evaluate_company_quality": {
+      "type": "formula",
+      "description": "Score company fit for Siva sales target based on size, industry, and entity type",
+      "formula": "base_quality * industry_multiplier * size_multiplier * entity_type_multiplier",
+      "variables": {
+        "base_quality": {
+          "type": "lookup_table",
+          "input": "uae_employees",
+          "description": "Base quality score based on company size sweet spot",
+          "table": [
+            {
+              "range": [
+                0,
+                50
+              ],
+              "value": 60
+            },
+            {
+              "range": [
+                50,
+                100
+              ],
+              "value": 75
+            },
+            {
+              "range": [
+                100,
+                200
+              ],
+              "value": 95
+            },
+            {
+              "range": [
+                200,
+                500
+              ],
+              "value": 80
+            },
+            {
+              "range": [
+                500,
+                1000
+              ],
+              "value": 70
+            },
+            {
+              "range": [
+                1000,
+                99999
+              ],
+              "value": 50
+            }
+          ]
+        },
+        "industry_multiplier": {
+          "type": "mapping",
+          "input": "industry",
+          "description": "Industry preference multiplier",
+          "map": {
+            "Technology": 1.15,
+            "Finance": 1.1,
+            "Healthcare": 1.05,
+            "Retail": 1,
+            "Manufacturing": 0.95,
+            "Government": 0.05
+          },
+          "default": 1
+        },
+        "size_multiplier": {
+          "type": "lookup_table",
+          "input": "uae_employees",
+          "description": "Size-based adjustment",
+          "table": [
+            {
+              "range": [
+                0,
+                30
+              ],
+              "value": 0.9
+            },
+            {
+              "range": [
+                30,
+                100
+              ],
+              "value": 1
+            },
+            {
+              "range": [
+                100,
+                300
+              ],
+              "value": 1.1
+            },
+            {
+              "range": [
+                300,
+                99999
+              ],
+              "value": 1
+            }
+          ]
+        },
+        "entity_type_multiplier": {
+          "type": "mapping",
+          "input": "entity_type",
+          "description": "Entity type adjustment",
+          "map": {
+            "private": 1,
+            "government": 0.05,
+            "free_zone": 1.2
+          },
+          "default": 1
+        }
+      },
+      "edge_cases": [
+        {
+          "condition": {
+            "company_name": {
+              "in": [
+                "Etihad",
+                "Emirates",
+                "ADNOC",
+                "Aramco"
+              ]
+            }
+          },
+          "action": {
+            "multiply": 0.1
+          },
+          "reason": "Enterprise exception - very large organization"
+        },
+        {
+          "condition": {
+            "entity_type": "government"
+          },
+          "action": {
+            "multiply": 0.05
+          },
+          "reason": "Government entity - low probability"
+        }
+      ],
+      "output_range": [
+        0,
+        100
+      ]
+    },
+    "select_contact_tier": {
+      "type": "decision_tree",
+      "description": "Identify appropriate contact titles based on company size",
+      "branches": [
+        {
+          "condition": {
+            "uae_employees": {
+              "lt": 50
+            }
+          },
+          "output": [
+            "Founder",
+            "CEO",
+            "COO",
+            "Managing Director"
+          ],
+          "reasoning": "Small company - target C-level executives"
+        },
+        {
+          "condition": {
+            "uae_employees": {
+              "between": [
+                50,
+                200
+              ]
+            }
+          },
+          "output": [
+            "HR Director",
+            "People Director",
+            "Head of HR"
+          ],
+          "reasoning": "Medium company - target HR leadership"
+        },
+        {
+          "condition": {
+            "uae_employees": {
+              "between": [
+                200,
+                500
+              ]
+            }
+          },
+          "output": [
+            "HR Manager",
+            "People Manager",
+            "HR Business Partner"
+          ],
+          "reasoning": "Mid-large company - target HR managers"
+        },
+        {
+          "condition": {
+            "uae_employees": {
+              "gte": 500
+            }
+          },
+          "output": [
+            "Payroll Manager",
+            "HR Operations Manager",
+            "Compensation Manager"
+          ],
+          "reasoning": "Large company - target payroll/ops specialists"
+        }
+      ],
+      "fallback": [
+        "HR Manager",
+        "People Manager"
+      ]
+    },
+    "calculate_timing_score": {
+      "type": "formula",
+      "description": "Apply recency and seasonal timing adjustments",
+      "formula": "base_timing * calendar_adjustment * signal_recency_adjustment",
+      "variables": {
+        "base_timing": {
+          "type": "constant",
+          "value": 1
+        },
+        "calendar_adjustment": {
+          "type": "mapping",
+          "input": "month",
+          "description": "Seasonal adjustment based on UAE business calendar",
+          "map": {
+            "1": 1.3,
+            "2": 1.3,
+            "3": 0.5,
+            "4": 1,
+            "5": 1,
+            "6": 1,
+            "7": 0.8,
+            "8": 0.8,
+            "9": 1.2,
+            "10": 1.2,
+            "11": 1,
+            "12": 1
+          },
+          "default": 1
+        },
+        "signal_recency_adjustment": {
+          "type": "mapping",
+          "input": "signal_recency_days",
+          "description": "Adjustment based on signal freshness",
+          "map": {
+            "0-7": 1.5,
+            "8-30": 1.2,
+            "31-90": 1,
+            "91-180": 0.8,
+            "181+": 0.5
+          },
+          "default": 1
+        }
+      },
+      "output_range": [
+        0.25,
+        1.95
+      ]
+    },
+    "check_edge_cases": {
+      "type": "rule_list",
+      "description": "Check for special cases requiring down/up-weighting",
+      "rules": [
+        {
+          "name": "government_entity",
+          "condition": {
+            "entity_type": "government"
+          },
+          "adjustment": 0.05,
+          "severity": "HIGH",
+          "reason": "Government entity - low probability"
+        },
+        {
+          "name": "enterprise_exception",
+          "condition": {
+            "company_name": {
+              "in": [
+                "Etihad",
+                "Emirates",
+                "ADNOC",
+                "Aramco",
+                "Du",
+                "Etisalat"
+              ]
+            }
+          },
+          "adjustment": 0.1,
+          "severity": "HIGH",
+          "reason": "Enterprise exception - very large organization"
+        },
+        {
+          "name": "free_zone_boost",
+          "condition": {
+            "license_type": "free_zone"
+          },
+          "adjustment": 1.2,
+          "severity": "MEDIUM",
+          "reason": "Free zone company - higher probability"
+        },
+        {
+          "name": "startup_age",
+          "condition": {
+            "company_age_years": {
+              "lt": 1
+            }
+          },
+          "adjustment": 0.7,
+          "severity": "MEDIUM",
+          "reason": "Very new company - may not have payroll established"
+        }
+      ]
+    },
+    "verify_contact_quality": {
+      "type": "formula",
+      "description": "Assess email and title trustworthiness",
+      "formula": "title_score * email_score",
+      "variables": {
+        "title_score": {
+          "type": "mapping",
+          "input": "title_confidence",
+          "map": {
+            "HIGH": 1,
+            "MEDIUM": 0.8,
+            "LOW": 0.5
+          },
+          "default": 0.7
+        },
+        "email_score": {
+          "type": "mapping",
+          "input": "email_type",
+          "map": {
+            "corporate": 1,
+            "personal": 0.3,
+            "catch_all": 0.5
+          },
+          "default": 0.7
+        }
+      },
+      "output_range": [
+        0,
+        1
+      ]
+    }
+  },
+  "metadata": {
+    "total_rules": 5,
+    "extraction_source": "Historical SIVA tool decisions + Domain expertise",
+    "decision_examples_analyzed": 30,
+    "rule_types": [
+      "formula",
+      "decision_tree",
+      "rule_list"
+    ],
+    "supported_operators": [
+      "eq",
+      "lt",
+      "gt",
+      "gte",
+      "lte",
+      "between",
+      "in",
+      "and",
+      "or"
+    ],
+    "variable_types": [
+      "mapping",
+      "lookup_table",
+      "range_lookup",
+      "constant",
+      "formula"
+    ]
+  }
+}

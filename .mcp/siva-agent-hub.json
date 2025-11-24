@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "siva-agent-hub": {
+      "command": "node",
+      "args": [
+        "/Users/skc/DataScience/upr/server/agent-hub/mcp-server-cli.js"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "postgresql://upr_app:SZgIpBmgAH8EoIfOtD/uNADpmUTgtMKYpOzaxqAt5VU=@34.121.0.240:5432/upr_production?sslmode=disable",
+        "SENTRY_DSN": "https://your-sentry-dsn@sentry.io/project-id",
+        "LOG_LEVEL": "info",
+        "ENABLE_HEALTH_CHECKS": "false"
+      }
+    }
+  }
+}

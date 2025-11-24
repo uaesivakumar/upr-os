@@ -1,0 +1,88 @@
+{
+  "timestamp": "2025-11-16T03:21:38.357Z",
+  "matchRate": 100,
+  "passCount": 5,
+  "totalTests": 5,
+  "results": [
+    {
+      "test": "Test 1: Small startup (fintech, expansion)",
+      "pass": true,
+      "inline": {
+        "products": 5,
+        "segment": "sme",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Emirates NBD Salary Account Plus"
+      },
+      "rule": {
+        "products": 5,
+        "segment": "sme",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Emirates NBD Salary Account Plus"
+      }
+    },
+    {
+      "test": "Test 2: SME (technology, hiring+expansion)",
+      "pass": true,
+      "inline": {
+        "products": 5,
+        "segment": "sme",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Emirates NBD Salary Account Plus"
+      },
+      "rule": {
+        "products": 5,
+        "segment": "sme",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Emirates NBD Salary Account Plus"
+      }
+    },
+    {
+      "test": "Test 3: Mid-market (healthcare, funding)",
+      "pass": true,
+      "inline": {
+        "products": 4,
+        "segment": "mid-market",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Emirates NBD Salary Account Plus"
+      },
+      "rule": {
+        "products": 4,
+        "segment": "mid-market",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Emirates NBD Salary Account Plus"
+      }
+    },
+    {
+      "test": "Test 4: Enterprise (construction, no signals)",
+      "pass": true,
+      "inline": {
+        "products": 3,
+        "segment": "enterprise",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Corporate Banking Account"
+      },
+      "rule": {
+        "products": 3,
+        "segment": "enterprise",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Corporate Banking Account"
+      }
+    },
+    {
+      "test": "Test 5: Large enterprise (hospitality, multiple signals)",
+      "pass": true,
+      "inline": {
+        "products": 3,
+        "segment": "enterprise",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Corporate Banking Account"
+      },
+      "rule": {
+        "products": 3,
+        "segment": "enterprise",
+        "confidenceLevel": "HIGH",
+        "topProduct": "Corporate Banking Account"
+      }
+    }
+  ]
+}

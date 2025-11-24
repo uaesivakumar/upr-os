@@ -1,0 +1,199 @@
+{
+  "version": "v1.0",
+  "created_at": "2025-11-16T03:45:00.000Z",
+  "description": "BankingProductMatch cognitive rules - product catalog matching with fit score calculation (Sprint 25)",
+  "changelog": {
+    "v1.0": "Initial rule engine based on BankingProductMatchTool implementation (194 shadow mode decisions)"
+  },
+  "rules": {
+    "match_banking_products": {
+      "type": "catalog_matching",
+      "description": "Match company profiles to appropriate Emirates NBD banking products with fit scoring",
+      "base_confidence": 1.0,
+
+      "product_catalog_path": "server/siva-tools/data/emiratesnbd-products.json",
+
+      "segment_inference": {
+        "description": "Infer company segment from company size if not provided",
+        "rules": [
+          {"condition": {"company_size": {"lt": 10}}, "segment": "startup"},
+          {"condition": {"company_size": {"lt": 50}}, "segment": "sme"},
+          {"condition": {"company_size": {"lt": 500}}, "segment": "mid-market"},
+          {"condition": {"company_size": {"gte": 500}}, "segment": "enterprise"}
+        ]
+      },
+
+      "eligibility_filtering": {
+        "description": "Filter products based on company profile eligibility",
+        "rules": {
+          "company_size": {
+            "description": "Company size must be within product's [company_size_min, company_size_max]",
+            "required": true
+          },
+          "salary_requirement": {
+            "description": "Average salary must be within product's [min_salary_aed, max_salary_aed] if specified",
+            "required": true,
+            "null_handling": "ignore"
+          },
+          "segment_compatibility": {
+            "description": "Company segment must match or be adjacent to product's target_segment",
+            "adjacency_map": {
+              "entry_level": ["startup", "sme"],
+              "mid_market": ["sme", "mid-market", "mid_market"],
+              "premium": ["mid-market", "mid_market", "enterprise"],
+              "corporate": ["enterprise"],
+              "sme": ["startup", "sme", "mid-market", "mid_market"],
+              "all": ["startup", "sme", "mid-market", "mid_market", "enterprise"]
+            }
+          }
+        }
+      },
+
+      "fit_score_calculation": {
+        "description": "Calculate fit score for each eligible product (formula protected)",
+        "base_score": "product.base_fit_score",
+        "multipliers": {
+          "industry_bonus": {
+            "description": "Add industry-specific bonus points",
+            "calculation": "Use product.industry_bonus[industry] if exists, else use global industry bonus",
+            "global_bonuses": {
+              "fintech": 15,
+              "tech": 10,
+              "technology": 10,
+              "healthcare": 10,
+              "aviation": 12,
+              "hospitality": 8,
+              "travel": 8,
+              "construction": 5,
+              "default": 0
+            },
+            "global_multiplier": 0.5
+          },
+          "signal_multiplier": {
+            "description": "Multiply score based on strongest signal",
+            "multipliers": {
+              "expansion": 1.3,
+              "hiring": 1.2,
+              "funding": 1.4,
+              "relocation": 1.3,
+              "award": 1.1,
+              "none": 1.0
+            },
+            "selection": "MAX"
+          },
+          "salary_alignment_bonus": {
+            "description": "Add bonus if average_salary_aed is well above product.min_salary_aed",
+            "rules": [
+              {"condition": {"ratio": {"gte": 1.5}}, "bonus": 5, "label": "Well above minimum"},
+              {"condition": {"ratio": {"gte": 1.2}}, "bonus": 3, "label": "Comfortably above minimum"},
+              {"condition": {"ratio": {"lt": 1.2}}, "bonus": 0, "label": "At or near minimum"}
+            ],
+            "ratio_calculation": "average_salary_aed / product.min_salary_aed",
+            "null_handling": "skip"
+          },
+          "free_zone_bonus": {
+            "description": "Multiply score if company has free zone license and product is Business Banking",
+            "condition": {
+              "AND": [
+                {"has_free_zone_license": {"eq": true}},
+                {"product.product_category": {"eq": "Business Banking"}}
+              ]
+            },
+            "multiplier": 1.1
+          }
+        },
+        "max_score": 100
+      },
+
+      "recommendation_selection": {
+        "description": "Sort products by fit_score and select top 5",
+        "sorting": "fit_score DESC",
+        "limit": 5,
+        "priority_assignment": "rank (1-5)"
+      },
+
+      "target_audience_labels": {
+        "startup": "Startups ({company_size} employees)",
+        "sme": "Small-Medium Enterprises ({company_size} employees)",
+        "mid-market": "Mid-market companies ({company_size} employees)",
+        "mid_market": "Mid-market companies ({company_size} employees)",
+        "enterprise": "Enterprise organizations ({company_size}+ employees)",
+        "default": "Companies with {company_size} employees"
+      },
+
+      "confidence_adjustments": {
+        "no_products_matched": {
+          "condition": {"recommended_products.length": {"eq": 0}},
+          "confidence": 0.5,
+          "reason": "No eligible products found"
+        },
+        "low_top_score": {
+          "condition": {"recommended_products[0].fit_score": {"lt": 60}},
+          "penalty_multiplier": 0.8,
+          "reason": "Top product has low fit score"
+        },
+        "no_industry": {
+          "condition": {
+            "OR": [
+              {"industry": {"null": true}},
+              {"industry": {"eq": "default"}}
+            ]
+          },
+          "penalty_multiplier": 0.9,
+          "reason": "Industry not specified"
+        },
+        "no_signals": {
+          "condition": {"signals.length": {"eq": 0}},
+          "penalty_multiplier": 0.85,
+          "reason": "No growth signals provided"
+        }
+      },
+
+      "confidence_level_classification": {
+        "HIGH": {"condition": {"confidence": {"gte": 0.85}}},
+        "MEDIUM": {"condition": {"confidence": {"gte": 0.65}}},
+        "LOW": {"condition": {"confidence": {"lt": 0.65}}}
+      },
+
+      "output_format": {
+        "recommended_products": [
+          {
+            "product_id": "string",
+            "product_name": "string",
+            "product_category": "string",
+            "fit_score": "number (0-100)",
+            "priority": "number (1-5)",
+            "target_audience": "string",
+            "key_benefits": "array of strings"
+          }
+        ],
+        "confidence": "number (0.5-1.0, rounded to 2 decimals)",
+        "timestamp": "ISO 8601 timestamp",
+        "metadata": {
+          "confidenceLevel": "HIGH | MEDIUM | LOW",
+          "segment_match": "string",
+          "total_products_considered": "number"
+        },
+        "_meta": {
+          "latency_ms": "number",
+          "tool_name": "match_banking_products",
+          "tool_type": "STRICT",
+          "policy_version": "v1.0"
+        }
+      },
+
+      "execution_phases": {
+        "phase_1": "Load product catalog from JSON file",
+        "phase_2": "Infer segment if not provided",
+        "phase_3": "Collect all products from catalog",
+        "phase_4": "Filter eligible products (size, salary, segment)",
+        "phase_5": "Calculate fit scores for eligible products",
+        "phase_6": "Sort by fit_score and select top 5",
+        "phase_7": "Add priority rankings (1-5)",
+        "phase_8": "Adjust confidence based on results quality",
+        "phase_9": "Classify confidence level (HIGH/MEDIUM/LOW)",
+        "phase_10": "Return recommendations with metadata"
+      }
+    }
+  }
+}

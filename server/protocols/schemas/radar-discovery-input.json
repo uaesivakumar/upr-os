@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://upr.ai/schemas/radar-discovery-input.json",
+  "title": "RADAR Discovery Input",
+  "description": "Input schema for RADAR discovery agent",
+  "type": "object",
+  "required": ["sourceId", "sourceName", "sourceType", "runId", "tenantId"],
+  "properties": {
+    "sourceId": {
+      "type": "string",
+      "description": "Unique identifier for the discovery source",
+      "minLength": 1
+    },
+    "sourceName": {
+      "type": "string",
+      "description": "Human-readable name of the source",
+      "minLength": 1
+    },
+    "sourceType": {
+      "type": "string",
+      "description": "Type of source for discovery",
+      "enum": ["news", "jobs", "social", "web", "custom"]
+    },
+    "runId": {
+      "type": "string",
+      "description": "Unique identifier for this discovery run",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "description": "Tenant identifier for multi-tenancy",
+      "minLength": 1
+    },
+    "budgetLimitUsd": {
+      "type": "number",
+      "description": "Maximum budget in USD for this run",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 2.00
+    },
+    "maxResults": {
+      "type": "integer",
+      "description": "Maximum number of results to return",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 10
+    }
+  },
+  "additionalProperties": false
+}

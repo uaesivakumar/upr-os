@@ -1,0 +1,27 @@
+{
+  "name": "upr-notion-setup",
+  "version": "1.0.0",
+  "description": "UPR Notion roadmap setup scripts",
+  "type": "module",
+  "scripts": {
+    "create-roadmap": "node create_upr_roadmap.js",
+    "populate-sprints": "node populate_upr_sprints.js",
+    "populate-upr-data": "node populate_upr_data.js",
+    "sprint:sync": "node updateNotion.js sync",
+    "sprint:pull": "node pullNotionUpdates.js",
+    "sprint:close": "node updateNotion.js close",
+    "sprint:template": "node createCheckpointTemplate.js",
+    "sprint:cascade": "node cascadeUpdates.js",
+    "sprint:status": "node cascadeUpdates.js",
+    "enhance": "node enhanceSchema.js",
+    "metrics": "node calculateMetrics.js",
+    "notion": "node index.js",
+    "todo:sync": "node syncWorkItems.js",
+    "ai:prioritize": "node prioritize.js",
+    "ai:suggest": "node suggest.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.4.5"
+  }
+}

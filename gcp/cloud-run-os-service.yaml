@@ -1,0 +1,125 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: upr-os-service
+  labels:
+    app: upr-os
+    version: v1.0.0
+    phase: phase-1.5-complete
+  annotations:
+    run.googleapis.com/description: "UPR Operating System - Core API Service"
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: upr-os-service@${PROJECT_ID}.iam.gserviceaccount.com
+      containers:
+        - image: gcr.io/${PROJECT_ID}/upr-os:v1.0.0
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          env:
+            # Service identification
+            - name: SERVICE_NAME
+              value: "upr-os-service"
+            - name: OS_VERSION
+              value: "1.0.0"
+            - name: NODE_ENV
+              value: "production"
+
+            # Database (Cloud SQL)
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: DB_HOST
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: DB_PASSWORD
+
+            # API Keys
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: OPENAI_API_KEY
+            - name: APOLLO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: APOLLO_API_KEY
+            - name: CLEARBIT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: CLEARBIT_API_KEY
+
+            # Monitoring
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: upr-os-secrets
+                  key: SENTRY_DSN
+
+            # OS specific
+            - name: DEFAULT_REGION
+              value: "UAE"
+            - name: ENABLE_REGION_ENGINE
+              value: "true"
+            - name: ENABLE_USP_HOOKS
+              value: "true"
+            - name: ENABLE_DATA_LAKE
+              value: "true"
+
+          startupProbe:
+            httpGet:
+              path: /api/os/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 10
+
+          livenessProbe:
+            httpGet:
+              path: /api/os/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /api/os/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+  traffic:
+    - percent: 100
+      latestRevision: true

@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "totalDecisions": 225,
+    "analysisDate": "2025-11-15T10:17:43.764Z",
+    "sprint": "Sprint 24"
+  },
+  "tierDistribution": {
+    "STRATEGIC": 225,
+    "PRIMARY": 0,
+    "SECONDARY": 0,
+    "BACKUP": 0
+  },
+  "confidenceDistribution": {
+    "high": 195,
+    "medium": 30,
+    "low": 0
+  },
+  "topTitles": [
+    {
+      "title": "HR Director",
+      "count": 195,
+      "seniority": "Director"
+    },
+    {
+      "title": "CEO",
+      "count": 30,
+      "seniority": "Unknown"
+    }
+  ],
+  "sizeToTier": {
+    "midsize": {
+      "STRATEGIC": 30
+    },
+    "large": {
+      "STRATEGIC": 195
+    }
+  },
+  "edgeCases": []
+}

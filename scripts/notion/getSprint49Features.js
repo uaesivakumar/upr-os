@@ -1,0 +1,133 @@
+#!/usr/bin/env node
+/**
+ * Fetch Sprint 49 features from Notion
+ */
+
+import { Client } from '@notionhq/client';
+import { readFileSync, writeFileSync } from 'fs';
+
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
+
+async function getSprint49Features() {
+  try {
+    console.log('🔍 Fetching Sprint 49 from Notion...\n');
+
+    const dbIds = JSON.parse(readFileSync('./.notion-db-ids.json', 'utf-8'));
+    const featuresDbId = dbIds.module_features_db_id;
+    const sprintsDbId = dbIds.sprints_db_id;
+
+    // First, find Sprint 49 in sprints database
+    console.log('🔍 Looking for Sprint 49...');
+    const sprintsResponse = await notion.databases.query({
+      database_id: sprintsDbId,
+      filter: {
+        property: 'Sprint',
+        title: {
+          equals: 'Sprint 49',
+        },
+      },
+    });
+    
+    if (sprintsResponse.results.length === 0) {
+      console.log('❌ Sprint 49 not found in Sprints database');
+      console.log('   Please create Sprint 49 in Notion first.');
+      process.exit(1);
+    }
+    
+    const sprint49 = sprintsResponse.results[0];
+    const sprint49Id = sprint49.id;
+    console.log(`✅ Found Sprint 49 (ID: ${sprint49Id})\n`);
+
+    // Get sprint details
+    const sprintProps = sprint49.properties;
+    const sprintGoal = sprintProps.Goal?.rich_text?.[0]?.plain_text || 'No goal set';
+    console.log(`📋 Sprint 49 Goal: ${sprintGoal}\n`);
+
+    // Query for Sprint 49 features - Sprint property is a number (49)
+    console.log('🔍 Fetching features for Sprint 49...');
+    const response = await notion.databases.query({
+      database_id: featuresDbId,
+      filter: {
+        property: 'Sprint',
+        number: {
+          equals: 49,
+        },
+      },
+      sorts: [
+        {
+          property: 'Priority',
+          direction: 'ascending',
+        },
+      ],
+    });
+
+    if (response.results.length === 0) {
+      console.log('❌ No features with Sprint = 49 found');
+      console.log('   Please create features with Sprint number 49 in Notion.');
+      process.exit(1);
+    }
+
+    console.log(`✅ Found ${response.results.length} features for Sprint 49\n`);
+
+    const features = response.results.map((page) => {
+      const props = page.properties;
+      return {
+        id: page.id,
+        name: props.Features?.title?.[0]?.plain_text || 'Untitled',
+        status: props.Status?.select?.name || 'Not Started',
+        priority: props.Priority?.select?.name || 'Medium',
+        type: props.Type?.select?.name || 'Feature',
+        complexity: props.Complexity?.select?.name || 'Unknown',
+        description: props.Notes?.rich_text?.[0]?.plain_text || '',
+        tags: props.Tags?.multi_select?.map(t => t.name) || [],
+        estimate: props.ETA?.number || 0,
+        modules: props.Modules?.relation?.length || 0,
+      };
+    });
+
+    // Display features
+    console.log('📋 Sprint 49 Features:\n');
+    features.forEach((feature, index) => {
+      console.log(`${index + 1}. ${feature.name}`);
+      console.log(`   Status: ${feature.status} | Priority: ${feature.priority} | Type: ${feature.type}`);
+      if (feature.complexity !== 'Unknown') {
+        console.log(`   Complexity: ${feature.complexity}`);
+      }
+      if (feature.tags.length > 0) {
+        console.log(`   Tags: ${feature.tags.join(', ')}`);
+      }
+      if (feature.description) {
+        console.log(`   Notes: ${feature.description.substring(0, 100)}${feature.description.length > 100 ? '...' : ''}`);
+      }
+      console.log('');
+    });
+
+    // Save to file
+    const output = {
+      sprint: 'Sprint 49',
+      sprint_id: sprint49Id,
+      sprint_goal: sprintGoal,
+      fetched_at: new Date().toISOString(),
+      total_features: features.length,
+      features,
+    };
+
+    writeFileSync(
+      './sprint-49-features.json',
+      JSON.stringify(output, null, 2)
+    );
+
+    console.log('✅ Features saved to sprint-49-features.json\n');
+    console.log('🎯 Ready to start Sprint 49 implementation!');
+
+    return features;
+  } catch (error) {
+    console.error('❌ Error fetching Sprint 49 features:', error.message);
+    if (error.body) {
+      console.error('Details:', JSON.stringify(error.body, null, 2));
+    }
+    process.exit(1);
+  }
+}
+
+getSprint49Features();

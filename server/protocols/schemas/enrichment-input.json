@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://upr.ai/schemas/enrichment-input.json",
+  "title": "Enrichment Input",
+  "description": "Input schema for enrichment agent",
+  "type": "object",
+  "required": ["companyName", "tenantId"],
+  "properties": {
+    "companyName": {
+      "type": "string",
+      "description": "Company name to enrich",
+      "minLength": 1
+    },
+    "domain": {
+      "type": ["string", "null"],
+      "description": "Company domain (if known)",
+      "format": "hostname"
+    },
+    "jobId": {
+      "type": ["string", "null"],
+      "description": "Enrichment job ID"
+    },
+    "tenantId": {
+      "type": "string",
+      "description": "Tenant identifier",
+      "minLength": 1
+    },
+    "signal_feed": {
+      "type": ["object", "null"],
+      "description": "Associated hiring signal data",
+      "properties": {
+        "company_name": { "type": "string" },
+        "trigger_type": { "type": "string" },
+        "description": { "type": "string" },
+        "hiring_likelihood_score": { "type": ["integer", "null"] }
+      }
+    },
+    "maxLeads": {
+      "type": "integer",
+      "description": "Maximum number of leads to find",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 25
+    },
+    "budgetLimitUsd": {
+      "type": "number",
+      "description": "Budget limit in USD",
+      "minimum": 0,
+      "maximum": 50,
+      "default": 5.00
+    }
+  },
+  "additionalProperties": false
+}

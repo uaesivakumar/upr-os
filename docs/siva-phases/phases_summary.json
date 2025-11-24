@@ -1,0 +1,122 @@
+[
+  {
+    "phase": "Phase 1: Persona Extraction & Cognitive Foundation",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Translate Sivakumar's real-world banking reasoning into structured cognitive pillars\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-80a0-a55a-f9c96282e69a"
+  },
+  {
+    "phase": "Phase 2: Cognitive Framework Architecture\n",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Map each cognitive pillar to its functional module and design clear data flows\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-801b-bd2b-f3180d9d7a8e"
+  },
+  {
+    "phase": "Phase 3: Centralized Agentic Hub Design\n",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Define architecture for Agent Hub (MCP Host + Wrapper)\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-8076-8f7b-e7104c29b682"
+  },
+  {
+    "phase": "Phase 4: Infrastructure & Topology\n",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Outline hosting topology, data flow, service dependencies, and Cloud Run environment settings\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-8092-ab62-f2026ee088f0"
+  },
+  {
+    "phase": "Phase 5: Cognitive Extraction & Encoding\n",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Convert human reasoning into machine-readable logic blocks: objectives, formulas, heuristics, decision trees. Ensure every rule remains deterministic and editable.\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-806b-98b6-ffa91f5396de"
+  },
+  {
+    "phase": "Phase 6: Prompt Engineering (Siva-Mode)",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Create prompt templates written in Siva's natural voice and outreach style. No generative improvisation — engineered templates with fixed doctrine and variable placeholders.\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-80ea-a035-e5bdaeab4545"
+  },
+  {
+    "phase": "Phase 7: Quantitative Intelligence Layer",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Encode the mathematical and logical scoring framework: Q-Score formula (quality × signal × reachability), Segmentation logic, Edge-case rules\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-80ae-8e61-c76e230dddfa"
+  },
+  {
+    "phase": "Phase 8: Opportunity Lifecycle Engine",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Define the customer journey state machine (COLD → APPOINTMENT_SET → FIRST_BUSINESS → TRUST_ESTABLISHED → REPEAT_BUSINESS). Each state contains its outreach intent and transition triggers.\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-80d0-bb91-dc43d304771c"
+  },
+  {
+    "phase": "Phase 9: Explainability & Transparency Layer",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Develop the reasoning output format that explains why each score or decision was made. Design UI schema for 'Why this score' breakdowns in the Hiring Signals drawer.\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-8070-b9fa-fc43ebe133d1"
+  },
+  {
+    "phase": "Phase 10: Feedback & Reinforcement Analytics",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Establish feedback loop between outreach outcomes and scoring adjustments. Define metrics, storage, and analytics queries for continual learning.\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-80c1-9d07-fac6b63ed691"
+  },
+  {
+    "phase": "Phase 11: Multi-Agent Collaboration & Reflection",
+    "status": "To-Do",
+    "priority": "Critical",
+    "eta": 3,
+    "notes": "\"Implement multi-agent reasoning (DiscoveryAgent, ValidationAgent, ScoringAgent, OutreachAgent, CriticAgent). Ensure reflection dialogue stays within deterministic bounds and preserves Siva's logic.\"",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a366151-dd16-80fd-b230-f466402075fd"
+  },
+  {
+    "phase": "Phase 12 - Lead Scoring Engine",
+    "status": "N/A",
+    "priority": "Critical",
+    "eta": 2,
+    "notes": "\"Score individual leads (person + company combination) for display priority. Identify which contacts are most actionable within each company.",
+    "fullDescription": "",
+    "files": [],
+    "pageId": "2a466151-dd16-8011-abde-cc58a61e5ec9"
+  }
+]

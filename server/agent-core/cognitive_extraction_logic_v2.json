@@ -1,0 +1,421 @@
+{
+  "version": "v2.0",
+  "created_at": "2025-11-15T00:00:00.000Z",
+  "description": "Updated cognitive rules matching actual SIVA tool implementations (Sprint 22)",
+  "rules": {
+    "evaluate_company_quality": {
+      "type": "decision_tree",
+      "description": "Score company fit based on UAE presence, salary level, size, industry, and domain (matches CompanyQualityToolStandalone.js v2.0)",
+      "input_schema": {
+        "company_name": "string",
+        "domain": "string (optional)",
+        "industry": "string (optional)",
+        "uae_signals": {
+          "has_ae_domain": "boolean",
+          "has_uae_address": "boolean",
+          "linkedin_location": "string (optional)"
+        },
+        "size_bucket": "string (optional): scaleup|midsize|enterprise",
+        "size": "number (optional)",
+        "salary_indicators": {
+          "salary_level": "string (optional): high|medium|low",
+          "avg_salary": "number (optional)",
+          "job_posting_salaries": "array (optional)"
+        },
+        "license_type": "string (optional)",
+        "sector": "string (optional)"
+      },
+      "decisions": [
+        {
+          "name": "Enterprise Brand Exclusion",
+          "priority": 1,
+          "condition": "company_name matches ['Etihad', 'Emirates', 'ADNOC', 'Emaar', 'DP World'] (case-insensitive)",
+          "action": {
+            "quality_multiplier": 0.1,
+            "confidence_adjustment": -0.05,
+            "key_factors": ["ENTERPRISE_BRAND"],
+            "edge_cases": ["ENTERPRISE_BRAND_EXCLUSION"]
+          }
+        },
+        {
+          "name": "Government Sector Exclusion",
+          "priority": 2,
+          "condition": "sector contains 'government' (case-insensitive)",
+          "action": {
+            "quality_multiplier": 0.05,
+            "confidence_adjustment": -0.05,
+            "key_factors": ["GOVERNMENT_SECTOR"],
+            "edge_cases": ["GOVERNMENT_SECTOR_EXCLUSION"]
+          }
+        },
+        {
+          "name": "Free Zone Bonus",
+          "priority": 3,
+          "condition": "license_type contains 'free zone' (case-insensitive)",
+          "action": {
+            "quality_multiplier": 1.3,
+            "confidence_adjustment": 0,
+            "key_factors": ["FREE_ZONE"],
+            "edge_cases": ["FREE_ZONE_BONUS"]
+          }
+        }
+      ],
+      "scoring": {
+        "base_calculation": "4-factor additive scoring (0-100 scale)",
+        "factors": [
+          {
+            "name": "UAE Presence + Salary Level",
+            "weight": 40,
+            "rules": [
+              {
+                "condition": "salary_level=high AND uae_presence=strong",
+                "points": 40,
+                "key_factors": ["UAE_VERIFIED", "HIGH_SALARY"]
+              },
+              {
+                "condition": "salary_level=high",
+                "points": 25,
+                "key_factors": ["HIGH_SALARY"],
+                "confidence_adjustment": -0.1
+              },
+              {
+                "condition": "uae_presence=strong",
+                "points": 20,
+                "key_factors": ["UAE_VERIFIED"]
+              },
+              {
+                "condition": "salary_level=medium AND uae_presence=moderate",
+                "points": 15,
+                "key_factors": ["UAE_MODERATE", "MEDIUM_SALARY"],
+                "confidence_adjustment": -0.05
+              }
+            ]
+          },
+          {
+            "name": "Company Size",
+            "weight": 20,
+            "rules": [
+              {
+                "condition": "size >= 50 AND size <= 500",
+                "points": 20,
+                "key_factors": ["SIZE_OPTIMAL"]
+              },
+              {
+                "condition": "size_bucket in ['scaleup', 'midsize']",
+                "points": 15,
+                "key_factors": ["SIZE_GOOD"]
+              },
+              {
+                "condition": "size < 50",
+                "points": 10,
+                "key_factors": ["SIZE_SMALL"]
+              },
+              {
+                "condition": "size_bucket='enterprise'",
+                "points": 5,
+                "key_factors": ["SIZE_LARGE"],
+                "confidence_adjustment": -0.05
+              }
+            ]
+          },
+          {
+            "name": "Industry Bonus",
+            "weight": 15,
+            "high_value_industries": ["FinTech", "fintech", "Technology", "technology", "tech", "Healthcare", "healthcare", "Health Tech", "healthtech"],
+            "points_if_match": 15,
+            "key_factors_template": "{INDUSTRY}_SECTOR"
+          },
+          {
+            "name": "Domain Verification",
+            "weight": 10,
+            "rules": [
+              {
+                "condition": "domain ends with '.ae'",
+                "points": 10,
+                "key_factors": ["DOMAIN_VERIFIED"]
+              },
+              {
+                "condition": "domain present",
+                "points": 5,
+                "key_factors": ["DOMAIN_PRESENT"]
+              }
+            ]
+          }
+        ],
+        "confidence_adjustments": [
+          {
+            "condition": "no salary_level AND no avg_salary",
+            "adjustment": -0.15
+          },
+          {
+            "condition": "no has_ae_domain AND no has_uae_address",
+            "adjustment": -0.15
+          },
+          {
+            "condition": "no size AND no size_bucket",
+            "adjustment": -0.1
+          }
+        ]
+      },
+      "output_schema": {
+        "quality_score": "number (0-100)",
+        "reasoning": "string (natural language)",
+        "confidence": "number (0.0-1.0)",
+        "policy_version": "string",
+        "timestamp": "ISO datetime",
+        "metadata": {
+          "keyFactors": "array of strings",
+          "confidenceLevel": "HIGH|MEDIUM|LOW",
+          "edgeCasesApplied": "array of strings"
+        }
+      },
+      "helper_functions": {
+        "calculate_uae_presence": {
+          "description": "Determine UAE presence strength from signals",
+          "logic": {
+            "strong": "has_ae_domain=true AND has_uae_address=true",
+            "moderate": "has_ae_domain=true OR has_uae_address=true",
+            "weak": "linkedin_location contains 'uae' (case-insensitive)",
+            "none": "no UAE signals"
+          }
+        },
+        "infer_salary_level": {
+          "description": "Infer salary level if not provided",
+          "logic": {
+            "from_avg_salary": {
+              "high": "avg_salary >= 15000",
+              "medium": "avg_salary >= 8000",
+              "low": "avg_salary < 8000"
+            },
+            "from_job_postings": "average of job_posting_salaries array, apply same thresholds"
+          }
+        }
+      }
+    },
+    "select_contact_tier": {
+      "type": "decision_tree",
+      "description": "Classify contact into VIP/PRIORITY/QUALIFIED/EXPLORE tiers",
+      "input_schema": {
+        "seniority": "string (optional): C-Suite|VP|Director|Manager|Individual Contributor",
+        "department": "string (optional): Finance|HR|Operations|Sales|IT|Other",
+        "company_size": "number (optional)",
+        "company_quality_score": "number (0-100, optional)",
+        "confidence_score": "number (0.0-1.0, optional)"
+      },
+      "decisions": [
+        {
+          "name": "VIP Tier",
+          "condition": "(seniority='C-Suite' OR seniority='VP') AND (department in ['Finance', 'HR', 'Operations']) AND company_size >= 100 AND company_quality_score >= 70",
+          "outcome": "VIP",
+          "confidence_level": "HIGH"
+        },
+        {
+          "name": "Priority Tier",
+          "condition": "(seniority='Director' OR seniority='Manager') AND (department in ['Finance', 'HR']) AND company_quality_score >= 60",
+          "outcome": "PRIORITY",
+          "confidence_level": "HIGH"
+        },
+        {
+          "name": "Qualified Tier",
+          "condition": "company_quality_score >= 50 OR (department in ['Finance', 'HR', 'Operations'])",
+          "outcome": "QUALIFIED",
+          "confidence_level": "MEDIUM"
+        },
+        {
+          "name": "Explore Tier (Default)",
+          "condition": "default",
+          "outcome": "EXPLORE",
+          "confidence_level": "LOW"
+        }
+      ],
+      "output_schema": {
+        "tier": "VIP|PRIORITY|QUALIFIED|EXPLORE",
+        "reasoning": "string (outcome only, no detailed reasoning to protect formula)",
+        "confidence": "number (0.0-1.0)",
+        "policy_version": "string",
+        "timestamp": "ISO datetime",
+        "metadata": {
+          "confidenceLevel": "HIGH|MEDIUM|LOW"
+        }
+      }
+    },
+    "calculate_timing_score": {
+      "type": "formula",
+      "description": "Calculate timing score based on calendar factors and signal recency",
+      "input_schema": {
+        "signal_date": "ISO datetime",
+        "calendar_context": "string (optional): Q1_BUDGET|Q4_PLANNING|SUMMER|RAMADAN|REGULAR",
+        "signal_type": "string (optional): HIRING|FUNDING|EXPANSION|PARTNERSHIP|OTHER",
+        "company_decision_velocity": "string (optional): HIGH|MEDIUM|LOW"
+      },
+      "factors": [
+        {
+          "name": "Calendar Factor",
+          "key_factors_mapping": {
+            "Q1_BUDGET": {
+              "category": "OPTIMAL",
+              "key_factors": ["NEW_BUDGETS_UNLOCKED"]
+            },
+            "Q4_PLANNING": {
+              "category": "GOOD",
+              "key_factors": ["PLANNING_SEASON"]
+            },
+            "SUMMER": {
+              "category": "FAIR",
+              "key_factors": ["VACATION_PERIOD"]
+            },
+            "RAMADAN": {
+              "category": "POOR",
+              "key_factors": ["BUSINESS_SLOWDOWN"]
+            },
+            "REGULAR": {
+              "category": "GOOD",
+              "key_factors": []
+            }
+          }
+        },
+        {
+          "name": "Signal Recency",
+          "key_factors_mapping": {
+            "0-7_days": {
+              "key_factors": ["FRESH_SIGNAL"]
+            },
+            "8-30_days": {
+              "key_factors": ["RECENT_SIGNAL"]
+            },
+            "31-90_days": {
+              "key_factors": ["AGING_SIGNAL"]
+            },
+            "90+_days": {
+              "key_factors": ["STALE_SIGNAL"]
+            }
+          }
+        },
+        {
+          "name": "Signal Type",
+          "key_factors_mapping": {
+            "HIRING": {
+              "key_factors": ["HIRING_SIGNAL"]
+            },
+            "FUNDING": {
+              "key_factors": ["FUNDING_EVENT"]
+            },
+            "EXPANSION": {
+              "key_factors": ["GROWTH_SIGNAL"]
+            }
+          }
+        },
+        {
+          "name": "Decision Velocity",
+          "key_factors_mapping": {
+            "HIGH": {
+              "key_factors": ["HIGH_DECISION_VELOCITY"]
+            },
+            "MEDIUM": {
+              "key_factors": ["MODERATE_DECISION_VELOCITY"]
+            },
+            "LOW": {
+              "key_factors": ["SLOW_DECISION_VELOCITY"]
+            }
+          }
+        }
+      ],
+      "reasoning_templates": {
+        "OPTIMAL": "Optimal timing: {calendar_context}. {decision_velocity_text}. High likelihood of engagement.",
+        "GOOD": "Good timing: {calendar_context}. {decision_velocity_text}. Normal conversion likelihood.",
+        "FAIR": "Moderate timing: {calendar_context}. Consider prioritizing other opportunities.",
+        "POOR": "Poor timing: {calendar_context}. Strongly recommend waiting for better timing window."
+      },
+      "output_schema": {
+        "timing_score": "number (0-100)",
+        "category": "OPTIMAL|GOOD|FAIR|POOR",
+        "reasoning": "string (natural language, no formulas exposed)",
+        "confidence": "number (0.0-1.0)",
+        "policy_version": "string",
+        "timestamp": "ISO datetime",
+        "metadata": {
+          "key_factors": "array of strings"
+        }
+      }
+    },
+    "check_edge_cases": {
+      "type": "decision_tree",
+      "description": "Detect blockers, warnings, and special handling requirements",
+      "input_schema": {
+        "company_name": "string",
+        "domain": "string (optional)",
+        "sector": "string (optional)",
+        "license_type": "string (optional)",
+        "company_quality_score": "number (optional)",
+        "contact_tier": "string (optional)",
+        "timing_score": "number (optional)",
+        "industry": "string (optional)"
+      },
+      "edge_cases": [
+        {
+          "type": "BLOCKER",
+          "name": "Enterprise Brand",
+          "condition": "company_name matches ['Etihad', 'Emirates', 'ADNOC', 'Emaar', 'DP World'] (case-insensitive)",
+          "recommendation": "DO_NOT_CONTACT",
+          "reason": "Major enterprise brand - existing banking relationships likely, conversion probability extremely low"
+        },
+        {
+          "type": "BLOCKER",
+          "name": "Government Sector",
+          "condition": "sector contains 'government' (case-insensitive)",
+          "recommendation": "DO_NOT_CONTACT",
+          "reason": "Government entity - ENBD policy restricts direct employee banking outreach"
+        },
+        {
+          "type": "WARNING",
+          "name": "Low Quality Score",
+          "condition": "company_quality_score < 30",
+          "recommendation": "REVIEW_MANUALLY",
+          "reason": "Company quality below threshold - limited qualifying factors detected"
+        },
+        {
+          "type": "WARNING",
+          "name": "Poor Timing",
+          "condition": "timing_score < 40",
+          "recommendation": "DELAY_OUTREACH",
+          "reason": "Timing conditions unfavorable - suggest waiting for better window"
+        },
+        {
+          "type": "SPECIAL_HANDLING",
+          "name": "Free Zone Company",
+          "condition": "license_type contains 'free zone' (case-insensitive)",
+          "recommendation": "PRIORITY_QUEUE",
+          "reason": "Free zone license - favorable business environment, priority handling recommended"
+        },
+        {
+          "type": "SPECIAL_HANDLING",
+          "name": "VIP Contact + High Quality",
+          "condition": "contact_tier='VIP' AND company_quality_score >= 70",
+          "recommendation": "EXECUTIVE_REVIEW",
+          "reason": "VIP contact at high-quality company - executive approval recommended before outreach"
+        }
+      ],
+      "output_schema": {
+        "blockers": "array of edge case objects",
+        "warnings": "array of edge case objects",
+        "special_handling": "array of edge case objects",
+        "recommendation": "PROCEED|REVIEW_MANUALLY|DO_NOT_CONTACT|DELAY_OUTREACH|PRIORITY_QUEUE|EXECUTIVE_REVIEW",
+        "reasoning": "string (natural language)",
+        "confidence": "number (0.0-1.0)",
+        "policy_version": "string",
+        "timestamp": "ISO datetime"
+      }
+    }
+  },
+  "metadata": {
+    "sprint": 22,
+    "phase": "SIVA Phase 6 - Rule Engine Integration",
+    "notes": "These rules match actual tool implementations in server/siva-tools/*Standalone.js files. Updated to reflect 4-factor additive scoring, natural language reasoning, and key_factors arrays instead of formula exposure.",
+    "compatible_with": {
+      "CompanyQualityToolStandalone.js": "v2.0",
+      "ContactTierToolStandalone.js": "v2.0",
+      "TimingScoreToolStandalone.js": "v2.0",
+      "EdgeCasesToolStandalone.js": "v2.0"
+    }
+  }
+}

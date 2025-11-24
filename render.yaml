@@ -1,0 +1,35 @@
+# render.yaml
+# This version USES THE EXISTING Redis instance instead of creating a new one.
+
+services:
+  # 1. The Web Service (Frontend and API)
+  - type: web
+    name: upr-web-service
+    env: docker
+    autoDeploy: true
+    branch: main
+    envVars:
+      - fromGroup: upr-env
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: upr-redis # This refers to your existing Redis service
+          property: connectionString
+      - key: SERVICE_TYPE
+        value: web
+
+  # 2. The Background Worker for Enrichment Jobs
+  - type: worker
+    name: upr-enrichment-worker
+    env: docker
+    autoDeploy: true
+    branch: main
+    envVars:
+      - fromGroup: upr-env
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: upr-redis # This refers to your existing Redis service
+          property: connectionString
+      - key: SERVICE_TYPE
+        value: worker

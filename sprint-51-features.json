@@ -1,0 +1,149 @@
+{
+  "sprint": "Sprint 51",
+  "sprint_id": "2b166151-dd16-8153-bdf4-ddbeff7833a0",
+  "sprint_goal": "Analytics & Insights Dashboard - Modern charts, custom reports, exports",
+  "fetched_at": "2025-11-22T04:21:31.356Z",
+  "total_features": 10,
+  "features": [
+    {
+      "id": "2b166151-dd16-817f-b7b7-f7b52fe3ba03",
+      "name": "Document analytics features",
+      "status": "Not Started",
+      "priority": "Medium",
+      "type": "Documentation",
+      "complexity": "Unknown",
+      "description": "Documentation: Analytics user guide and examples",
+      "tags": [
+        "Documentation"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-813f-8cde-e68b4cc80c25",
+      "name": "Create dashboard templates",
+      "status": "Not Started",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: Pre-built dashboard templates",
+      "tags": [
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8182-9ca1-f2479c70a567",
+      "name": "Add export functionality (PDF, CSV)",
+      "status": "Not Started",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: Export reports in multiple formats",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8175-9894-fb0d5707c34d",
+      "name": "Implement cohort analysis",
+      "status": "Not Started",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: Cohort-based analytics and comparisons",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8199-be74-e090ac0f312b",
+      "name": "Test analytics calculations",
+      "status": "Not Started",
+      "priority": "High",
+      "type": "Test",
+      "complexity": "Unknown",
+      "description": "Testing: Verify analytics accuracy",
+      "tags": [
+        "Testing"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8137-ac32-c83cebba48e8",
+      "name": "Build analytics aggregation service",
+      "status": "Not Started",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Backend - Analytics: Backend service for data aggregation",
+      "tags": [
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-817e-a520-d713aef8f18b",
+      "name": "Add time-series visualizations",
+      "status": "Not Started",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: Time-series charts for trends analysis",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8113-ad32-c75270ff3ed4",
+      "name": "Create custom report builder",
+      "status": "Not Started",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: Drag-and-drop report builder",
+      "tags": [
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81c1-93fe-f1ffa803ec6b",
+      "name": "Implement Chart.js/Recharts integration",
+      "status": "Not Started",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: Interactive charts and visualizations",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8177-858d-ea3fce57ae33",
+      "name": "Design modern analytics dashboard",
+      "status": "Not Started",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Analytics: 2030-style analytics with modern charts",
+      "tags": [
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 1
+    }
+  ]
+}

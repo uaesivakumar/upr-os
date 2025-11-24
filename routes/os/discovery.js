@@ -1,0 +1,168 @@
+/**
+ * UPR OS Discovery Endpoint
+ * Sprint 64: Unified OS API Layer
+ *
+ * POST /api/os/discovery
+ *
+ * Facade over existing discovery functionality with standardized OS interface
+ */
+
+import express from 'express';
+import * as Sentry from '@sentry/node';
+import multiSourceOrchestrator from '../../server/services/multiSourceOrchestrator.js';
+import signalQualityScoring from '../../server/services/signalQualityScoring.js';
+import {
+  createOSResponse,
+  createOSError,
+  getTenantId,
+  generateRequestId,
+  OS_PROFILES
+} from './types.js';
+
+const router = express.Router();
+
+/**
+ * POST /api/os/discovery
+ *
+ * Unified discovery endpoint for the OS layer
+ *
+ * Request Body:
+ * {
+ *   "industry": "banking",           // Target industry
+ *   "filters": {
+ *     "location": "UAE",
+ *     "sector": "Banking",
+ *     "companySize": "Enterprise",
+ *     "signals": ["hiring", "expansion"]
+ *   },
+ *   "options": {
+ *     "sources": ["news", "linkedin", "glassdoor"],
+ *     "maxResults": 100,
+ *     "minQuality": 0.6,
+ *     "profile": "banking_employee"
+ *   }
+ * }
+ *
+ * Response: OSResponse with discovered signals
+ */
+router.post('/', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const tenantId = getTenantId(req);
+    const {
+      industry = 'default',
+      filters = {},
+      options = {}
+    } = req.body;
+
+    const {
+      sources = null,
+      maxResults = 100,
+      minQuality = 0,
+      profile = OS_PROFILES.DEFAULT,
+      useCache = true
+    } = options;
+
+    console.log(`[OS:Discovery] Request ${requestId} - Industry: ${industry}, Tenant: ${tenantId}`);
+
+    // Execute multi-source orchestration
+    const orchestrationResult = await multiSourceOrchestrator.orchestrate({
+      sources,
+      filters: {
+        ...filters,
+        industry
+      },
+      maxParallel: 4,
+      tenantId
+    });
+
+    let signals = orchestrationResult.signals || [];
+
+    // Apply quality filtering
+    if (minQuality > 0) {
+      signals = signalQualityScoring.filterByQuality(signals, minQuality);
+    }
+
+    // Sort by quality and limit results
+    signals = signals
+      .sort((a, b) => (b.quality_score || 0) - (a.quality_score || 0))
+      .slice(0, maxResults);
+
+    // Calculate confidence based on source success rate
+    const successRate = orchestrationResult.successfulSources?.length /
+      (orchestrationResult.sources?.length || 1);
+    const confidence = Math.round(successRate * 100);
+
+    const executionTimeMs = Date.now() - startTime;
+
+    // Build reason explanation
+    const reason = signals.length > 0
+      ? `Discovered ${signals.length} signals from ${orchestrationResult.successfulSources?.length || 0} sources`
+      : 'No signals found matching criteria';
+
+    const response = createOSResponse({
+      success: true,
+      data: {
+        signals,
+        total: signals.length,
+        sources: {
+          requested: orchestrationResult.sources,
+          successful: orchestrationResult.successfulSources,
+          failed: orchestrationResult.failedSources
+        },
+        statistics: {
+          deduplication: orchestrationResult.deduplication,
+          quality: orchestrationResult.quality
+        }
+      },
+      reason,
+      confidence,
+      profile,
+      endpoint: '/api/os/discovery',
+      executionTimeMs,
+      requestId
+    });
+
+    console.log(`[OS:Discovery] Request ${requestId} completed in ${executionTimeMs}ms - ${signals.length} signals`);
+
+    res.json(response);
+
+  } catch (error) {
+    const executionTimeMs = Date.now() - startTime;
+
+    console.error(`[OS:Discovery] Request ${requestId} failed:`, error);
+
+    Sentry.captureException(error, {
+      tags: {
+        os_endpoint: '/api/os/discovery',
+        request_id: requestId
+      },
+      extra: req.body
+    });
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_DISCOVERY_ERROR',
+      endpoint: '/api/os/discovery',
+      executionTimeMs,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/discovery/health
+ * Health check for discovery service
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    service: 'os-discovery',
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
+export default router;

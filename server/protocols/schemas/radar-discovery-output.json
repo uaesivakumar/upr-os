@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://upr.ai/schemas/radar-discovery-output.json",
+  "title": "RADAR Discovery Output",
+  "description": "Output schema for RADAR discovery agent",
+  "type": "object",
+  "required": ["companiesFound", "companies", "costUsd", "latencyMs"],
+  "properties": {
+    "companiesFound": {
+      "type": "integer",
+      "description": "Total number of companies discovered",
+      "minimum": 0
+    },
+    "companies": {
+      "type": "array",
+      "description": "Array of discovered hiring signals",
+      "items": {
+        "type": "object",
+        "required": ["company", "trigger_type", "description"],
+        "properties": {
+          "company": {
+            "type": "string",
+            "description": "Company name",
+            "minLength": 1
+          },
+          "domain": {
+            "type": ["string", "null"],
+            "description": "Company domain"
+          },
+          "sector": {
+            "type": ["string", "null"],
+            "description": "Business sector"
+          },
+          "trigger_type": {
+            "type": "string",
+            "description": "Type of hiring signal",
+            "enum": [
+              "Project Award",
+              "Expansion",
+              "Investment",
+              "Market Entry",
+              "Acquisition",
+              "Hiring Drive",
+              "Partnership",
+              "Tender",
+              "Other"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Signal description",
+            "maxLength": 150
+          },
+          "hiring_likelihood_score": {
+            "type": ["integer", "null"],
+            "description": "Hiring likelihood score (1-5)",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "hiring_likelihood": {
+            "type": ["string", "null"],
+            "description": "Hiring likelihood label",
+            "enum": ["Very High", "High", "Medium", "Low", "Very Low", null]
+          },
+          "geo_status": {
+            "type": ["string", "null"],
+            "description": "Geographic status",
+            "enum": ["confirmed", "probable", "ambiguous", null]
+          },
+          "geo_hints": {
+            "type": "array",
+            "description": "Geographic hints/evidence",
+            "items": { "type": "string" }
+          },
+          "location": {
+            "type": ["string", "null"],
+            "description": "Specific location"
+          },
+          "source_url": {
+            "type": ["string", "null"],
+            "description": "Source URL",
+            "format": "uri"
+          },
+          "source_date": {
+            "type": ["string", "null"],
+            "description": "Source date",
+            "format": "date"
+          },
+          "evidence_quote": {
+            "type": ["string", "null"],
+            "description": "Evidence quote from source"
+          },
+          "evidence_note": {
+            "type": ["string", "null"],
+            "description": "Additional evidence notes"
+          },
+          "role_cluster": {
+            "type": ["object", "null"],
+            "description": "Expected role cluster",
+            "properties": {
+              "roles": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "horizon": {
+                "type": "string",
+                "pattern": "^\\d+-\\d+m$"
+              }
+            }
+          },
+          "notes": {
+            "type": ["string", "null"],
+            "description": "Additional notes"
+          }
+        }
+      }
+    },
+    "costUsd": {
+      "type": "number",
+      "description": "Total cost in USD",
+      "minimum": 0
+    },
+    "latencyMs": {
+      "type": "number",
+      "description": "Total latency in milliseconds",
+      "minimum": 0
+    },
+    "errors": {
+      "type": "array",
+      "description": "Errors encountered during discovery",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string" },
+          "company": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

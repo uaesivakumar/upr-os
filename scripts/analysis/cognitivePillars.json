@@ -1,0 +1,563 @@
+{
+  "metadata": {
+    "extraction_date": "2025-11-15T11:06:20.191Z",
+    "sprint": "Sprint 24",
+    "phase": "Phase 1 Retrospective",
+    "total_decisions_analyzed": "850+"
+  },
+  "cognitive_pillars": {
+    "pillar_1_size_sensitivity": {
+      "name": "Company Size as Primary Discriminator",
+      "description": "All tools use company size as a fundamental decision factor with consistent sweet spots",
+      "evidence": {
+        "companyQuality": "Midsize companies (50-200) dominate TIER_1: 67 decisions",
+        "contactTier": "Size impacts tier classification: {\"small\":{\"total\":31,\"strategic_percentage\":\"0.0\",\"avg_confidence\":\"NaN\"},\"midsize\":{\"total\":197,\"strategic_percentage\":\"0.0\",\"avg_confidence\":\"NaN\"},\"large\":{\"total\":2,\"strategic_percentage\":\"0.0\",\"avg_confidence\":\"NaN\"}}",
+        "bankingProduct": "Product recommendations vary by size bucket: 3 buckets"
+      },
+      "cognitive_rule": "Size bucketing (micro/small/midsize/large/enterprise) drives initial filtering across all decisions"
+    },
+    "pillar_2_seniority_hierarchy": {
+      "name": "Title-Based Seniority Hierarchy",
+      "description": "Consistent seniority inference from job titles using keyword matching",
+      "evidence": {
+        "contactTier": "4 unique titles mapped to seniority levels",
+        "top_mappings": [
+          {
+            "title": "HR Director",
+            "seniority": "Director",
+            "count": 196,
+            "avg_confidence": "NaN"
+          },
+          {
+            "title": "Operations Manager",
+            "seniority": "Manager",
+            "count": 1,
+            "avg_confidence": "1.00"
+          },
+          {
+            "title": "VP Engineering",
+            "seniority": "VP",
+            "count": 1,
+            "avg_confidence": "1.00"
+          },
+          {
+            "title": "CEO",
+            "seniority": "C-Level",
+            "count": 1,
+            "avg_confidence": "0.90"
+          }
+        ]
+      },
+      "cognitive_rule": "C-Level > VP > Director > Manager > Individual, with keyword-based inference when not explicit"
+    },
+    "pillar_3_temporal_decay": {
+      "name": "Signal Age Decay Function",
+      "description": "Recent signals weighted exponentially higher than old signals",
+      "evidence": {
+        "timingScore": {
+          "fresh": [],
+          "recent": [],
+          "stale": [],
+          "old": {
+            "total": 226,
+            "hot_percentage": "0.0",
+            "avg_score": "0.0",
+            "avg_confidence": "NaN"
+          }
+        },
+        "age_thresholds": {
+          "hot_max": [],
+          "warm_max": [],
+          "cool_max": []
+        }
+      },
+      "cognitive_rule": "Fresh signals (≤7 days) = HOT, Recent (≤30 days) = WARM, Stale (≤90 days) = COOL, Old (>90) = COLD"
+    },
+    "pillar_4_department_context": {
+      "name": "Department-Driven Decision Modifiers",
+      "description": "HR, Finance, Admin departments receive priority across tools",
+      "evidence": {
+        "contactTier": {
+          "HR": 196,
+          "Finance": 0,
+          "Admin": 1,
+          "Sales": 0,
+          "Engineering": 1,
+          "Other": 31
+        },
+        "tier_by_department": {
+          "Admin": {
+            "STRATEGIC": 0,
+            "PRIMARY": 0,
+            "SECONDARY": 0,
+            "BACKUP": 0,
+            "undefined": 1
+          },
+          "Engineering": {
+            "STRATEGIC": 0,
+            "PRIMARY": 0,
+            "SECONDARY": 0,
+            "BACKUP": 0,
+            "undefined": 1
+          },
+          "Other": {
+            "STRATEGIC": 0,
+            "PRIMARY": 0,
+            "SECONDARY": 0,
+            "BACKUP": 0,
+            "undefined": 31
+          },
+          "HR": {
+            "STRATEGIC": 0,
+            "PRIMARY": 0,
+            "SECONDARY": 0,
+            "BACKUP": 0,
+            "undefined": 196
+          },
+          "C-Suite": {
+            "STRATEGIC": 0,
+            "PRIMARY": 0,
+            "SECONDARY": 0,
+            "BACKUP": 0,
+            "undefined": 1
+          }
+        }
+      },
+      "cognitive_rule": "HR/Finance/Admin departments boost tier classification, especially combined with Director+ seniority"
+    },
+    "pillar_5_confidence_by_completeness": {
+      "name": "Data Completeness → Confidence Mapping",
+      "description": "More complete input data yields higher confidence scores",
+      "evidence": {
+        "companyQuality": {
+          "complete": {
+            "count": 309,
+            "avg": "NaN",
+            "min": "0.70",
+            "max": "1.00"
+          },
+          "partial": [],
+          "minimal": []
+        },
+        "contactTier": "Inference penalty: 0 seniority inferred, 0 department inferred",
+        "timingScore": {
+          "strong": [],
+          "moderate": [],
+          "weak": {
+            "count": 226,
+            "avg": "NaN"
+          }
+        }
+      },
+      "cognitive_rule": "Complete data (8+ fields) = high confidence, Partial (5-7 fields) = medium, Minimal (<5) = low"
+    },
+    "pillar_6_industry_specialization": {
+      "name": "Industry-Specific Optimization",
+      "description": "Certain industries consistently receive preferential treatment",
+      "evidence": {
+        "companyQuality": [
+          {
+            "industry": "Technology",
+            "count": 267,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Retail",
+            "count": 6,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Healthcare",
+            "count": 6,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Real Estate",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Education",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Manufacturing",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Finance",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Oil & Gas",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Unknown",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          },
+          {
+            "industry": "Marketing",
+            "count": 3,
+            "avg_quality_score": "1.00"
+          }
+        ],
+        "bankingProduct": [
+          {
+            "industry": "technology",
+            "top_products": []
+          }
+        ]
+      },
+      "cognitive_rule": "Technology, Finance, Healthcare industries bias toward higher quality/priority classifications"
+    }
+  },
+  "tool_patterns": {
+    "CompanyQualityTool": {
+      "sizeDistribution": {
+        "micro": 0,
+        "small": 15,
+        "midsize": 67,
+        "large": 215,
+        "enterprise": 12
+      },
+      "qualityBySize": {
+        "large": {
+          "TIER_1": 0,
+          "TIER_2": 0,
+          "TIER_3": 0,
+          "undefined": 215
+        },
+        "midsize": {
+          "TIER_1": 0,
+          "TIER_2": 0,
+          "TIER_3": 0,
+          "undefined": 67
+        },
+        "enterprise": {
+          "TIER_1": 0,
+          "TIER_2": 0,
+          "TIER_3": 0,
+          "undefined": 12
+        },
+        "small": {
+          "TIER_1": 0,
+          "TIER_2": 0,
+          "TIER_3": 0,
+          "undefined": 15
+        }
+      },
+      "industryPreferences": [
+        {
+          "industry": "Technology",
+          "count": 267,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Retail",
+          "count": 6,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Healthcare",
+          "count": 6,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Real Estate",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Education",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Manufacturing",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Finance",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Oil & Gas",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Unknown",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        },
+        {
+          "industry": "Marketing",
+          "count": 3,
+          "avg_quality_score": "1.00"
+        }
+      ],
+      "licenseImpact": {
+        "Free Zone": {
+          "total": 243,
+          "tier1_percentage": "0.0",
+          "avg_confidence": "NaN"
+        },
+        "Mainland": {
+          "total": 66,
+          "tier1_percentage": "0.0",
+          "avg_confidence": "NaN"
+        },
+        "Offshore": []
+      },
+      "sectorPatterns": {
+        "Private": 309,
+        "Public/Government": 0,
+        "Nonprofit": 0
+      },
+      "confidenceByDataQuality": {
+        "complete": {
+          "count": 309,
+          "avg": "NaN",
+          "min": "0.70",
+          "max": "1.00"
+        },
+        "partial": [],
+        "minimal": []
+      }
+    },
+    "ContactTierTool": {
+      "titleSeniorityMap": [
+        {
+          "title": "HR Director",
+          "seniority": "Director",
+          "count": 196,
+          "avg_confidence": "NaN"
+        },
+        {
+          "title": "Operations Manager",
+          "seniority": "Manager",
+          "count": 1,
+          "avg_confidence": "1.00"
+        },
+        {
+          "title": "VP Engineering",
+          "seniority": "VP",
+          "count": 1,
+          "avg_confidence": "1.00"
+        },
+        {
+          "title": "CEO",
+          "seniority": "C-Level",
+          "count": 1,
+          "avg_confidence": "0.90"
+        }
+      ],
+      "titleDepartmentMap": [
+        {
+          "title": "HR Director",
+          "department": "HR",
+          "count": 196
+        },
+        {
+          "title": "Operations Manager",
+          "department": "Admin",
+          "count": 1
+        },
+        {
+          "title": "VP Engineering",
+          "department": "Engineering",
+          "count": 1
+        },
+        {
+          "title": "CEO",
+          "department": "C-Suite",
+          "count": 1
+        }
+      ],
+      "seniorityDistribution": {
+        "C-Level": 1,
+        "VP": 1,
+        "Director": 196,
+        "Manager": 1,
+        "Individual": 0,
+        "Unknown": 31
+      },
+      "departmentDistribution": {
+        "HR": 196,
+        "Finance": 0,
+        "Admin": 1,
+        "Sales": 0,
+        "Engineering": 1,
+        "Other": 31
+      },
+      "tierBySeniority": {
+        "Manager": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 1
+        },
+        "VP": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 1
+        },
+        "Unknown": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 31
+        },
+        "Director": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 196
+        },
+        "C-Level": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 1
+        }
+      },
+      "tierByDepartment": {
+        "Admin": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 1
+        },
+        "Engineering": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 1
+        },
+        "Other": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 31
+        },
+        "HR": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 196
+        },
+        "C-Suite": {
+          "STRATEGIC": 0,
+          "PRIMARY": 0,
+          "SECONDARY": 0,
+          "BACKUP": 0,
+          "undefined": 1
+        }
+      },
+      "companySizeImpact": {
+        "small": {
+          "total": 31,
+          "strategic_percentage": "0.0",
+          "avg_confidence": "NaN"
+        },
+        "midsize": {
+          "total": 197,
+          "strategic_percentage": "0.0",
+          "avg_confidence": "NaN"
+        },
+        "large": {
+          "total": 2,
+          "strategic_percentage": "0.0",
+          "avg_confidence": "NaN"
+        }
+      },
+      "inferenceAccuracy": {
+        "seniority_inferred": 0,
+        "department_inferred": 0,
+        "both_explicit": 230
+      }
+    },
+    "TimingScoreTool": {
+      "signalAgeImpact": {
+        "fresh": [],
+        "recent": [],
+        "stale": [],
+        "old": {
+          "total": 226,
+          "hot_percentage": "0.0",
+          "avg_score": "0.0",
+          "avg_confidence": "NaN"
+        }
+      },
+      "fiscalContextPatterns": {
+        "[object Object]": {
+          "HOT": 0,
+          "WARM": 0,
+          "COOL": 0,
+          "COLD": 0,
+          "undefined": null
+        }
+      },
+      "priorityDistribution": {
+        "HOT": 0,
+        "WARM": 0,
+        "COOL": 0,
+        "COLD": 0
+      },
+      "ageThresholds": {
+        "hot_max": [],
+        "warm_max": [],
+        "cool_max": []
+      },
+      "confidenceBySignalQuality": {
+        "strong": [],
+        "moderate": [],
+        "weak": {
+          "count": 226,
+          "avg": "NaN"
+        }
+      }
+    },
+    "BankingProductMatchTool": {
+      "productDistribution": {},
+      "sizeToProduct": {
+        "small": {},
+        "midsize": {},
+        "large": {}
+      },
+      "industryToProduct": [
+        {
+          "industry": "technology",
+          "top_products": []
+        }
+      ],
+      "employeeCountThresholds": {},
+      "confidenceByMatchQuality": {
+        "strong": [],
+        "moderate": [],
+        "weak": {
+          "count": 194,
+          "avg": "NaN"
+        }
+      }
+    }
+  }
+}

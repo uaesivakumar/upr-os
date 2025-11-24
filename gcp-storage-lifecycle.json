@@ -1,0 +1,31 @@
+{
+    "lifecycle": {
+        "rule": [
+            {
+                "action": {
+                    "type": "SetStorageClass",
+                    "storageClass": "COLDLINE"
+                },
+                "condition": {
+                    "age": 30,
+                    "matchesPrefix": [
+                        "logs/",
+                        "backups/"
+                    ]
+                }
+            },
+            {
+                "action": {
+                    "type": "Delete"
+                },
+                "condition": {
+                    "age": 365,
+                    "matchesPrefix": [
+                        "temp/",
+                        "cache/"
+                    ]
+                }
+            }
+        ]
+    }
+}

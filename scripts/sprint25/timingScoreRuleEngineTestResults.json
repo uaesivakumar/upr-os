@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-11-16T03:17:22.565Z",
+  "matchRate": 100,
+  "passCount": 5,
+  "totalTests": 5,
+  "results": [
+    {
+      "test": "Test 1: Q4 Early Freeze + HOT signal (hiring)",
+      "pass": true,
+      "inline": {
+        "multiplier": 1.22,
+        "category": "GOOD",
+        "calendar": "Q4_EARLY_FREEZE",
+        "freshness": "HOT"
+      },
+      "rule": {
+        "multiplier": 1.22,
+        "category": "GOOD",
+        "calendar": "Q4_EARLY_FREEZE",
+        "freshness": "HOT"
+      },
+      "diff": 0
+    },
+    {
+      "test": "Test 2: Q1 Budget Season + WARM signal (funding)",
+      "pass": true,
+      "inline": {
+        "multiplier": 1.57,
+        "category": "OPTIMAL",
+        "calendar": "Q1_BUDGET_SEASON",
+        "freshness": "WARM"
+      },
+      "rule": {
+        "multiplier": 1.57,
+        "category": "OPTIMAL",
+        "calendar": "Q1_BUDGET_SEASON",
+        "freshness": "WARM"
+      },
+      "diff": 0
+    },
+    {
+      "test": "Test 3: Ramadan + COLD signal (expansion)",
+      "pass": true,
+      "inline": {
+        "multiplier": 0.1,
+        "category": "POOR",
+        "calendar": "RAMADAN",
+        "freshness": "COLD"
+      },
+      "rule": {
+        "multiplier": 0.1,
+        "category": "POOR",
+        "calendar": "RAMADAN",
+        "freshness": "COLD"
+      },
+      "diff": 0
+    },
+    {
+      "test": "Test 4: Q3 Summer + STALE signal (other)",
+      "pass": true,
+      "inline": {
+        "multiplier": 0.01,
+        "category": "POOR",
+        "calendar": "Q3_SUMMER_SLOWDOWN",
+        "freshness": "STALE"
+      },
+      "rule": {
+        "multiplier": 0.01,
+        "category": "POOR",
+        "calendar": "Q3_SUMMER_SLOWDOWN",
+        "freshness": "STALE"
+      },
+      "diff": 0
+    },
+    {
+      "test": "Test 5: Q2 Standard + RECENT signal (award)",
+      "pass": true,
+      "inline": {
+        "multiplier": 0.92,
+        "category": "FAIR",
+        "calendar": "Q2_STANDARD",
+        "freshness": "RECENT"
+      },
+      "rule": {
+        "multiplier": 0.92,
+        "category": "FAIR",
+        "calendar": "Q2_STANDARD",
+        "freshness": "RECENT"
+      },
+      "diff": 0
+    }
+  ]
+}

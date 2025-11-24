@@ -1,0 +1,37 @@
+# Cloud Scheduler Configuration for Automated Rule Performance Monitoring
+# Sprint 28 - Phase 10: Feedback & Reinforcement Analytics
+#
+# This configuration sets up automated monitoring every 6 hours
+# to check shadow mode agreement rates and alert if below thresholds
+#
+# Deploy using: gcloud scheduler jobs create http rule-performance-monitor --config=cloud-scheduler-config.yaml
+
+name: rule-performance-monitor
+description: "Automated Rule Performance Monitoring - Runs every 6 hours"
+schedule: "0 */6 * * *"
+time_zone: "UTC"
+attempt_deadline: 600s  # 10 minutes timeout
+
+http_target:
+  uri: "https://upr-web-service-191599223867.us-central1.run.app/api/monitoring/check-rule-performance"
+  http_method: POST
+  headers:
+    Content-Type: "application/json"
+    User-Agent: "CloudScheduler/Sprint28"
+
+  body: |
+    {
+      "source": "cloud-scheduler",
+      "scheduled_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    }
+
+  oidc_token:
+    service_account_email: "upr-cloud-run@applied-algebra-474804-e6.iam.gserviceaccount.com"
+    audience: "https://upr-web-service-191599223867.us-central1.run.app"
+
+retry_config:
+  retry_count: 3
+  max_retry_duration: 3600s  # 1 hour max retry window
+  min_backoff_duration: 5s
+  max_backoff_duration: 300s
+  max_doublings: 5

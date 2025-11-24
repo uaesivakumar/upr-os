@@ -1,0 +1,79 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: upr-enrichment-worker
+  labels:
+    env: production
+    team: upr
+    cost-center: product
+    component: enrichment-worker
+  annotations:
+    run.googleapis.com/launch-stage: BETA
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/vpc-access-connector: projects/applied-algebra-474804-e6/locations/us-central1/connectors/upr-vpc-connector
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+        run.googleapis.com/cloudsql-instances: applied-algebra-474804-e6:us-central1:upr-postgres
+        run.googleapis.com/cpu-throttling: 'true'
+        autoscaling.knative.dev/maxScale: '3'
+        autoscaling.knative.dev/minScale: '0'
+        autoscaling.knative.dev/target-utilization-percentage: '60'
+    spec:
+      serviceAccountName: upr-runner@applied-algebra-474804-e6.iam.gserviceaccount.com
+      containerConcurrency: 80
+      timeoutSeconds: 600
+      containers:
+      - image: us-central1-docker.pkg.dev/applied-algebra-474804-e6/upr-app-repo/upr-enrichment-worker:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: WORKER_MODE
+          value: "true"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: DATABASE_URL
+              key: latest
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: REDIS_URL
+              key: latest
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: JWT_SECRET
+              key: latest
+        - name: APOLLO_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: APOLLO_API_KEY
+              key: latest
+        - name: SERPAPI_KEY
+          valueFrom:
+            secretKeyRef:
+              name: SERPAPI_KEY
+              key: latest
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: OPENAI_API_KEY
+              key: latest
+        - name: NEVERBOUNCE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: NEVERBOUNCE_API_KEY
+              key: latest
+        - name: TENANT_ID
+          valueFrom:
+            secretKeyRef:
+              name: TENANT_ID
+              key: latest
+        resources:
+          limits:
+            cpu: '1'
+            memory: 2Gi

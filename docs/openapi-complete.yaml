@@ -1,0 +1,882 @@
+openapi: 3.0.3
+info:
+  title: UPR - Unified Persona & Relationship API
+  description: |
+    Complete API documentation for the UPR (Unified Persona & Relationship) system.
+
+    UPR is an intelligent lead enrichment and outreach automation platform that combines:
+    - Multi-source data enrichment (Apollo, Hunter, LinkedIn)
+    - AI-powered lead scoring and prioritization
+    - Personalized outreach generation
+    - Multi-agent collaboration system
+    - Real-time monitoring and analytics
+
+    ## Authentication
+    Most endpoints require JWT authentication via the `upr_jwt` cookie or `Authorization: Bearer <token>` header.
+
+    ## Rate Limiting
+    - General API: 100 requests per 15 minutes
+    - Enrichment endpoints: 10 requests per minute
+    - Authentication endpoints: 5 requests per minute
+
+  version: 1.0.0
+  contact:
+    name: UPR API Support
+    email: support@upr.ai
+  license:
+    name: Proprietary
+servers:
+  - url: https://upr-web-service-191599223867.us-central1.run.app
+    description: Production server
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Lead Enrichment
+    description: Lead data enrichment from multiple sources
+  - name: Company Intelligence
+    description: Company data and quality assessment
+  - name: Contact Management
+    description: Contact tier evaluation and management
+  - name: Outreach
+    description: Personalized outreach generation
+  - name: Lead Scoring
+    description: AI-powered lead scoring and prioritization
+  - name: Agent Core
+    description: Multi-agent system tools (SIVA Framework)
+  - name: Agent Hub
+    description: Centralized agent management and orchestration
+  - name: Analytics
+    description: System analytics and metrics
+  - name: Monitoring
+    description: System health and performance monitoring
+  - name: Admin
+    description: Administrative functions
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: upr_jwt
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Error message"
+
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "admin"
+        role:
+          type: string
+          example: "admin"
+
+    Lead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_name:
+          type: string
+        domain:
+          type: string
+        contact_name:
+          type: string
+        contact_email:
+          type: string
+        contact_title:
+          type: string
+        contact_tier:
+          type: string
+          enum: [T1, T2, T3, T4]
+        lead_score:
+          type: number
+          minimum: 0
+          maximum: 100
+        company_quality_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        enrichment_status:
+          type: string
+          enum: [pending, in_progress, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+
+    Company:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        domain:
+          type: string
+        industry:
+          type: string
+        size:
+          type: integer
+        location:
+          type: string
+        quality_score:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    AgentDecision:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        agent_type:
+          type: string
+          enum: [discovery, validation, critic]
+        decision:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        reasoning:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+paths:
+  # ============================================================
+  # AUTHENTICATION
+  # ============================================================
+  /api/auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate user and create session
+      description: Login with username and password. Returns JWT token in httpOnly cookie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: "admin"
+                password:
+                  type: string
+                  format: password
+                  example: "supersecret"
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: upr_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Lax
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Authentication not configured
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Authentication not configured"
+
+  /api/auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Logout and clear session
+      description: Clears the JWT authentication cookie
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+
+  /api/auth/verify:
+    get:
+      tags: [Authentication]
+      summary: Verify current session
+      description: Check if the current JWT token is valid
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Session is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  authenticated:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Session invalid or expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: false
+                  authenticated:
+                    type: boolean
+                    example: false
+
+  /api/auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current user info
+      description: Returns information about the authenticated user
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================
+  # LEAD ENRICHMENT
+  # ============================================================
+  /api/enrichment/start:
+    post:
+      tags: [Lead Enrichment]
+      summary: Start lead enrichment job
+      description: |
+        Initiates asynchronous enrichment of leads using multiple data sources:
+        - Apollo: Company and contact data
+        - Hunter: Email finding and verification
+        - NeverBounce: Email deliverability check
+        - OpenAI: AI-powered data enhancement
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [leads]
+              properties:
+                leads:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      company_name:
+                        type: string
+                        example: "Acme Corp"
+                      domain:
+                        type: string
+                        example: "acme.com"
+                      contact_name:
+                        type: string
+                        example: "John Doe"
+                      contact_email:
+                        type: string
+                        example: "john@acme.com"
+                max_contacts:
+                  type: integer
+                  default: 3
+                  minimum: 1
+                  maximum: 10
+      responses:
+        '202':
+          description: Enrichment job started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  job_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    example: "in_progress"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/enrichment/status/{job_id}:
+    get:
+      tags: [Lead Enrichment]
+      summary: Get enrichment job status
+      description: Check the status and progress of an enrichment job
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  status:
+                    type: string
+                    enum: [pending, in_progress, completed, failed]
+                  progress:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                    example: 75.5
+                  completed:
+                    type: integer
+                    example: 15
+                  total:
+                    type: integer
+                    example: 20
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================
+  # AGENT CORE (SIVA Tools)
+  # ============================================================
+  /api/agent-core/v1/tools/evaluate_company_quality:
+    post:
+      tags: [Agent Core]
+      summary: Evaluate company quality (SIVA Tool)
+      description: |
+        Uses multi-agent collaboration to assess company quality based on:
+        - UAE market signals
+        - Salary indicators
+        - Company size and sector
+        - License type
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company_name, domain]
+              properties:
+                company_name:
+                  type: string
+                  example: "TechCorp UAE"
+                domain:
+                  type: string
+                  example: "techcorp.ae"
+                industry:
+                  type: string
+                  example: "Technology"
+                uae_signals:
+                  type: object
+                  properties:
+                    has_ae_domain:
+                      type: boolean
+                    has_uae_address:
+                      type: boolean
+                    linkedin_location:
+                      type: string
+                salary_indicators:
+                  type: object
+                  properties:
+                    salary_level:
+                      type: string
+                      enum: [low, medium, high, very_high]
+                    avg_salary:
+                      type: number
+                size:
+                  type: integer
+                size_bucket:
+                  type: string
+                  enum: [startup, small, midsize, enterprise]
+                license_type:
+                  type: string
+                  example: "Free Zone"
+                sector:
+                  type: string
+                  enum: [Government, Private, Semi-Government]
+      responses:
+        '200':
+          description: Company quality evaluation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  quality_score:
+                    type: number
+                    minimum: 0
+                    maximum: 1
+                    example: 0.85
+                  confidence:
+                    type: number
+                    minimum: 0
+                    maximum: 1
+                    example: 0.92
+                  reasoning:
+                    type: string
+                  factors:
+                    type: object
+
+  /api/agent-core/v1/tools/evaluate_contact_tier:
+    post:
+      tags: [Agent Core]
+      summary: Evaluate contact tier (SIVA Tool)
+      description: |
+        Multi-agent system evaluates contact importance (T1-T4) based on:
+        - Job title and seniority
+        - Department and function
+        - Decision-making authority
+        - Organizational hierarchy
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contact_name, title]
+              properties:
+                contact_name:
+                  type: string
+                  example: "Jane Smith"
+                title:
+                  type: string
+                  example: "Chief People Officer"
+                department:
+                  type: string
+                  example: "Human Resources"
+                seniority:
+                  type: string
+                  enum: [junior, mid, senior, executive, c-level]
+                company_size:
+                  type: integer
+      responses:
+        '200':
+          description: Contact tier evaluation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  tier:
+                    type: string
+                    enum: [T1, T2, T3, T4]
+                    example: "T1"
+                  confidence:
+                    type: number
+                    example: 0.95
+                  reasoning:
+                    type: string
+
+  # ============================================================
+  # AGENT HUB
+  # ============================================================
+  /api/agent-hub/workflow/execute:
+    post:
+      tags: [Agent Hub]
+      summary: Execute multi-agent workflow
+      description: |
+        Executes a collaborative multi-agent workflow with:
+        - Discovery agent (pattern finding)
+        - Validation agent (verification)
+        - Critic agent (quality assessment)
+        - Consensus mechanism
+        - Reflection and learning
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workflow_type, input_data]
+              properties:
+                workflow_type:
+                  type: string
+                  example: "lead_evaluation"
+                input_data:
+                  type: object
+                agents:
+                  type: array
+                  items:
+                    type: string
+                  example: ["discovery", "validation", "critic"]
+                consensus_threshold:
+                  type: number
+                  default: 0.7
+                  minimum: 0
+                  maximum: 1
+      responses:
+        '200':
+          description: Workflow execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  workflow_id:
+                    type: string
+                    format: uuid
+                  result:
+                    type: object
+                  consensus:
+                    type: object
+                  agents_participated:
+                    type: array
+                    items:
+                      type: string
+
+  # ============================================================
+  # OUTREACH GENERATION
+  # ============================================================
+  /api/outreach/generate:
+    post:
+      tags: [Outreach]
+      summary: Generate personalized outreach
+      description: |
+        AI-powered personalized outreach generation using:
+        - Company intelligence
+        - Contact profile
+        - Industry insights
+        - Voice templates
+        - Multi-agent validation
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lead_id]
+              properties:
+                lead_id:
+                  type: string
+                  format: uuid
+                template_id:
+                  type: string
+                  format: uuid
+                voice_style:
+                  type: string
+                  enum: [professional, friendly, consultative, direct]
+                length:
+                  type: string
+                  enum: [short, medium, long]
+                  default: medium
+      responses:
+        '200':
+          description: Generated outreach
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  subject:
+                    type: string
+                  body:
+                    type: string
+                  personalization_score:
+                    type: number
+                    minimum: 0
+                    maximum: 1
+                  quality_score:
+                    type: number
+                    minimum: 0
+                    maximum: 1
+
+  # ============================================================
+  # LEAD SCORING
+  # ============================================================
+  /api/leads/score:
+    post:
+      tags: [Lead Scoring]
+      summary: Calculate lead score
+      description: |
+        AI-powered lead scoring based on:
+        - Fit score (company quality, size, industry)
+        - Engagement score (signals, behaviors)
+        - Intent score (hiring signals, expansion)
+        - Recency score (data freshness)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lead_id]
+              properties:
+                lead_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Lead score calculated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  total_score:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                    example: 87.5
+                  fit_score:
+                    type: number
+                  engagement_score:
+                    type: number
+                  intent_score:
+                    type: number
+                  recency_score:
+                    type: number
+                  breakdown:
+                    type: object
+
+  # ============================================================
+  # MONITORING & HEALTH
+  # ============================================================
+  /health:
+    get:
+      tags: [Monitoring]
+      summary: Health check endpoint
+      description: Returns basic service health status
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                    example: 3600.5
+                  port:
+                    type: integer
+                    example: 8080
+
+  /ready:
+    get:
+      tags: [Monitoring]
+      summary: Readiness check endpoint
+      description: Checks if service is ready to handle requests (includes database connectivity)
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ready"
+                  database:
+                    type: string
+                    example: "connected"
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "not ready"
+                  database:
+                    type: string
+                    example: "disconnected"
+
+  /api/monitoring/system-health:
+    get:
+      tags: [Monitoring]
+      summary: Get comprehensive system health
+      description: Returns detailed system health metrics including agent performance
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System health metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  health_score:
+                    type: number
+                    minimum: 0
+                    maximum: 1
+                    example: 0.95
+                  agents:
+                    type: object
+                  database:
+                    type: object
+                  services:
+                    type: object
+
+  # ============================================================
+  # ANALYTICS
+  # ============================================================
+  /api/stats/dashboard:
+    get:
+      tags: [Analytics]
+      summary: Get dashboard statistics
+      description: Returns key metrics and statistics for the dashboard
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: time_range
+          in: query
+          schema:
+            type: string
+            enum: [24h, 7d, 30d, 90d]
+            default: 7d
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  total_leads:
+                    type: integer
+                  enriched_leads:
+                    type: integer
+                  avg_lead_score:
+                    type: number
+                  conversion_rate:
+                    type: number

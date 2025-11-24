@@ -1,0 +1,137 @@
+# ========================================
+# UPR Security-Focused .gitignore
+# ========================================
+
+# PRIVATE DOCUMENTATION (NEVER COMMIT)
+# ========================================
+/progress/private/
+progress/private/
+**/private/
+
+# Encrypted archives
+*.7z
+*.tc
+*.sparseimage
+*.gpg
+private_docs_encrypted.*
+
+# ENVIRONMENT VARIABLES & SECRETS
+# ========================================
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+!.env.example
+UPR.env
+
+# API Keys & Credentials
+*.key
+*.pem
+secrets/
+credentials/
+api_keys.json
+
+# DATABASE
+# ========================================
+*.sqlite
+*.db
+*.sql.gz
+database_backup/
+
+# LOGS
+# ========================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# DEPENDENCIES
+# ========================================
+node_modules/
+npm-debug.log
+.pnp
+.pnp.js
+
+# BUILD OUTPUT
+# ========================================
+dist/
+build/
+.next/
+out/
+
+# TESTING
+# ========================================
+coverage/
+.nyc_output/
+
+# IDE & EDITOR
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS FILES
+# ========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# TEMPORARY FILES
+# ========================================
+*.tmp
+*.bak
+*.backup
+*~
+.cache/
+temp/
+tmp/
+
+# SENSITIVE BACKUPS
+# ========================================
+backup/
+backups/
+*.backup
+*.bak
+
+# CLOUD CREDENTIALS
+# ========================================
+gcloud-key.json
+aws-credentials.json
+azure-credentials.json
+
+# NOTES (if you keep private notes)
+# ========================================
+PRIVATE_NOTES.md
+TODO_PRIVATE.md
+notes/private/
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+*.tfstate
+*.tfstate.*
+
+# User documents
+instructions/
+*.docx
+
+# Temporary files
+prompt.txt
+SESSION_LOG.md
+QUICK_REFERENCE.md
+UPR_SNAPSHOTS.json
+
+# Progress tracking (keep committed versions)
+# progress/ folder is committed for team visibility

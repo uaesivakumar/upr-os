@@ -1,0 +1,136 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: premiumradar-saas-service
+  labels:
+    app: premiumradar
+    version: v0.1.0
+    phase: phase-2-initial
+  annotations:
+    run.googleapis.com/description: "PremiumRadar SaaS - Commercial Application"
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "20"
+        run.googleapis.com/cpu-throttling: "false"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      containerConcurrency: 100
+      timeoutSeconds: 300
+      serviceAccountName: premiumradar-saas@${PROJECT_ID}.iam.gserviceaccount.com
+      containers:
+        - image: gcr.io/${PROJECT_ID}/premiumradar-saas:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "500m"
+              memory: 512Mi
+          env:
+            # Service identification
+            - name: SERVICE_NAME
+              value: "premiumradar-saas-service"
+            - name: NODE_ENV
+              value: "production"
+
+            # OS Integration - CRITICAL
+            - name: UPR_OS_BASE_URL
+              value: "https://upr-os-service-xxxxx.run.app"
+            - name: UPR_OS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: UPR_OS_API_KEY
+
+            # SaaS Database (separate from OS)
+            - name: SAAS_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: DB_HOST
+            - name: SAAS_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: DB_NAME
+            - name: SAAS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: DB_USER
+            - name: SAAS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: DB_PASSWORD
+
+            # Stripe Billing
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+
+            # Auth
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: JWT_SECRET
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: SESSION_SECRET
+
+            # Product Analytics
+            - name: MIXPANEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: MIXPANEL_TOKEN
+
+            # Monitoring
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: premiumradar-secrets
+                  key: SENTRY_DSN
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+  traffic:
+    - percent: 100
+      latestRevision: true

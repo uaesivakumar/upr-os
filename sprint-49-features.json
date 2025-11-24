@@ -1,0 +1,150 @@
+{
+  "sprint": "Sprint 49",
+  "sprint_id": "2b166151-dd16-81e3-8408-de3d18cfdaa2",
+  "sprint_goal": "Lead Enrichment Workflow UI - Redesigned enrichment with AI suggestions, smart validation, batch operations, quality indicators, history timeline, and templates",
+  "fetched_at": "2025-11-21T15:08:28.861Z",
+  "total_features": 10,
+  "features": [
+    {
+      "id": "2b166151-dd16-81c7-bfba-c74082ffa150",
+      "name": "Document enrichment UI features",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Documentation",
+      "complexity": "Unknown",
+      "description": "Documentation: User documentation for new enrichment interface",
+      "tags": [
+        "frontend",
+        "Documentation"
+      ],
+      "estimate": 0,
+      "modules": 2
+    },
+    {
+      "id": "2b166151-dd16-8141-b9a5-e5dd1f47654e",
+      "name": "Create enrichment templates",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Pre-configured enrichment workflows",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-817b-8845-e91fa92e8d72",
+      "name": "Add enrichment history timeline",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Timeline view of enrichment changes",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81f5-89eb-ea016ca839d3",
+      "name": "Add enrichment quality indicators",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Visual indicators for data quality and completeness",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 2
+    },
+    {
+      "id": "2b166151-dd16-81de-b94f-d63bf87c37e9",
+      "name": "Test enrichment workflow E2E",
+      "status": "Done",
+      "priority": "High",
+      "type": "Test",
+      "complexity": "Unknown",
+      "description": "Testing: End-to-end testing of new enrichment UI",
+      "tags": [
+        "Testing"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81c9-9a07-d20d2e8ed0e3",
+      "name": "Implement smart field validation",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Real-time validation with helpful error messages",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81ea-ad51-e63e981d0207",
+      "name": "Create batch enrichment UI",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Bulk enrichment interface for multiple leads",
+      "tags": [
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-817d-865a-db2fbe4dea1e",
+      "name": "Implement real-time progress tracking",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Live progress updates with visual feedback",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81fe-afa9-c13a3a25a2f8",
+      "name": "Add AI-powered field suggestions",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: AI suggests field values during enrichment",
+      "tags": [
+        "AI"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81ee-946b-fd4d816a3027",
+      "name": "Redesign enrichment workflow UI",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - Enrichment: Modern, intuitive enrichment workflow interface",
+      "tags": [
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 1
+    }
+  ]
+}

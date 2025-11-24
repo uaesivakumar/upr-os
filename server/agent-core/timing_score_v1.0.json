@@ -1,0 +1,383 @@
+{
+  "version": "v1.0",
+  "created_at": "2025-11-16T03:15:00.000Z",
+  "description": "TimingScore cognitive rules - calendar-based multiplier calculation with signal recency (Sprint 25)",
+  "changelog": {
+    "v1.0": "Initial rule engine based on TimingScoreTool implementation (226 shadow mode decisions)"
+  },
+  "rules": {
+    "calculate_timing_score": {
+      "type": "multiplicative_scoring",
+      "description": "Calculate timing multiplier from calendar context, signal recency, and signal type decay",
+      "base_confidence": 1.0,
+      "output_range": [0.0, 2.0],
+
+      "uae_calendar_periods": {
+        "ramadan_2025": {"start": "2025-03-01", "end": "2025-03-30"},
+        "ramadan_2026": {"start": "2026-02-18", "end": "2026-03-19"},
+        "eid_2025": {"start": "2025-03-31", "end": "2025-04-13"},
+        "eid_2026": {"start": "2026-03-20", "end": "2026-04-02"},
+        "national_day": {"month": 12, "day": 2, "duration_days": 2}
+      },
+
+      "computed_variables": {
+        "current_quarter": {
+          "type": "conditional",
+          "description": "Infer quarter from current_date month",
+          "branches": [
+            {
+              "type": "if",
+              "condition": {"fiscal_context.quarter": {"exists": true}},
+              "value": {"source": "fiscal_context.quarter"}
+            },
+            {
+              "type": "elif",
+              "condition": {"current_date_month": {"in": [1, 2, 3]}},
+              "value": "Q1"
+            },
+            {
+              "type": "elif",
+              "condition": {"current_date_month": {"in": [4, 5, 6]}},
+              "value": "Q2"
+            },
+            {
+              "type": "elif",
+              "condition": {"current_date_month": {"in": [7, 8, 9]}},
+              "value": "Q3"
+            },
+            {
+              "type": "else",
+              "value": "Q4"
+            }
+          ]
+        },
+
+        "calendar_multiplier": {
+          "type": "conditional",
+          "description": "Calculate calendar-based multiplier (highest priority: Ramadan, then Eid, then National Day, then Quarter)",
+          "branches": [
+            {
+              "type": "if",
+              "condition": {
+                "OR": [
+                  {"fiscal_context.is_ramadan": {"eq": true}},
+                  {"current_date": {"in_period": "ramadan_2025"}},
+                  {"current_date": {"in_period": "ramadan_2026"}}
+                ]
+              },
+              "value": 0.3,
+              "context": "RAMADAN"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "OR": [
+                  {"fiscal_context.is_post_eid": {"eq": true}},
+                  {"current_date": {"in_period": "eid_2025"}},
+                  {"current_date": {"in_period": "eid_2026"}}
+                ]
+              },
+              "value": 0.8,
+              "context": "POST_EID_RECOVERY"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "current_date_month": {"eq": 12},
+                "current_date_day": {"in": [2, 3]}
+              },
+              "value": 0.8,
+              "context": "UAE_NATIONAL_DAY"
+            },
+            {
+              "type": "elif",
+              "condition": {"current_quarter": {"eq": "Q1"}},
+              "value": 1.3,
+              "context": "Q1_BUDGET_SEASON"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "AND": [
+                  {"current_quarter": {"eq": "Q2"}},
+                  {"ramadan_approaching": {"eq": true}}
+                ]
+              },
+              "value": 1.2,
+              "context": "Q2_PRE_RAMADAN_RUSH"
+            },
+            {
+              "type": "elif",
+              "condition": {"current_quarter": {"eq": "Q2"}},
+              "value": 1.0,
+              "context": "Q2_STANDARD"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "AND": [
+                  {"current_quarter": {"eq": "Q3"}},
+                  {"current_date_month": {"eq": 6}}
+                ]
+              },
+              "value": 0.9,
+              "context": "Q3_EARLY_SUMMER"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "AND": [
+                  {"current_quarter": {"eq": "Q3"}},
+                  {
+                    "OR": [
+                      {"fiscal_context.is_summer": {"eq": true}},
+                      {"current_date_month": {"in": [7, 8]}}
+                    ]
+                  }
+                ]
+              },
+              "value": 0.7,
+              "context": "Q3_SUMMER_SLOWDOWN"
+            },
+            {
+              "type": "elif",
+              "condition": {"current_quarter": {"eq": "Q3"}},
+              "value": 0.9,
+              "context": "Q3_STANDARD"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "AND": [
+                  {"current_quarter": {"eq": "Q4"}},
+                  {"current_date_month": {"eq": 11}}
+                ]
+              },
+              "value": 0.9,
+              "context": "Q4_EARLY_FREEZE"
+            },
+            {
+              "type": "elif",
+              "condition": {
+                "AND": [
+                  {"current_quarter": {"eq": "Q4"}},
+                  {"current_date_month": {"eq": 12}}
+                ]
+              },
+              "value": 0.6,
+              "context": "Q4_BUDGET_FREEZE"
+            },
+            {
+              "type": "else",
+              "value": 1.0,
+              "context": "STANDARD"
+            }
+          ]
+        },
+
+        "signal_recency_multiplier": {
+          "type": "conditional",
+          "description": "Calculate signal recency multiplier based on signal age (days)",
+          "branches": [
+            {
+              "type": "if",
+              "condition": {"signal_age": {"null": true}},
+              "value": 1.0,
+              "freshness": "STANDARD",
+              "confidence_penalty": 0.2
+            },
+            {
+              "type": "elif",
+              "condition": {"signal_age": {"lte": 7}},
+              "value": 1.5,
+              "freshness": "HOT"
+            },
+            {
+              "type": "elif",
+              "condition": {"signal_age": {"lte": 14}},
+              "value": 1.3,
+              "freshness": "WARM"
+            },
+            {
+              "type": "elif",
+              "condition": {"signal_age": {"lte": 30}},
+              "value": 1.1,
+              "freshness": "RECENT"
+            },
+            {
+              "type": "elif",
+              "condition": {"signal_age": {"lte": 60}},
+              "value": 1.0,
+              "freshness": "STANDARD"
+            },
+            {
+              "type": "elif",
+              "condition": {"signal_age": {"lte": 90}},
+              "value": 0.8,
+              "freshness": "COOLING"
+            },
+            {
+              "type": "elif",
+              "condition": {"signal_age": {"lte": 180}},
+              "value": 0.5,
+              "freshness": "COLD"
+            },
+            {
+              "type": "else",
+              "value": 0.3,
+              "freshness": "STALE"
+            }
+          ]
+        },
+
+        "signal_type_decay_modifier": {
+          "type": "formula",
+          "description": "Calculate signal type decay modifier: decay_rate ^ (signal_age / 7 weeks)",
+          "formula": "POWER(decay_rate, signal_age / 7)",
+          "decay_rates": {
+            "hiring": 0.90,
+            "funding": 0.95,
+            "expansion": 0.98,
+            "award": 0.95,
+            "other": 0.90
+          },
+          "default_decay_rate": 0.90
+        },
+
+        "timing_multiplier_raw": {
+          "type": "formula",
+          "description": "Calculate raw timing multiplier: calendar × signal_recency × signal_type_decay",
+          "formula": "calendar_multiplier * signal_recency_multiplier * signal_type_decay_modifier"
+        },
+
+        "timing_multiplier": {
+          "type": "clamp",
+          "description": "Clamp timing multiplier to valid range [0.0, 2.0]",
+          "source": "timing_multiplier_raw",
+          "min": 0.0,
+          "max": 2.0
+        }
+      },
+
+      "category_classification": {
+        "OPTIMAL": {
+          "condition": {"timing_multiplier": {"gte": 1.3}},
+          "description": "Optimal timing for outreach - high calendar favorability + fresh signal"
+        },
+        "GOOD": {
+          "condition": {"timing_multiplier": {"gte": 1.0}},
+          "description": "Good timing for outreach - favorable conditions"
+        },
+        "FAIR": {
+          "condition": {"timing_multiplier": {"gte": 0.7}},
+          "description": "Fair timing - moderate conditions, outreach possible"
+        },
+        "POOR": {
+          "condition": {"timing_multiplier": {"lt": 0.7}},
+          "description": "Poor timing - unfavorable conditions (Ramadan, summer, budget freeze, stale signal)"
+        }
+      },
+
+      "reasoning_templates": {
+        "OPTIMAL": {
+          "calendar_primary": "Excellent timing with {calendar_context} providing strong calendar advantage.",
+          "signal_primary": "Signal is {signal_freshness} ({signal_age} days old), making this an ideal time to engage.",
+          "combined": "{calendar_reason} {signal_reason} Signal type: {signal_type}."
+        },
+        "GOOD": {
+          "calendar_primary": "Good timing with {calendar_context} providing favorable conditions.",
+          "signal_primary": "Signal freshness is {signal_freshness} ({signal_age} days old), supporting timely outreach.",
+          "combined": "{calendar_reason} {signal_reason} Signal type: {signal_type}."
+        },
+        "FAIR": {
+          "calendar_primary": "Moderate timing with {calendar_context}.",
+          "signal_primary": "Signal is {signal_freshness} ({signal_age} days old), outreach is still viable.",
+          "combined": "{calendar_reason} {signal_reason} Signal type: {signal_type}. Consider waiting for optimal window if possible.",
+          "next_window": "Next optimal window: {next_optimal_window}."
+        },
+        "POOR": {
+          "calendar_primary": "Unfavorable timing with {calendar_context} creating significant headwinds.",
+          "signal_primary": "Signal is {signal_freshness} ({signal_age} days old), reducing urgency.",
+          "combined": "{calendar_reason} {signal_reason} Signal type: {signal_type}. Strong recommendation to wait for better timing.",
+          "next_window": "Next optimal window: {next_optimal_window}."
+        }
+      },
+
+      "key_factors_mapping": {
+        "calendar_context": {
+          "RAMADAN": ["RAMADAN_PERIOD", "VERY_LOW_ACTIVITY"],
+          "POST_EID_RECOVERY": ["POST_EID", "REDUCED_ACTIVITY"],
+          "UAE_NATIONAL_DAY": ["UAE_NATIONAL_DAY", "REDUCED_ACTIVITY"],
+          "Q1_BUDGET_SEASON": ["Q1_BUDGET_SEASON", "HIGH_ACTIVITY"],
+          "Q2_PRE_RAMADAN_RUSH": ["Q2_PRE_RAMADAN", "ELEVATED_ACTIVITY"],
+          "Q2_STANDARD": ["Q2_STANDARD"],
+          "Q3_EARLY_SUMMER": ["Q3_EARLY_SUMMER", "SLIGHTLY_REDUCED"],
+          "Q3_SUMMER_SLOWDOWN": ["Q3_SUMMER", "VERY_LOW_ACTIVITY"],
+          "Q3_STANDARD": ["Q3_STANDARD"],
+          "Q4_EARLY_FREEZE": ["Q4_EARLY_FREEZE", "REDUCED_ACTIVITY"],
+          "Q4_BUDGET_FREEZE": ["Q4_BUDGET_FREEZE", "VERY_LOW_ACTIVITY"],
+          "STANDARD": ["STANDARD_PERIOD"]
+        },
+        "signal_freshness": {
+          "HOT": ["HOT_SIGNAL", "HIGH_URGENCY"],
+          "WARM": ["WARM_SIGNAL", "ELEVATED_URGENCY"],
+          "RECENT": ["RECENT_SIGNAL"],
+          "STANDARD": ["STANDARD_SIGNAL"],
+          "COOLING": ["COOLING_SIGNAL", "REDUCED_URGENCY"],
+          "COLD": ["COLD_SIGNAL", "LOW_URGENCY"],
+          "STALE": ["STALE_SIGNAL", "MINIMAL_URGENCY"]
+        },
+        "signal_type": {
+          "hiring": ["HIRING_SIGNAL", "FAST_DECAY"],
+          "funding": ["FUNDING_SIGNAL", "MEDIUM_DECAY"],
+          "expansion": ["EXPANSION_SIGNAL", "SLOW_DECAY"],
+          "award": ["AWARD_SIGNAL", "MEDIUM_DECAY"],
+          "other": ["OTHER_SIGNAL", "FAST_DECAY"]
+        }
+      },
+
+      "next_optimal_window_calculation": {
+        "description": "Calculate next optimal window (Q1 budget season) if timing is POOR or FAIR",
+        "rule": "If current_month > 3, suggest next year's Q1 (YYYY-01-15), else suggest this year's Q1 (YYYY-01-15)"
+      },
+
+      "confidence_adjustments": {
+        "no_fiscal_context": {
+          "condition": {
+            "AND": [
+              {"fiscal_context.quarter": {"null": true}},
+              {"fiscal_context.is_ramadan": {"null": true}}
+            ]
+          },
+          "penalty": 0.15,
+          "reason": "Inferred fiscal context (not explicitly provided)"
+        },
+        "no_signal_age": {
+          "condition": {"signal_age": {"null": true}},
+          "penalty": 0.2,
+          "reason": "Signal age not provided"
+        }
+      },
+
+      "output_format": {
+        "timing_multiplier": "number (0.0-2.0, rounded to 2 decimals)",
+        "category": "OPTIMAL | GOOD | FAIR | POOR",
+        "confidence": "number (0.5-1.0, rounded to 2 decimals)",
+        "reasoning": "string (natural language explanation)",
+        "timestamp": "ISO 8601 timestamp",
+        "metadata": {
+          "calendar_context": "string",
+          "signal_freshness": "string",
+          "key_factors": "array of strings",
+          "next_optimal_window": "YYYY-MM-DD | null"
+        },
+        "_meta": {
+          "latency_ms": "number",
+          "tool_name": "calculate_timing_score",
+          "tool_type": "STRICT",
+          "policy_version": "v1.0"
+        }
+      }
+    }
+  }
+}

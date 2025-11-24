@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://upr.ai/schemas/domain-pattern-discovery-output.json",
+  "title": "Domain Pattern Discovery Output",
+  "description": "Output schema for domain and email pattern discovery agent",
+  "type": "object",
+  "required": ["domain", "pattern", "confidence", "source"],
+  "properties": {
+    "domain": {
+      "type": ["string", "null"],
+      "description": "Discovered company domain",
+      "format": "hostname"
+    },
+    "pattern": {
+      "type": ["string", "null"],
+      "description": "Discovered email pattern (e.g., {first}.{last})",
+      "pattern": "^\\{[a-z]+\\}([._-]\\{[a-z]+\\})?$"
+    },
+    "confidence": {
+      "type": "number",
+      "description": "Confidence score (0-1)",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of discovery",
+      "enum": [
+        "manual_override",
+        "rocketreach",
+        "leadiq",
+        "percentage_based",
+        "email_example",
+        "ai_overview",
+        "explicit_notation",
+        "serp_no_results",
+        "serp_no_extraction",
+        "error",
+        "cached"
+      ]
+    },
+    "alternative_patterns": {
+      "type": "array",
+      "description": "Alternative email patterns",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern": { "type": "string" },
+          "confidence": { "type": "number" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Evidence for the discovery",
+      "properties": {
+        "query": { "type": "string" },
+        "top_result": { "type": "object" },
+        "total_results": { "type": "integer" }
+      }
+    },
+    "processing_time_ms": {
+      "type": "number",
+      "description": "Processing time in milliseconds",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false
+}

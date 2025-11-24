@@ -1,0 +1,153 @@
+{
+  "sprint": "Sprint 50",
+  "sprint_id": "2b166151-dd16-816b-b8a4-e5fb12d730fc",
+  "sprint_goal": "AI Agent Visualization (SIVA in Action) - Real-time agent activity and reasoning",
+  "fetched_at": "2025-11-22T04:20:58.907Z",
+  "total_features": 10,
+  "features": [
+    {
+      "id": "2b166151-dd16-814e-826a-facbdc7dbf69",
+      "name": "Document SIVA visualization",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Documentation",
+      "complexity": "Unknown",
+      "description": "Documentation: User guide for agent visualization features",
+      "tags": [
+        "Documentation"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8156-bfaf-f8607ba0a2f1",
+      "name": "Add agent filtering and search",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Filter and search agent activities",
+      "tags": [
+        "AI"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8114-af52-dd90a4604836",
+      "name": "Create agent performance dashboard",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Dashboard showing agent metrics and performance",
+      "tags": [
+        "AI",
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 2
+    },
+    {
+      "id": "2b166151-dd16-81a5-a2ec-e9a24f65d474",
+      "name": "Implement confidence score displays",
+      "status": "Done",
+      "priority": "Medium",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Visual confidence indicators for agent decisions",
+      "tags": [
+        "Feature"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-8153-9476-d38ee9bda973",
+      "name": "Test agent visualization",
+      "status": "Done",
+      "priority": "High",
+      "type": "Test",
+      "complexity": "Unknown",
+      "description": "Testing: Test agent visualization components",
+      "tags": [
+        "AI",
+        "Testing"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-819c-a641-d007a9efe34b",
+      "name": "Build agent activity streaming API",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Backend - SIVA: Real-time API for agent activity",
+      "tags": [
+        "AI",
+        "backend",
+        "frontend"
+      ],
+      "estimate": 0,
+      "modules": 2
+    },
+    {
+      "id": "2b166151-dd16-8145-a859-e6961248ef70",
+      "name": "Add agent collaboration visualization",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Show how agents work together",
+      "tags": [
+        "AI"
+      ],
+      "estimate": 0,
+      "modules": 2
+    },
+    {
+      "id": "2b166151-dd16-81b2-a7fb-e347fe7ecbf2",
+      "name": "Create agent decision cards with reasoning",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Cards showing agent decisions with explanations",
+      "tags": [
+        "AI"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-81ea-9c80-e63be13befdb",
+      "name": "Implement real-time agent activity feed",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Live feed of agent decisions and actions",
+      "tags": [
+        "AI"
+      ],
+      "estimate": 0,
+      "modules": 1
+    },
+    {
+      "id": "2b166151-dd16-818d-a364-f94afb1ee03b",
+      "name": "Design agent visualization interface",
+      "status": "Done",
+      "priority": "High",
+      "type": "Feature",
+      "complexity": "Unknown",
+      "description": "Frontend - SIVA: Visual interface showing agents at work",
+      "tags": [
+        "AI"
+      ],
+      "estimate": 0,
+      "modules": 1
+    }
+  ]
+}

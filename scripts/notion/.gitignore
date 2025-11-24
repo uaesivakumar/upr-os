@@ -1,0 +1,7 @@
+# Notion setup - local files only
+node_modules/
+.env
+*.log
+
+# Keep example files
+!.env.example

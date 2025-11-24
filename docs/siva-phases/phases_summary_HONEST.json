@@ -1,0 +1,287 @@
+[
+  {
+    "phase": "Phase 1: Persona Extraction & Cognitive Foundation",
+    "status": "Complete (Retrospective)",
+    "completion": "80%",
+    "priority": "Critical",
+    "eta": 1,
+    "sprintTarget": "Sprint 24 (Complete by Sprint 25)",
+    "notes": "SPRINT 24 COMPLETE: Extracted 6 cognitive pillars from 959 shadow mode decisions. Full retrospective documentation created. Remaining: golden dataset formalization.",
+    "actualStatus": "Completed retrospectively using production data",
+    "deliverables": [
+      "✅ 959 documented decisions with reasoning (shadow mode data)",
+      "✅ Pattern extraction (extractCognitivePillars.js)",
+      "✅ Cognitive pillars documentation (Phase_1_COMPLETE.md, COGNITIVE_PILLARS.md)",
+      "✅ 6 cognitive pillars identified and documented",
+      "⏳ Golden dataset creation (50+ curated examples - Sprint 25)"
+    ],
+    "files": [
+      "scripts/analysis/extractCognitivePillars.js",
+      "scripts/analysis/cognitivePillars.json",
+      "docs/siva-phases/Phase_1_COMPLETE.md",
+      "docs/siva-phases/COGNITIVE_PILLARS.md"
+    ],
+    "pageId": "2a366151-dd16-80a0-a55a-f9c96282e69a"
+  },
+  {
+    "phase": "Phase 2: Cognitive Framework Architecture",
+    "status": "Complete",
+    "completion": "100%",
+    "priority": "Critical",
+    "eta": 0,
+    "sprintTarget": "Sprint 24 (Complete)",
+    "notes": "SPRINT 24 COMPLETE: Comprehensive architecture documentation with 9 Mermaid diagrams. Module mapping, data flows, tool interactions, and deployment architecture fully documented.",
+    "actualStatus": "Architecture fully documented with diagrams and specifications",
+    "deliverables": [
+      "✅ Functional modules exist (4 SIVA tools)",
+      "✅ Architecture diagrams (9 Mermaid diagrams)",
+      "✅ Module mapping (6 cognitive pillars → 4 tools)",
+      "✅ Tool interface contracts (TypeScript definitions)",
+      "✅ Data flows (request → tool → decision → logging)",
+      "✅ Shadow mode architecture (parallel execution + comparison)",
+      "✅ Database schema (agent_core.agent_decisions + 5 tables)",
+      "✅ Multi-tool orchestration patterns",
+      "✅ Deployment CI/CD pipeline"
+    ],
+    "files": [
+      "docs/siva-phases/Phase_2_ARCHITECTURE.md (9 Mermaid diagrams)",
+      "server/siva-tools/*.js (4 standalone tools)",
+      "server/agent-core/ContactTierRuleEngineV2.js",
+      "server/agent-core/rule-engine.js"
+    ],
+    "pageId": "2a366151-dd16-801b-bd2b-f3180d9d7a8e"
+  },
+  {
+    "phase": "Phase 3: Centralized Agentic Hub Design",
+    "status": "Not Started",
+    "completion": "0%",
+    "priority": "High",
+    "eta": 6,
+    "sprintTarget": "Sprint 25 (Design Only)",
+    "notes": "SPRINT 25: Create Agent Hub design spec. No implementation yet.",
+    "actualStatus": "Tools work independently, no orchestration layer",
+    "deliverables": [
+      "❌ Agent Hub architecture design",
+      "❌ MCP integration spec",
+      "❌ Multi-agent coordination protocol",
+      "❌ Centralized orchestration layer"
+    ],
+    "files": [],
+    "pageId": "2a366151-dd16-8076-8f7b-e7104c29b682"
+  },
+  {
+    "phase": "Phase 4: Infrastructure & Topology",
+    "status": "Complete",
+    "completion": "100%",
+    "priority": "Critical",
+    "eta": 0,
+    "sprintTarget": "Complete (Sprint 26)",
+    "notes": "SPRINT 26 COMPLETE: Full infrastructure documentation with 24 Mermaid diagrams. Cloud Run + VPC + Cloud SQL topology, deployment pipeline, disaster recovery plan (RTO: 1h, RPO: 5min).",
+    "actualStatus": "Infrastructure deployed, tested, and fully documented",
+    "deliverables": [
+      "✅ Cloud Run hosting (99.50% uptime, 2-10 instances)",
+      "✅ GCP Cloud SQL database (private IP: 10.154.0.5)",
+      "✅ Docker containerization (multi-stage build)",
+      "✅ VPC networking + Cloud SQL Proxy (10.8.0.0/28)",
+      "✅ Sentry error tracking (10% performance sampling)",
+      "✅ Infrastructure topology diagrams (15+ diagrams) - Sprint 26",
+      "✅ Deployment pipeline documentation (CI/CD, rollback) - Sprint 26",
+      "✅ Disaster recovery plan (RTO: 1h, RPO: 5min) - Sprint 26"
+    ],
+    "files": [
+      "cloudbuild.yaml",
+      "Dockerfile",
+      "server/utils/db.js",
+      "docs/PHASE_4_DEPLOYMENT.md",
+      "docs/siva-phases/PHASE_4_TOPOLOGY_DIAGRAMS.md",
+      "docs/siva-phases/DEPLOYMENT_PIPELINE.md",
+      "docs/siva-phases/DISASTER_RECOVERY_PLAN.md"
+    ],
+    "pageId": "2a366151-dd16-8092-ab62-f2026ee088f0"
+  },
+  {
+    "phase": "Phase 5: Cognitive Extraction & Encoding",
+    "status": "Complete",
+    "completion": "100%",
+    "priority": "Critical",
+    "eta": 0,
+    "sprintTarget": "Sprint 25 (COMPLETE)",
+    "notes": "SPRINT 25 COMPLETE: All 4 rule engines operational! TimingScore v1.0 (100% match, 5ms) and BankingProductMatch v1.0 (100% match, 3ms) deployed. Production verified via smoke test (4/4 pass).",
+    "actualStatus": "All 4 cognitive rule engines operational in production with 95%+ match rates and <10ms latency",
+    "deliverables": [
+      "✅ Rule Engine interpreter (rule-engine.js)",
+      "✅ CompanyQuality cognitive rules (v2.2, 97.88% match, 7ms, 309 decisions)",
+      "✅ ContactTier rule engine v2.0 (100% match, 1ms, 230 decisions)",
+      "✅ TimingScore rule engine v1.0 (100% match, 5ms, 226 decisions) - Sprint 25",
+      "✅ BankingProductMatch rule engine v1.0 (100% match, 3ms, 194 decisions) - Sprint 25",
+      "✅ Explainability format (breakdown + reasoning)",
+      "✅ Shadow mode decision logging (959+ total decisions)",
+      "✅ Golden dataset (50 validated examples)",
+      "✅ Production smoke test (4/4 tools pass)",
+      "❌ Governance policy (Sprint 27)"
+    ],
+    "files": [
+      "server/agent-core/rule-engine.js",
+      "server/agent-core/cognitive_extraction_logic_v2.0.json (CompanyQuality v2.2)",
+      "server/agent-core/contact_tier_v2.0.json",
+      "server/agent-core/ContactTierRuleEngineV2.js",
+      "server/agent-core/timing_score_v1.0.json",
+      "server/agent-core/TimingScoreRuleEngineV1.js",
+      "server/agent-core/banking_product_match_v1.0.json",
+      "server/agent-core/BankingProductMatchRuleEngineV1.js",
+      "scripts/testing/smokeTestSprint25.js",
+      "docs/SPRINT_25_COMPLETION.md"
+    ],
+    "pageId": "2a366151-dd16-806b-98b6-ffa91f5396de"
+  },
+  {
+    "phase": "Phase 6: Prompt Engineering (Siva-Mode)",
+    "status": "Not Started",
+    "completion": "0%",
+    "priority": "Medium",
+    "eta": 8,
+    "sprintTarget": "Sprint 30+",
+    "notes": "Future phase. Requires Phase 5 completion first.",
+    "actualStatus": "Not started",
+    "deliverables": [
+      "❌ Siva-mode voice templates",
+      "❌ Fixed doctrine prompts",
+      "❌ Outreach message generation",
+      "❌ Variable placeholder system"
+    ],
+    "files": [],
+    "pageId": "2a366151-dd16-80ea-a035-e5bdaeab4545"
+  },
+  {
+    "phase": "Phase 7: Quantitative Intelligence Layer",
+    "status": "Not Started",
+    "completion": "0%",
+    "priority": "High",
+    "eta": 6,
+    "sprintTarget": "Sprint 27 (Design)",
+    "notes": "Partial scoring exists (CompanyQuality 0-100). Full Q-Score formula planned for Sprint 27.",
+    "actualStatus": "Basic quality scoring exists, but not full quantitative framework",
+    "deliverables": [
+      "⚠️ Quality score exists (0-100)",
+      "❌ Q-Score formula (quality × signal × reachability)",
+      "❌ Segmentation logic",
+      "⚠️ Edge-case rules (partial in v2.2)"
+    ],
+    "files": [],
+    "pageId": "2a366151-dd16-80ae-8e61-c76e230dddfa"
+  },
+  {
+    "phase": "Phase 8: Opportunity Lifecycle Engine",
+    "status": "Not Started",
+    "completion": "0%",
+    "priority": "Medium",
+    "eta": 10,
+    "sprintTarget": "Sprint 35+",
+    "notes": "Advanced phase. Requires Phases 5-7 completion.",
+    "actualStatus": "Not started",
+    "deliverables": [
+      "❌ State machine (COLD → REPEAT_BUSINESS)",
+      "❌ Outreach intent per state",
+      "❌ Transition triggers",
+      "❌ Journey tracking"
+    ],
+    "files": [],
+    "pageId": "2a366151-dd16-80d0-bb91-dc43d304771c"
+  },
+  {
+    "phase": "Phase 9: Explainability & Transparency Layer",
+    "status": "In Progress",
+    "completion": "50%",
+    "priority": "High",
+    "eta": 4,
+    "sprintTarget": "Sprint 28",
+    "notes": "Backend explainability exists (breakdown arrays). UI layer not built.",
+    "actualStatus": "Rule engine returns reasoning, but no UI for transparency",
+    "deliverables": [
+      "✅ Reasoning breakdown in responses",
+      "✅ Explainability format (breakdown array)",
+      "❌ UI schema for 'Why this score'",
+      "❌ Hiring Signals drawer visualization"
+    ],
+    "files": [
+      "server/agent-core/rule-engine.js (breakdown logic)"
+    ],
+    "pageId": "2a366151-dd16-8070-b9fa-fc43ebe133d1"
+  },
+  {
+    "phase": "Phase 10: Feedback & Reinforcement Analytics",
+    "status": "In Progress",
+    "completion": "80%",
+    "priority": "Critical",
+    "eta": 1,
+    "sprintTarget": "Sprint 28 (Complete)",
+    "notes": "SPRINT 27 COMPLETE: A/B testing infrastructure operational (ABTestingHelper, consistent hashing, 50/50 traffic split). Automated monitoring complete (checkRulePerformance.js with 4 trigger conditions, Sentry + Slack alerts). Enterprise detection fixed (size-based, scales to 1M+ brands). Remaining: Cloud Scheduler setup + scoring adjustments.",
+    "actualStatus": "A/B testing + automated monitoring operational, deployment + Cloud Scheduler pending",
+    "deliverables": [
+      "✅ agent_decisions table (959+ decisions logged)",
+      "✅ decision_feedback table (schema ready)",
+      "✅ Shadow mode data collection (all 4 tools)",
+      "✅ Pattern extraction automation (extractCognitivePillars.js)",
+      "✅ Feedback loop architecture (complete 6-stage cycle) - Sprint 26",
+      "✅ Feedback collection API (POST /feedback) - Sprint 26",
+      "✅ Feedback dashboard API (GET /feedback/summary) - Sprint 26",
+      "✅ Analytics queries (success rate, confidence, latency) - Sprint 26",
+      "✅ Rule adjustment workflow (A/B testing, ABTestingHelper) - Sprint 27",
+      "✅ Automated retraining trigger (checkRulePerformance.js, analyzeABTest.js) - Sprint 27",
+      "✅ Sentry + Slack alert integration - Sprint 27",
+      "✅ Training sample creation from failed decisions - Sprint 27",
+      "⏳ Cloud Scheduler integration (every 6 hours) - Sprint 28",
+      "❌ Scoring adjustments based on outcomes (Sprint 28)"
+    ],
+    "files": [
+      "database/schema/agent_core.sql",
+      "scripts/sprint23/checkShadowModeProgress.sh",
+      "scripts/analysis/extractCognitivePillars.js",
+      "scripts/analysis/cognitivePillars.json",
+      "docs/siva-phases/FEEDBACK_LOOP_ARCHITECTURE.md",
+      "routes/agent-core.js (POST /feedback, GET /feedback/summary)",
+      "server/agent-core/ab-testing.js (ABTestingHelper)",
+      "scripts/monitoring/analyzeABTest.js",
+      "scripts/monitoring/checkRulePerformance.js",
+      "scripts/testing/smokeTestFeedbackLoop.js"
+    ],
+    "pageId": "2a366151-dd16-80c1-9d07-fac6b63ed691"
+  },
+  {
+    "phase": "Phase 11: Multi-Agent Collaboration & Reflection",
+    "status": "Not Started",
+    "completion": "0%",
+    "priority": "Low",
+    "eta": 15,
+    "sprintTarget": "Sprint 40+",
+    "notes": "Advanced phase. Requires Agent Hub (Phase 3) and Phases 5-10 completion.",
+    "actualStatus": "Not started",
+    "deliverables": [
+      "❌ Multi-agent system",
+      "❌ DiscoveryAgent, ValidationAgent, CriticAgent",
+      "❌ Reflection dialogue",
+      "❌ Agent collaboration protocol"
+    ],
+    "files": [],
+    "pageId": "2a366151-dd16-80fd-b230-f466402075fd"
+  },
+  {
+    "phase": "Phase 12: Lead Scoring Engine",
+    "status": "Not Started",
+    "completion": "0%",
+    "priority": "Medium",
+    "eta": 8,
+    "sprintTarget": "Sprint 32",
+    "notes": "Company scoring exists. Lead scoring (person + company) not implemented.",
+    "actualStatus": "Company scoring exists, but not lead scoring",
+    "deliverables": [
+      "⚠️ Company quality scoring (0-100)",
+      "⚠️ Contact tier selection",
+      "❌ Lead scoring (person + company combination)",
+      "❌ Display priority ranking",
+      "❌ Most actionable contacts identification"
+    ],
+    "files": [],
+    "pageId": "2a466151-dd16-8011-abde-cc58a61e5ec9"
+  }
+]
