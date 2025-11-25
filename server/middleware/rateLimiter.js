@@ -1,9 +1,30 @@
 /**
  * Sprint 17 P1: API Rate Limiting
  * Protects endpoints from abuse and prevents cost overruns
+ *
+ * WHITELIST: Service-to-service calls from PremiumRadar SaaS are exempt
+ * (identified by X-Client: premiumradar-saas header)
  */
 
 import rateLimit from 'express-rate-limit';
+
+// ============================================================
+// WHITELIST CONFIGURATION
+// ============================================================
+
+/**
+ * Skip rate limiting for whitelisted internal services
+ * SaaS sends X-Client: premiumradar-saas header via os-client.ts
+ */
+const WHITELISTED_CLIENTS = ['premiumradar-saas'];
+
+function skipWhitelistedClients(req) {
+  const clientHeader = req.get('X-Client');
+  if (clientHeader && WHITELISTED_CLIENTS.includes(clientHeader)) {
+    return true; // Skip rate limiting
+  }
+  return false;
+}
 
 // ============================================================
 // RATE LIMIT CONFIGURATIONS
@@ -24,6 +45,7 @@ export const generalLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false, // Disable X-RateLimit-* headers
   validate: { trustProxy: false }, // Sprint 19: Skip trust proxy validation for Cloud Run
+  skip: skipWhitelistedClients, // Whitelist SaaS service-to-service calls
   handler: (req, res) => {
     console.warn('⚠️  Rate limit exceeded', {
       ip: req.ip,
@@ -58,6 +80,7 @@ export const enrichmentLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: false, // Count all requests
   validate: { trustProxy: false }, // Sprint 19: Skip trust proxy validation for Cloud Run
+  skip: skipWhitelistedClients, // Whitelist SaaS service-to-service calls
   handler: (req, res) => {
     console.warn('⚠️  Enrichment rate limit exceeded', {
       ip: req.ip,
