@@ -5,9 +5,9 @@
 This service has been frozen as of **2025-11-25**.
 
 ### Frozen State
-- **Revision**: `upr-os-service-00011-pwb`
-- **Docker Image**: `us-central1-docker.pkg.dev/applied-algebra-474804-e6/cloud-run-source-deploy/upr-os-service:frozen-2025-11-25`
-- **Git Tag**: `frozen-2025-11-25`
+- **Revision**: `upr-os-service-00013-cl7`
+- **Docker Image**: `us-central1-docker.pkg.dev/applied-algebra-474804-e6/cloud-run-source-deploy/upr-os-service:frozen-2025-11-25-v2`
+- **Git Commit**: `4be9804` (includes SaaS whitelist fix)
 
 ### Why Frozen?
 The UPR OS service is the core backend for PremiumRadar SaaS. Breaking changes here cascade to:
@@ -19,9 +19,10 @@ The UPR OS service is the core backend for PremiumRadar SaaS. Breaking changes h
 If the service breaks, restore using:
 ```bash
 gcloud run deploy upr-os-service \
-  --image=us-central1-docker.pkg.dev/applied-algebra-474804-e6/cloud-run-source-deploy/upr-os-service:frozen-2025-11-25 \
+  --image=us-central1-docker.pkg.dev/applied-algebra-474804-e6/cloud-run-source-deploy/upr-os-service:frozen-2025-11-25-v2 \
   --region=us-central1 \
-  --project=applied-algebra-474804-e6
+  --project=applied-algebra-474804-e6 \
+  --ingress=all
 ```
 
 ### Verified Endpoints (2025-11-25)
