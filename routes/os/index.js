@@ -2,6 +2,7 @@
  * UPR OS Router - Main Entry Point
  * Sprint 64: Unified OS API Layer
  * Sprint 67: Added Settings endpoints
+ * Sprint 50: Added Provider Management endpoints
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -13,6 +14,7 @@
  * - POST /api/os/outreach     - Outreach generation
  * - POST /api/os/pipeline     - Full pipeline orchestration
  * - GET  /api/os/settings/*   - OS settings management
+ * - GET  /api/os/providers/*  - API provider management
  */
 
 import express from 'express';
@@ -24,6 +26,8 @@ import outreachRouter from './outreach.js';
 import pipelineRouter from './pipeline.js';
 import settingsRouter from './settings.js';
 import entitiesRouter from './entities.js';
+import providersRouter from './providers.js';
+import objectsRouter from './objects.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -73,6 +77,16 @@ router.get('/', (req, res) => {
         path: '/api/os/settings',
         method: 'GET/PUT',
         description: 'OS settings, scoring profiles, verticals, personas'
+      },
+      providers: {
+        path: '/api/os/providers',
+        method: 'GET/POST/PATCH/DELETE',
+        description: 'API provider management, rate limits, health monitoring'
+      },
+      objects: {
+        path: '/api/os/objects',
+        method: 'GET/POST',
+        description: 'Object registry, schemas, auto-population, dependency graphs'
       }
     },
     profiles: OS_PROFILES,
@@ -135,5 +149,7 @@ router.use('/outreach', outreachRouter);
 router.use('/pipeline', pipelineRouter);
 router.use('/settings', settingsRouter);
 router.use('/entities', entitiesRouter);
+router.use('/providers', providersRouter);
+router.use('/objects', objectsRouter);
 
 export default router;
