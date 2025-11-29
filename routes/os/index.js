@@ -3,6 +3,7 @@
  * Sprint 64: Unified OS API Layer
  * Sprint 67: Added Settings endpoints
  * Sprint 50: Added Provider Management endpoints
+ * Sprint 51: Added LLM Engine Routing endpoints
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -15,6 +16,7 @@
  * - POST /api/os/pipeline     - Full pipeline orchestration
  * - GET  /api/os/settings/*   - OS settings management
  * - GET  /api/os/providers/*  - API provider management
+ * - POST /api/os/llm/*        - LLM engine routing, model selection, journeys
  */
 
 import express from 'express';
@@ -28,6 +30,7 @@ import settingsRouter from './settings.js';
 import entitiesRouter from './entities.js';
 import providersRouter from './providers.js';
 import objectsRouter from './objects.js';
+import llmRouter from './llm.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -87,6 +90,11 @@ router.get('/', (req, res) => {
         path: '/api/os/objects',
         method: 'GET/POST',
         description: 'Object registry, schemas, auto-population, dependency graphs'
+      },
+      llm: {
+        path: '/api/os/llm',
+        method: 'GET/POST',
+        description: 'LLM engine routing, model selection, fallback chains, journeys'
       }
     },
     profiles: OS_PROFILES,
@@ -108,7 +116,8 @@ router.get('/health', async (req, res) => {
     score: 'checking',
     rank: 'checking',
     outreach: 'checking',
-    pipeline: 'checking'
+    pipeline: 'checking',
+    llm: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -151,5 +160,6 @@ router.use('/settings', settingsRouter);
 router.use('/entities', entitiesRouter);
 router.use('/providers', providersRouter);
 router.use('/objects', objectsRouter);
+router.use('/llm', llmRouter);
 
 export default router;

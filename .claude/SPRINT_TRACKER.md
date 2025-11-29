@@ -61,7 +61,7 @@
 | Sprint | Name | Service | Status | Branch | Notes |
 |--------|------|---------|--------|--------|-------|
 | S50 | API Provider Management | OS | Complete | feat/s50-os-api-provider-management | Provider registry, rate limiting, health monitoring, fallback chains, vertical-aware chaining, object registry |
-| S51 | LLM Engine Routing | OS | Backlog | - | - |
+| S51 | LLM Engine Routing | OS | Complete | feat/s51-os-llm-engine-routing | LLM provider adapters, model selection, fallback chains, routing rules, vertical-aware branching, journey state management |
 | S52 | Vertical Pack System | OS | Backlog | - | - |
 | S53 | Territory Management | OS | Backlog | - | - |
 
@@ -201,9 +201,9 @@ gcloud run deploy upr-os-api \
 
 ## Current Focus
 
-**Active Sprint:** S50 - API Provider Management (OS) - COMPLETE
+**Active Sprint:** S51 - LLM Engine Routing (OS) - COMPLETE
 
-**Next Sprint:** S51 - LLM Engine Routing (OS)
+**Next Sprint:** S52 - Vertical Pack System (OS)
 
 ---
 
