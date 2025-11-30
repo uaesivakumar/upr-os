@@ -4,6 +4,8 @@
  * Sprint 67: Added Settings endpoints
  * Sprint 50: Added Provider Management endpoints
  * Sprint 51: Added LLM Engine Routing endpoints
+ * Sprint 52: Added Vertical Pack endpoints
+ * Sprint 53: Added Territory Management endpoints
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -17,6 +19,7 @@
  * - GET  /api/os/settings/*   - OS settings management
  * - GET  /api/os/providers/*  - API provider management
  * - POST /api/os/llm/*        - LLM engine routing, model selection, journeys
+ * - GET  /api/os/territories/* - Territory management, hierarchy, rules
  */
 
 import express from 'express';
@@ -32,6 +35,7 @@ import providersRouter from './providers.js';
 import objectsRouter from './objects.js';
 import llmRouter from './llm.js';
 import verticalsRouter from './verticals.js';
+import territoriesRouter from './territories.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -101,6 +105,11 @@ router.get('/', (req, res) => {
         path: '/api/os/verticals',
         method: 'GET/POST/PATCH/DELETE',
         description: 'Vertical packs, signals, scoring, evidence, personas, journeys, radar'
+      },
+      territories: {
+        path: '/api/os/territories',
+        method: 'GET/POST/PATCH/DELETE',
+        description: 'Territory hierarchy, config inheritance, assignment rules, audit logs'
       }
     },
     profiles: OS_PROFILES,
@@ -124,7 +133,8 @@ router.get('/health', async (req, res) => {
     outreach: 'checking',
     pipeline: 'checking',
     llm: 'checking',
-    verticals: 'checking'
+    verticals: 'checking',
+    territories: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -169,5 +179,6 @@ router.use('/providers', providersRouter);
 router.use('/objects', objectsRouter);
 router.use('/llm', llmRouter);
 router.use('/verticals', verticalsRouter);
+router.use('/territories', territoriesRouter);
 
 export default router;

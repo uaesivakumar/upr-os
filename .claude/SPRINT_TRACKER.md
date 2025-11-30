@@ -63,7 +63,7 @@
 | S50 | API Provider Management | OS | Complete | feat/s50-os-api-provider-management | Provider registry, rate limiting, health monitoring, fallback chains, vertical-aware chaining, object registry |
 | S51 | LLM Engine Routing | OS | Complete | feat/s51-os-llm-engine-routing | LLM provider adapters, model selection, fallback chains, routing rules, vertical-aware branching, journey state management |
 | S52 | Vertical Pack System | OS | Complete | feat/s52-os-vertical-pack-system | Vertical packs, signal types, scoring templates, evidence rules, personas, journeys, radar targets, 200-object stress test |
-| S53 | Territory Management | OS | Backlog | - | - |
+| S53 | Territory Management | OS | Complete | feat/s53-os-territory-management | Territory hierarchy, config inheritance, assignment rules, audit logs, UAE seed data, metrics, sub-verticals |
 
 ### Phase 2: Admin & Billing
 | Sprint | Name | Service | Status | Branch | Notes |
@@ -201,9 +201,9 @@ gcloud run deploy upr-os-api \
 
 ## Current Focus
 
-**Active Sprint:** S52 - Vertical Pack System (OS) - COMPLETE
+**Active Sprint:** S53 - Territory Management (OS) - COMPLETE
 
-**Next Sprint:** S53 - Territory Management (OS)
+**Next Sprint:** S55 - Config-Driven OS Kernel (OS)
 
 ---
 
