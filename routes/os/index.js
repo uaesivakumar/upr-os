@@ -31,6 +31,7 @@ import entitiesRouter from './entities.js';
 import providersRouter from './providers.js';
 import objectsRouter from './objects.js';
 import llmRouter from './llm.js';
+import verticalsRouter from './verticals.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -95,6 +96,11 @@ router.get('/', (req, res) => {
         path: '/api/os/llm',
         method: 'GET/POST',
         description: 'LLM engine routing, model selection, fallback chains, journeys'
+      },
+      verticals: {
+        path: '/api/os/verticals',
+        method: 'GET/POST/PATCH/DELETE',
+        description: 'Vertical packs, signals, scoring, evidence, personas, journeys, radar'
       }
     },
     profiles: OS_PROFILES,
@@ -117,7 +123,8 @@ router.get('/health', async (req, res) => {
     rank: 'checking',
     outreach: 'checking',
     pipeline: 'checking',
-    llm: 'checking'
+    llm: 'checking',
+    verticals: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -161,5 +168,6 @@ router.use('/entities', entitiesRouter);
 router.use('/providers', providersRouter);
 router.use('/objects', objectsRouter);
 router.use('/llm', llmRouter);
+router.use('/verticals', verticalsRouter);
 
 export default router;
