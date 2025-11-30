@@ -1,9 +1,10 @@
 /**
  * UPR OS Object Registry API
  * Sprint 50: API Provider Management
+ * Sprint 64: Object Intelligence v2
  *
  * Endpoints for managing business objects, their schemas,
- * auto-population, and dependency graphs.
+ * auto-population, dependency graphs, and object intelligence.
  */
 
 import express from 'express';
@@ -16,6 +17,7 @@ import {
 } from './types.js';
 import * as objectRegistry from '../../services/objectRegistry.js';
 import * as verticalChain from '../../services/verticalProviderChain.js';
+import * as objectIntelligence from '../../services/objectIntelligence.js';
 
 const router = express.Router();
 
@@ -544,6 +546,669 @@ router.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString()
   });
+});
+
+// ============================================================================
+// OBJECT INTELLIGENCE ENDPOINTS (S64)
+// ============================================================================
+
+/**
+ * POST /api/os/objects/register
+ * Register a new object node or update existing
+ *
+ * Request body:
+ * {
+ *   "objectType": "company",
+ *   "payload": { "name": "Acme Inc", "domain": "acme.com" },
+ *   "context": { "territoryId": "uae", "verticalSlug": "banking" }
+ * }
+ */
+router.post('/register', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { objectType, payload, context = {} } = req.body;
+
+    if (!objectType) {
+      return res.status(400).json(createOSError({
+        error: 'objectType is required',
+        code: 'OS_OBJECTS_INVALID_INPUT',
+        endpoint: '/api/os/objects/register',
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    const object = await objectIntelligence.registerObject(objectType, payload, context);
+
+    res.json(createOSResponse({
+      success: true,
+      data: object,
+      reason: `Registered ${objectType} object`,
+      confidence: 100,
+      endpoint: '/api/os/objects/register',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error registering object:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_REGISTER_ERROR',
+      endpoint: '/api/os/objects/register',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/objects/link
+ * Link two objects with a relationship edge
+ */
+router.post('/link', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { fromObjectId, toObjectId, edgeType, weight = 1.0, metadata = {} } = req.body;
+
+    if (!fromObjectId || !toObjectId || !edgeType) {
+      return res.status(400).json(createOSError({
+        error: 'fromObjectId, toObjectId, and edgeType are required',
+        code: 'OS_OBJECTS_INVALID_INPUT',
+        endpoint: '/api/os/objects/link',
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    const edge = await objectIntelligence.linkObjects(fromObjectId, toObjectId, edgeType, weight, metadata);
+
+    res.json(createOSResponse({
+      success: true,
+      data: edge,
+      reason: `Created ${edgeType} edge between objects`,
+      confidence: 100,
+      endpoint: '/api/os/objects/link',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error linking objects:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_LINK_ERROR',
+      endpoint: '/api/os/objects/link',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/:id/graph
+ * Get object relationship graph
+ */
+router.get('/:id/graph', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const { edgeTypes, direction, maxDepth, includeData } = req.query;
+
+    const options = {
+      edgeTypes: edgeTypes ? edgeTypes.split(',') : undefined,
+      direction: direction || 'both',
+      maxDepth: maxDepth ? parseInt(maxDepth, 10) : 1,
+      includeData: includeData !== 'false'
+    };
+
+    const graph = await objectIntelligence.getObjectGraph(id, options);
+
+    if (!graph) {
+      return res.status(404).json(createOSError({
+        error: 'Object not found',
+        code: 'OS_OBJECT_NOT_FOUND',
+        endpoint: `/api/os/objects/${id}/graph`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    res.json(createOSResponse({
+      success: true,
+      data: graph,
+      reason: `Found ${graph.neighbors.length} neighbors with ${graph.edges.length} edges`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/graph`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error getting object graph:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_GRAPH_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/graph`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/:id/timeline
+ * Get object event timeline
+ */
+router.get('/:id/timeline', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const { eventTypes, eventCategories, since, until, limit, offset } = req.query;
+
+    const options = {
+      eventTypes: eventTypes ? eventTypes.split(',') : undefined,
+      eventCategories: eventCategories ? eventCategories.split(',') : undefined,
+      since,
+      until,
+      limit: limit ? parseInt(limit, 10) : 50,
+      offset: offset ? parseInt(offset, 10) : 0
+    };
+
+    const timeline = await objectIntelligence.getObjectTimeline(id, options);
+
+    res.json(createOSResponse({
+      success: true,
+      data: timeline,
+      reason: `Found ${timeline.total} events`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/timeline`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error getting timeline:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_TIMELINE_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/timeline`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/:id/state
+ * Get object current state
+ */
+router.get('/:id/state', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+
+    const state = await objectIntelligence.getObjectState(id);
+
+    res.json(createOSResponse({
+      success: true,
+      data: state,
+      reason: `State version ${state.stateVersion}`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/state`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error getting state:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_STATE_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/state`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/objects/:id/state
+ * Update object state (merge patch)
+ */
+router.post('/:id/state', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const statePatch = req.body;
+
+    const state = await objectIntelligence.setObjectState(id, statePatch);
+
+    res.json(createOSResponse({
+      success: true,
+      data: state,
+      reason: `Updated state to version ${state.stateVersion}`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/state`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error updating state:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_STATE_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/state`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/objects/:id/events
+ * Append event to object timeline
+ */
+router.post('/:id/events', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const { eventType, payload = {}, actorType, actorId, relatedObjectId } = req.body;
+
+    if (!eventType) {
+      return res.status(400).json(createOSError({
+        error: 'eventType is required',
+        code: 'OS_OBJECTS_INVALID_INPUT',
+        endpoint: `/api/os/objects/${id}/events`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    const event = await objectIntelligence.appendObjectEvent(id, eventType, payload, {
+      actorType,
+      actorId,
+      relatedObjectId
+    });
+
+    res.json(createOSResponse({
+      success: true,
+      data: event,
+      reason: `Appended ${eventType} event`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/events`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error appending event:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_EVENT_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/events`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/:id/threads
+ * Get threads for an object
+ */
+router.get('/:id/threads', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const { threadTypes, isOpen, limit, offset } = req.query;
+
+    const options = {
+      threadTypes: threadTypes ? threadTypes.split(',') : undefined,
+      isOpen: isOpen !== undefined ? isOpen === 'true' : undefined,
+      limit: limit ? parseInt(limit, 10) : 20,
+      offset: offset ? parseInt(offset, 10) : 0
+    };
+
+    const threads = await objectIntelligence.getObjectThreads(id, options);
+
+    res.json(createOSResponse({
+      success: true,
+      data: threads,
+      reason: `Found ${threads.total} threads`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/threads`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error getting threads:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_THREADS_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/threads`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/objects/:id/threads
+ * Create a new thread for an object
+ */
+router.post('/:id/threads', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const { threadType, initialMessage, title } = req.body;
+
+    if (!threadType) {
+      return res.status(400).json(createOSError({
+        error: 'threadType is required',
+        code: 'OS_OBJECTS_INVALID_INPUT',
+        endpoint: `/api/os/objects/${id}/threads`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    const thread = await objectIntelligence.createObjectThread(id, threadType, initialMessage, title);
+
+    res.json(createOSResponse({
+      success: true,
+      data: thread,
+      reason: `Created ${threadType} thread`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/threads`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error creating thread:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_THREAD_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/threads`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/threads/:threadId
+ * Append message to a thread
+ */
+router.post('/threads/:threadId', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { threadId } = req.params;
+    const message = req.body;
+
+    if (!message || !message.content) {
+      return res.status(400).json(createOSError({
+        error: 'message with content is required',
+        code: 'OS_OBJECTS_INVALID_INPUT',
+        endpoint: `/api/os/threads/${threadId}`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    const thread = await objectIntelligence.appendToThread(threadId, message);
+
+    if (!thread) {
+      return res.status(404).json(createOSError({
+        error: 'Thread not found',
+        code: 'OS_THREAD_NOT_FOUND',
+        endpoint: `/api/os/threads/${threadId}`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    res.json(createOSResponse({
+      success: true,
+      data: thread,
+      reason: `Added message to thread`,
+      confidence: 100,
+      endpoint: `/api/os/threads/${threadId}`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error appending to thread:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_THREAD_ERROR',
+      endpoint: `/api/os/threads/${req.params.threadId}`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/objects/:id/signals
+ * Derive signals from an object
+ */
+router.post('/:id/signals', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const context = req.body;
+
+    const result = await objectIntelligence.deriveSignalsFromObject(id, context);
+
+    if (result.error) {
+      return res.status(404).json(createOSError({
+        error: result.error,
+        code: 'OS_OBJECT_NOT_FOUND',
+        endpoint: `/api/os/objects/${id}/signals`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    res.json(createOSResponse({
+      success: true,
+      data: result,
+      reason: `Derived ${result.signals.length} signals`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/signals`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error deriving signals:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_SIGNALS_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/signals`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/:id/actions
+ * Get available actions for an object
+ */
+router.get('/:id/actions', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+    const { verticalSlug } = req.query;
+
+    const actions = await objectIntelligence.getObjectActions(id, { verticalSlug });
+
+    res.json(createOSResponse({
+      success: true,
+      data: { actions },
+      reason: `Found ${actions.length} available actions`,
+      confidence: 100,
+      endpoint: `/api/os/objects/${id}/actions`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error getting actions:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_ACTIONS_ERROR',
+      endpoint: `/api/os/objects/${req.params.id}/actions`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/nodes/:id
+ * Get a specific object node
+ */
+router.get('/nodes/:id', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { id } = req.params;
+
+    const object = await objectIntelligence.getObject(id);
+
+    if (!object) {
+      return res.status(404).json(createOSError({
+        error: 'Object not found',
+        code: 'OS_OBJECT_NOT_FOUND',
+        endpoint: `/api/os/objects/nodes/${id}`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    res.json(createOSResponse({
+      success: true,
+      data: object,
+      reason: `Found ${object.objectType} object`,
+      confidence: 100,
+      endpoint: `/api/os/objects/nodes/${id}`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error getting object:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_GET_ERROR',
+      endpoint: `/api/os/objects/nodes/${req.params.id}`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/objects/list
+ * List objects with filters
+ */
+router.get('/list', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { objectType, territoryId, verticalSlug, search, limit, offset, orderBy, order } = req.query;
+
+    const filters = { objectType, territoryId, verticalSlug, search };
+    const options = {
+      limit: limit ? parseInt(limit, 10) : 50,
+      offset: offset ? parseInt(offset, 10) : 0,
+      orderBy: orderBy || 'created_at',
+      order: order || 'desc'
+    };
+
+    const result = await objectIntelligence.listObjects(filters, options);
+
+    res.json(createOSResponse({
+      success: true,
+      data: result,
+      reason: `Found ${result.total} objects`,
+      confidence: 100,
+      endpoint: '/api/os/objects/list',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Objects] Error listing objects:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_OBJECTS_LIST_ERROR',
+      endpoint: '/api/os/objects/list',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
 });
 
 export default router;

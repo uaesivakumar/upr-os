@@ -9,6 +9,8 @@
  * Sprint 55: Added Config-Driven OS Kernel
  * Sprint 56: Added Discovery Target Types
  * Sprint 58-61: Added Journey Engine (Core, Steps, Templates, Monitoring)
+ * Sprint 64: Added Object Intelligence v2
+ * Sprint 65: Added Evidence System v2
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -26,6 +28,7 @@
  * - GET  /api/os/config/*     - OS kernel configuration
  * - GET  /api/os/targets/*    - Discovery target types
  * - GET  /api/os/journeys/*   - Journey engine, instances, templates, monitoring
+ * - GET  /api/os/evidence/*  - Evidence aggregation, scoring, freshness, conflicts
  */
 
 import express from 'express';
@@ -45,6 +48,7 @@ import territoriesRouter from './territories.js';
 import configRouter from './config.js';
 import targetsRouter from './targets.js';
 import journeysRouter from './journeys.js';
+import evidenceRouter from './evidence.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -134,6 +138,11 @@ router.get('/', (req, res) => {
         path: '/api/os/journeys',
         method: 'GET/POST/PATCH/DELETE',
         description: 'Journey engine, definitions, instances, templates, monitoring, A/B tests'
+      },
+      evidence: {
+        path: '/api/os/evidence',
+        method: 'GET/POST/PUT/DELETE',
+        description: 'Evidence aggregation, scoring, freshness, provider weights, conflicts'
       }
     },
     profiles: OS_PROFILES,
@@ -161,7 +170,8 @@ router.get('/health', async (req, res) => {
     territories: 'checking',
     config: 'checking',
     targets: 'checking',
-    journeys: 'checking'
+    journeys: 'checking',
+    evidence: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -210,5 +220,6 @@ router.use('/territories', territoriesRouter);
 router.use('/config', configRouter);
 router.use('/targets', targetsRouter);
 router.use('/journeys', journeysRouter);
+router.use('/evidence', evidenceRouter);
 
 export default router;
