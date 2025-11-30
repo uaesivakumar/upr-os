@@ -6,6 +6,8 @@
  * Sprint 51: Added LLM Engine Routing endpoints
  * Sprint 52: Added Vertical Pack endpoints
  * Sprint 53: Added Territory Management endpoints
+ * Sprint 55: Added Config-Driven OS Kernel
+ * Sprint 56: Added Discovery Target Types
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -20,6 +22,8 @@
  * - GET  /api/os/providers/*  - API provider management
  * - POST /api/os/llm/*        - LLM engine routing, model selection, journeys
  * - GET  /api/os/territories/* - Territory management, hierarchy, rules
+ * - GET  /api/os/config/*     - OS kernel configuration
+ * - GET  /api/os/targets/*    - Discovery target types
  */
 
 import express from 'express';
@@ -36,6 +40,8 @@ import objectsRouter from './objects.js';
 import llmRouter from './llm.js';
 import verticalsRouter from './verticals.js';
 import territoriesRouter from './territories.js';
+import configRouter from './config.js';
+import targetsRouter from './targets.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -110,6 +116,16 @@ router.get('/', (req, res) => {
         path: '/api/os/territories',
         method: 'GET/POST/PATCH/DELETE',
         description: 'Territory hierarchy, config inheritance, assignment rules, audit logs'
+      },
+      config: {
+        path: '/api/os/config',
+        method: 'GET/PUT/POST/DELETE',
+        description: 'OS kernel configuration, presets, versioning, hot reload'
+      },
+      targets: {
+        path: '/api/os/targets',
+        method: 'GET/POST/PATCH/DELETE',
+        description: 'Discovery target types, sources, strategies, execution'
       }
     },
     profiles: OS_PROFILES,
@@ -134,7 +150,9 @@ router.get('/health', async (req, res) => {
     pipeline: 'checking',
     llm: 'checking',
     verticals: 'checking',
-    territories: 'checking'
+    territories: 'checking',
+    config: 'checking',
+    targets: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -180,5 +198,7 @@ router.use('/objects', objectsRouter);
 router.use('/llm', llmRouter);
 router.use('/verticals', verticalsRouter);
 router.use('/territories', territoriesRouter);
+router.use('/config', configRouter);
+router.use('/targets', targetsRouter);
 
 export default router;

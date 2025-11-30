@@ -69,8 +69,8 @@
 | Sprint | Name | Service | Status | Branch | Notes |
 |--------|------|---------|--------|--------|-------|
 | S54 | Admin Panel Foundation | SaaS | Backlog | - | - |
-| S55 | Config-Driven OS Kernel | OS | Backlog | - | - |
-| S56 | Discovery Target Types | OS | Backlog | - | - |
+| S55 | Config-Driven OS Kernel | OS | Complete | feat/s55-s56-os-kernel-discovery | Config loader, versioning, presets, hot reload, env overrides, deterministic snapshots |
+| S56 | Discovery Target Types | OS | Complete | feat/s55-s56-os-kernel-discovery | Target type registry, sources, strategies, execution tracking, deterministic selection |
 | S57 | Billing, Plans & Feature Flags | SaaS | Backlog | - | - |
 
 ### Phase 3: Journey Engine
@@ -201,9 +201,9 @@ gcloud run deploy upr-os-api \
 
 ## Current Focus
 
-**Active Sprint:** S53 - Territory Management (OS) - COMPLETE
+**Active Sprint:** S55-S56 - Config Kernel & Discovery Targets (OS) - COMPLETE
 
-**Next Sprint:** S55 - Config-Driven OS Kernel (OS)
+**Next Sprint:** S58 - Journey Engine Core (OS)
 
 ---
 
