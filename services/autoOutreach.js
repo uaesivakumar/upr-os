@@ -13,12 +13,20 @@
  *   - Context via territoryId, verticalSlug parameters
  *   - Integrates with S64 Object Intelligence
  *   - Integrates with S65 Evidence System
+ *   - Integrates with S66 Autonomous Safety (kill switch, activity log, checkpoints)
  *   - Integrates with S67 Auto-Discovery
+ *
+ * S66 Integration:
+ *   - Before sending: check isAutonomyEnabled()
+ *   - High-value outreach: registerCheckpoint() for human approval
+ *   - On send: logAutonomousEvent({ eventType: 'outreach_sent', source: 'auto-outreach' })
+ *   - On error: logAutonomousEvent({ eventType: 'outreach_failed', severity: 'error' })
  */
 
 import { getDb } from '../db/index.js';
 import { ConfigLoader } from './configLoader.js';
 import * as Sentry from '@sentry/node';
+import * as autonomousSafety from './autonomousSafety.js';
 
 // =====================================================
 // OUTREACH QUEUE MANAGER
@@ -98,14 +106,45 @@ export async function queueOutreach({
 export async function getOutreachBatch({
   batchSize = 10,
   channel = null,
-  verticalSlug = null
+  verticalSlug = null,
+  territoryId = null,
+  respectKillSwitch = true
 }) {
   const db = getDb();
+
+  // Check kill switch before processing
+  if (respectKillSwitch) {
+    const enabled = await autonomousSafety.isAutonomyEnabled({ verticalSlug, territoryId });
+    if (!enabled) {
+      await autonomousSafety.logAutonomousEvent({
+        eventType: 'outreach_blocked',
+        severity: 'warning',
+        source: 'auto-outreach',
+        message: 'Kill switch is active - skipping outreach batch',
+        verticalSlug,
+        territoryId
+      });
+      return [];
+    }
+  }
 
   const result = await db.raw(
     'SELECT * FROM get_outreach_batch(?, ?, ?)',
     [batchSize, channel, verticalSlug]
   );
+
+  // Log batch fetch
+  if (result.rows?.length > 0) {
+    await autonomousSafety.logAutonomousEvent({
+      eventType: 'outreach_batch_fetched',
+      severity: 'info',
+      source: 'auto-outreach',
+      message: `Fetched ${result.rows.length} items for outreach`,
+      verticalSlug,
+      territoryId,
+      metadata: { batchSize: result.rows.length, channel }
+    });
+  }
 
   return result.rows || [];
 }
@@ -116,7 +155,9 @@ export async function getOutreachBatch({
 export async function recordOutreachEvent({
   outreachId,
   eventType,
-  eventData = {}
+  eventData = {},
+  verticalSlug = null,
+  territoryId = null
 }) {
   const db = getDb();
 
@@ -124,6 +165,18 @@ export async function recordOutreachEvent({
     'SELECT record_outreach_event(?, ?, ?::jsonb)',
     [outreachId, eventType, JSON.stringify(eventData)]
   );
+
+  // Log outreach event to activity log
+  const isError = eventType === 'bounced' || eventType === 'failed';
+  await autonomousSafety.logAutonomousEvent({
+    eventType: `outreach_${eventType}`,
+    severity: isError ? 'warning' : 'info',
+    source: 'auto-outreach',
+    message: `Outreach ${eventType} for item ${outreachId}`,
+    verticalSlug,
+    territoryId,
+    metadata: { outreachId, eventType, ...eventData }
+  });
 
   // Update send time patterns if we have enough data
   if (['opened', 'clicked', 'replied', 'bounced'].includes(eventType)) {

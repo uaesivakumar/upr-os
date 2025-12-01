@@ -13,6 +13,7 @@
  * Sprint 65: Added Evidence System v2
  * Sprint 67: Added Auto-Discovery Engine
  * Sprint 68: Added Auto-Outreach Engine
+ * Sprint 66: Added Autonomous Safety & Control
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -53,6 +54,7 @@ import journeysRouter from './journeys.js';
 import evidenceRouter from './evidence.js';
 import autoDiscoveryRouter from './autoDiscovery.js';
 import autoOutreachRouter from './autoOutreach.js';
+import autonomousSafetyRouter from './autonomousSafety.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -157,6 +159,11 @@ router.get('/', (req, res) => {
         path: '/api/os/auto-outreach',
         method: 'GET/POST/PATCH/DELETE',
         description: 'Autonomous outreach: queue, channels, send time optimization, sequences, response classification'
+      },
+      autonomous: {
+        path: '/api/os/autonomous',
+        method: 'GET/POST/PUT/DELETE',
+        description: 'Autonomous safety: kill switch, activity log, checkpoints, task queue'
       }
     },
     profiles: OS_PROFILES,
@@ -187,7 +194,8 @@ router.get('/health', async (req, res) => {
     journeys: 'checking',
     evidence: 'checking',
     autoDiscovery: 'checking',
-    autoOutreach: 'checking'
+    autoOutreach: 'checking',
+    autonomous: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -239,5 +247,6 @@ router.use('/journeys', journeysRouter);
 router.use('/evidence', evidenceRouter);
 router.use('/auto-discovery', autoDiscoveryRouter);
 router.use('/auto-outreach', autoOutreachRouter);
+router.use('/autonomous', autonomousSafetyRouter);
 
 export default router;

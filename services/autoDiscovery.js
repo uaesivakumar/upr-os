@@ -13,12 +13,21 @@
  *   - Context via territoryId, verticalSlug parameters
  *   - Integrates with S64 Object Intelligence
  *   - Integrates with S65 Evidence System
+ *   - Integrates with S66 Autonomous Safety (kill switch, activity log, checkpoints)
  *   - ConfigLoader for all configuration
+ *
+ * S66 Integration:
+ *   - Before processing: check isAutonomyEnabled()
+ *   - On start: logAutonomousEvent({ eventType: 'discovery_started', source: 'auto-discovery' })
+ *   - On complete: logAutonomousEvent({ eventType: 'discovery_completed' })
+ *   - On error: logAutonomousEvent({ eventType: 'discovery_failed', severity: 'error' })
+ *   - High-value targets: registerCheckpoint() before enrichment
  */
 
 import { getDb } from '../db/index.js';
 import { ConfigLoader } from './configLoader.js';
 import * as Sentry from '@sentry/node';
+import * as autonomousSafety from './autonomousSafety.js';
 
 // =====================================================
 // ENRICHMENT PIPELINE
@@ -83,14 +92,44 @@ export async function queueEnrichment({
 export async function getEnrichmentBatch({
   batchSize = 10,
   verticalSlug = null,
-  territoryId = null
+  territoryId = null,
+  respectKillSwitch = true
 }) {
   const db = getDb();
+
+  // Check kill switch before processing
+  if (respectKillSwitch) {
+    const enabled = await autonomousSafety.isAutonomyEnabled({ verticalSlug, territoryId });
+    if (!enabled) {
+      await autonomousSafety.logAutonomousEvent({
+        eventType: 'discovery_blocked',
+        severity: 'warning',
+        source: 'auto-discovery',
+        message: 'Kill switch is active - skipping enrichment batch',
+        verticalSlug,
+        territoryId
+      });
+      return [];
+    }
+  }
 
   const result = await db.raw(
     'SELECT * FROM get_enrichment_batch(?, ?, ?)',
     [batchSize, verticalSlug, territoryId]
   );
+
+  // Log batch fetch
+  if (result.rows?.length > 0) {
+    await autonomousSafety.logAutonomousEvent({
+      eventType: 'discovery_batch_fetched',
+      severity: 'info',
+      source: 'auto-discovery',
+      message: `Fetched ${result.rows.length} items for enrichment`,
+      verticalSlug,
+      territoryId,
+      metadata: { batchSize: result.rows.length }
+    });
+  }
 
   return result.rows || [];
 }
@@ -102,7 +141,9 @@ export async function completeEnrichment({
   itemId,
   success,
   result = null,
-  error = null
+  error = null,
+  verticalSlug = null,
+  territoryId = null
 }) {
   const db = getDb();
 
@@ -110,6 +151,18 @@ export async function completeEnrichment({
     'SELECT complete_enrichment_item(?, ?, ?, ?)',
     [itemId, success, result ? JSON.stringify(result) : null, error]
   );
+
+  // Log completion to activity log
+  await autonomousSafety.logAutonomousEvent({
+    eventType: success ? 'discovery_item_completed' : 'discovery_item_failed',
+    severity: success ? 'info' : 'error',
+    source: 'auto-discovery',
+    message: success ? `Enrichment completed for item ${itemId}` : `Enrichment failed for item ${itemId}`,
+    verticalSlug,
+    territoryId,
+    errorMessage: error,
+    metadata: { itemId, success }
+  });
 
   return { itemId, success };
 }
