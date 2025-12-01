@@ -22,12 +22,17 @@
  *   - On complete: logAutonomousEvent({ eventType: 'discovery_completed' })
  *   - On error: logAutonomousEvent({ eventType: 'discovery_failed', severity: 'error' })
  *   - High-value targets: registerCheckpoint() before enrichment
+ *
+ * S70 Integration:
+ *   - Record performance metrics for each enrichment operation
+ *   - Track success/failure rates, throughput, latency
  */
 
 import { getDb } from '../db/index.js';
 import { ConfigLoader } from './configLoader.js';
 import * as Sentry from '@sentry/node';
 import * as autonomousSafety from './autonomousSafety.js';
+import * as autonomousMetrics from './autonomousMetrics.js';
 
 // =====================================================
 // ENRICHMENT PIPELINE
@@ -163,6 +168,26 @@ export async function completeEnrichment({
     errorMessage: error,
     metadata: { itemId, success }
   });
+
+  // Record to S70 performance metrics
+  try {
+    await autonomousMetrics.recordPerformanceEvent({
+      service: 'auto-discovery',
+      operation: 'enrich',
+      eventType: success ? 'completed' : 'failed',
+      verticalSlug,
+      territoryId,
+      entityId: itemId,
+      itemsProcessed: 1,
+      itemsSucceeded: success ? 1 : 0,
+      itemsFailed: success ? 0 : 1,
+      errorMessage: error,
+      metadata: { itemId }
+    });
+  } catch (e) {
+    // Don't fail on metrics error
+    Sentry.captureException(e);
+  }
 
   return { itemId, success };
 }

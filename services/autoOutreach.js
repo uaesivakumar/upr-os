@@ -21,12 +21,17 @@
  *   - High-value outreach: registerCheckpoint() for human approval
  *   - On send: logAutonomousEvent({ eventType: 'outreach_sent', source: 'auto-outreach' })
  *   - On error: logAutonomousEvent({ eventType: 'outreach_failed', severity: 'error' })
+ *
+ * S70 Integration:
+ *   - Record performance metrics for each outreach operation
+ *   - Track conversion indicators (opened, clicked, replied, converted)
  */
 
 import { getDb } from '../db/index.js';
 import { ConfigLoader } from './configLoader.js';
 import * as Sentry from '@sentry/node';
 import * as autonomousSafety from './autonomousSafety.js';
+import * as autonomousMetrics from './autonomousMetrics.js';
 
 // =====================================================
 // OUTREACH QUEUE MANAGER
@@ -194,6 +199,26 @@ export async function recordOutreachEvent({
         bounced: eventType === 'bounced'
       });
     }
+  }
+
+  // Record to S70 performance metrics with conversion tracking
+  try {
+    await autonomousMetrics.recordPerformanceEvent({
+      service: 'auto-outreach',
+      operation: eventType === 'sent' ? 'send' : 'conversion',
+      eventType: isError ? 'failed' : 'completed',
+      verticalSlug,
+      territoryId,
+      entityId: outreachId,
+      opened: eventType === 'opened',
+      clicked: eventType === 'clicked',
+      replied: eventType === 'replied',
+      converted: eventType === 'converted',
+      metadata: { outreachId, eventType, ...eventData }
+    });
+  } catch (e) {
+    // Don't fail on metrics error
+    Sentry.captureException(e);
   }
 
   return { outreachId, eventType, recorded: true };

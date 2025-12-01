@@ -13,12 +13,19 @@
  *   - Context via territoryId, verticalSlug parameters
  *   - Integrates with S67 Auto-Discovery
  *   - Integrates with S68 Auto-Outreach
+ *   - Integrates with S70 Autonomous Metrics (performance tracking)
  *   - ConfigLoader for all thresholds and limits
+ *
+ * S70 Integration:
+ *   - Kill switch activations → recordPerformanceEvent
+ *   - Checkpoint approvals/rejections → recordPerformanceEvent
+ *   - Task completions/failures → recordPerformanceEvent
  */
 
 import { getDb } from '../db/index.js';
 import { ConfigLoader } from './configLoader.js';
 import * as Sentry from '@sentry/node';
+import * as autonomousMetrics from './autonomousMetrics.js';
 
 // =====================================================
 // KILL SWITCH / CONTROL STATE
@@ -210,6 +217,21 @@ export async function disableAutonomy({
     territoryId,
     eventData: { action: 'disabled', by: disabledBy, reason }
   });
+
+  // Record to S70 metrics
+  try {
+    await autonomousMetrics.recordPerformanceEvent({
+      service: 'autonomous-safety',
+      operation: 'kill_switch',
+      eventType: 'completed',
+      verticalSlug,
+      territoryId,
+      metadata: { action: 'disabled', by: disabledBy, reason, scopeType }
+    });
+  } catch (e) {
+    // Don't fail on metrics error
+    Sentry.captureException(e);
+  }
 
   return state;
 }
