@@ -11,6 +11,7 @@
  * Sprint 58-61: Added Journey Engine (Core, Steps, Templates, Monitoring)
  * Sprint 64: Added Object Intelligence v2
  * Sprint 65: Added Evidence System v2
+ * Sprint 67: Added Auto-Discovery Engine
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -49,6 +50,7 @@ import configRouter from './config.js';
 import targetsRouter from './targets.js';
 import journeysRouter from './journeys.js';
 import evidenceRouter from './evidence.js';
+import autoDiscoveryRouter from './autoDiscovery.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -143,6 +145,11 @@ router.get('/', (req, res) => {
         path: '/api/os/evidence',
         method: 'GET/POST/PUT/DELETE',
         description: 'Evidence aggregation, scoring, freshness, provider weights, conflicts'
+      },
+      autoDiscovery: {
+        path: '/api/os/auto-discovery',
+        method: 'GET/POST/PATCH/DELETE',
+        description: 'Autonomous discovery: enrichment queue, pipelines, quality filters, triggers, schedules'
       }
     },
     profiles: OS_PROFILES,
@@ -171,7 +178,8 @@ router.get('/health', async (req, res) => {
     config: 'checking',
     targets: 'checking',
     journeys: 'checking',
-    evidence: 'checking'
+    evidence: 'checking',
+    autoDiscovery: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -221,5 +229,6 @@ router.use('/config', configRouter);
 router.use('/targets', targetsRouter);
 router.use('/journeys', journeysRouter);
 router.use('/evidence', evidenceRouter);
+router.use('/auto-discovery', autoDiscoveryRouter);
 
 export default router;
