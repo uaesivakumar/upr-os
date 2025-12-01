@@ -15,6 +15,7 @@
  * Sprint 68: Added Auto-Outreach Engine
  * Sprint 66: Added Autonomous Safety & Control
  * Sprint 70: Added Autonomous Observability (Cost & Performance Metrics)
+ * Sprint 69: Added ML Self-Tuning (Config-Driven Learning Layer)
  *
  * Combines all OS endpoints into a single router mounted at /api/os
  *
@@ -57,6 +58,7 @@ import autoDiscoveryRouter from './autoDiscovery.js';
 import autoOutreachRouter from './autoOutreach.js';
 import autonomousSafetyRouter from './autonomousSafety.js';
 import autonomousMetricsRouter from './autonomousMetrics.js';
+import selfTuningRouter from './selfTuning.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 
 const router = express.Router();
@@ -171,6 +173,11 @@ router.get('/', (req, res) => {
         path: '/api/os/metrics',
         method: 'GET/POST/PUT',
         description: 'Autonomous observability: LLM cost tracking, performance metrics, conversion funnel'
+      },
+      tuning: {
+        path: '/api/os/tuning',
+        method: 'GET/POST',
+        description: 'ML self-tuning: scoring optimization, win/loss patterns, journey suggestions, persona analytics'
       }
     },
     profiles: OS_PROFILES,
@@ -203,7 +210,8 @@ router.get('/health', async (req, res) => {
     autoDiscovery: 'checking',
     autoOutreach: 'checking',
     autonomous: 'checking',
-    metrics: 'checking'
+    metrics: 'checking',
+    tuning: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -257,5 +265,6 @@ router.use('/auto-discovery', autoDiscoveryRouter);
 router.use('/auto-outreach', autoOutreachRouter);
 router.use('/autonomous', autonomousSafetyRouter);
 router.use('/metrics', autonomousMetricsRouter);
+router.use('/tuning', selfTuningRouter);
 
 export default router;
