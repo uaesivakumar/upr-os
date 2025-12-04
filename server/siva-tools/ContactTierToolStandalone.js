@@ -1,11 +1,16 @@
 /**
- * ContactTierTool - SIVA Decision Primitive 2 (Standalone) - v2.0
+ * ContactTierTool - SIVA Decision Primitive 2 (Standalone) - v3.0
  *
  * Implements: SELECT_CONTACT_TIER (STRICT)
  *
  * Purpose: Map company profile to target job titles and tier classification
  * Type: STRICT (deterministic, no LLM calls)
  * SLA: ≤200ms P50, ≤600ms P95
+ *
+ * v3.0 Changes (Sprint 71 - Multi-Vertical):
+ * - Persona-driven contact priority rules from sub_vertical_personas table
+ * - Dynamic target titles per company size from persona config
+ * - Backward compatible with v2.0 hardcoded logic
  *
  * v2.0 Changes:
  * - Outcome only (NO reasoning field - competitive algorithm protected)
@@ -22,6 +27,7 @@ const addFormats = require('ajv-formats');
 const Sentry = require('@sentry/node');
 const { contactTierInputSchema, contactTierOutputSchema } = require('./schemas/contactTierSchemas');
 const { v4: uuidv4 } = require('uuid');
+const personaLoader = require('./helpers/personaLoader');
 
 // Sprint 28: A/B Testing support
 const { ABTestingHelper } = require('../agent-core/ab-testing.js');
@@ -32,7 +38,7 @@ const scoringAdjustments = require('../agent-core/scoring-adjustments.js');
 class ContactTierToolStandalone {
   constructor() {
     this.agentName = 'ContactTierTool';
-    this.POLICY_VERSION = 'v2.0'; // Updated for outcome-only (no reasoning)
+    this.POLICY_VERSION = 'v3.0'; // Updated for persona-driven multi-vertical
 
     // Sprint 28: Initialize A/B testing helper
     this.abTesting = new ABTestingHelper('ContactTierTool');
@@ -176,8 +182,25 @@ class ContactTierToolStandalone {
       seniority_level,
       company_size,
       hiring_velocity_monthly = 0,
-      company_maturity_years = 0
+      company_maturity_years = 0,
+      sub_vertical_slug = null
     } = input;
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 0: LOAD PERSONA (v3.0 Multi-Vertical)
+    // ═══════════════════════════════════════════════════════
+    let persona = null;
+    let personaLoaded = false;
+
+    if (sub_vertical_slug) {
+      try {
+        persona = await personaLoader.loadPersona(sub_vertical_slug);
+        personaLoaded = !!persona;
+        console.log(`[ContactTierTool] Loaded persona for ${sub_vertical_slug}`);
+      } catch (err) {
+        console.warn(`[ContactTierTool] Failed to load persona for ${sub_vertical_slug}, using fallback logic`);
+      }
+    }
 
     // Infer seniority and department if not provided
     const inferredSeniority = seniority_level || this._inferSeniority(title);
@@ -218,14 +241,33 @@ class ContactTierToolStandalone {
     );
 
     // ═══════════════════════════════════════════════════════
-    // PHASE 3: TARGET TITLES RECOMMENDATION
+    // PHASE 3: TARGET TITLES RECOMMENDATION (with persona support)
     // ═══════════════════════════════════════════════════════
 
-    const { target_titles, fallback_titles } = this._recommendTitles(
-      company_size,
-      company_maturity_years,
-      hiring_velocity_monthly
-    );
+    let target_titles, fallback_titles;
+    let personaTitlesUsed = false;
+
+    // v3.0: Try persona-driven titles first
+    if (personaLoaded && persona) {
+      const personaTitles = personaLoader.getTargetTitles(persona, company_size);
+      if (personaTitles && personaTitles.length > 0) {
+        target_titles = personaTitles;
+        fallback_titles = this._recommendTitles(company_size, company_maturity_years, hiring_velocity_monthly).fallback_titles;
+        personaTitlesUsed = true;
+        console.log(`[ContactTierTool] Using persona titles for size ${company_size}: ${personaTitles.join(', ')}`);
+      }
+    }
+
+    // Fallback to hardcoded titles if persona doesn't provide them
+    if (!personaTitlesUsed) {
+      const recommended = this._recommendTitles(
+        company_size,
+        company_maturity_years,
+        hiring_velocity_monthly
+      );
+      target_titles = recommended.target_titles;
+      fallback_titles = recommended.fallback_titles;
+    }
 
     // ═══════════════════════════════════════════════════════
     // PHASE 4: CONFIDENCE CALCULATION
@@ -292,6 +334,12 @@ class ContactTierToolStandalone {
 
     // Track execution time
     const latencyMs = Date.now() - startTime;
+
+    // v3.0: Add persona info to metadata
+    metadata.persona_loaded = personaLoaded;
+    metadata.persona_titles_used = personaTitlesUsed;
+    metadata.sub_vertical_slug = sub_vertical_slug || 'default';
+    metadata.persona_name = persona?.persona_name || null;
 
     const output = {
       tier,

@@ -2,12 +2,23 @@
  * JSON Schemas for EdgeCasesTool (CHECK_EDGE_CASES)
  * SIVA Phase 1: Primitive 4 - CHECK_EDGE_CASES
  * SIVA Phase 2: Tool 4 - check_edge_cases (STRICT)
+ *
+ * v3.0 Updates (Sprint 71 - Multi-Vertical):
+ * - Added sub_vertical_slug for persona loading
+ * - Added signal_data for booster evaluation
+ * - Added boosters to output
+ * - Added persona metadata to output
  */
 
 const edgeCasesInputSchema = {
   type: 'object',
   required: ['company_profile'],
   properties: {
+    // v3.0: Sub-vertical for persona loading
+    sub_vertical_slug: {
+      type: 'string',
+      description: 'Sub-vertical identifier for persona loading (e.g., employee-banking)'
+    },
     company_profile: {
       type: 'object',
       required: ['name'],
@@ -141,6 +152,26 @@ const edgeCasesInputSchema = {
           description: 'Whether there is an active negotiation'
         }
       }
+    },
+    // v3.0: Signal data for booster evaluation
+    signal_data: {
+      type: 'object',
+      properties: {
+        days_since_signal: {
+          type: 'number',
+          minimum: 0,
+          description: 'Days since the triggering signal'
+        },
+        signal_type: {
+          type: 'string',
+          description: 'Type of signal (e.g., hiring-expansion, funding-round)'
+        },
+        signal_strength: {
+          type: 'string',
+          enum: ['HOT', 'WARM', 'RECENT', 'STALE'],
+          description: 'Signal freshness category'
+        }
+      }
     }
   },
   additionalProperties: false
@@ -183,6 +214,15 @@ const edgeCasesOutputSchema = {
           can_override: {
             type: 'boolean',
             description: 'Whether this blocker can be overridden'
+          },
+          metadata: {
+            type: 'object',
+            description: 'v3.0: Additional blocker metadata',
+            properties: {
+              rule_type: { type: 'string' },
+              multiplier: { type: 'number' },
+              source: { type: 'string', enum: ['hardcoded', 'persona'] }
+            }
           }
         }
       },
@@ -215,6 +255,34 @@ const edgeCasesOutputSchema = {
       },
       description: 'List of warning issues'
     },
+    // v3.0: Persona-driven boosters (opportunities)
+    boosters: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          type: {
+            type: 'string',
+            description: 'Booster type identifier'
+          },
+          multiplier: {
+            type: 'number',
+            minimum: 1,
+            description: 'Score multiplier (e.g., 1.3 for Free Zone)'
+          },
+          reason: {
+            type: 'string',
+            description: 'Reason for the boost'
+          },
+          source: {
+            type: 'string',
+            enum: ['persona'],
+            description: 'Source of the booster rule'
+          }
+        }
+      },
+      description: 'v3.0: List of positive signals/opportunities from persona'
+    },
     reasoning: {
       type: 'string',
       minLength: 1,
@@ -239,14 +307,37 @@ const edgeCasesOutputSchema = {
           minimum: 0,
           description: 'Number of warnings found'
         },
+        boosters_count: {
+          type: 'number',
+          minimum: 0,
+          description: 'v3.0: Number of boosters found'
+        },
         critical_issues: {
           type: 'array',
           items: { type: 'string' },
           description: 'List of critical issue types'
         },
+        persona_blockers: {
+          type: 'number',
+          minimum: 0,
+          description: 'v3.0: Number of persona-driven blockers'
+        },
         overridable: {
           type: 'boolean',
           description: 'Whether the decision can be overridden'
+        },
+        // v3.0: Persona info
+        persona_loaded: {
+          type: 'boolean',
+          description: 'Whether persona was successfully loaded'
+        },
+        sub_vertical_slug: {
+          type: 'string',
+          description: 'Sub-vertical used for persona lookup'
+        },
+        persona_name: {
+          type: ['string', 'null'],
+          description: 'Name of the loaded persona'
         }
       }
     },
@@ -256,7 +347,8 @@ const edgeCasesOutputSchema = {
       properties: {
         latency_ms: { type: 'number' },
         tool_name: { type: 'string' },
-        tool_type: { type: 'string' }
+        tool_type: { type: 'string' },
+        policy_version: { type: 'string' }
       }
     }
   },

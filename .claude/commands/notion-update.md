@@ -1,8 +1,50 @@
-# PremiumRadar-SAAS Notion Update
+# Notion Sprint Update
 
 Fix all Notion update issues and ensure complete property population.
 
 **Use after:** Completing a stream, sprint, or when Notion data is incomplete.
+
+---
+
+## CRITICAL: Database Selection Rules
+
+There are TWO separate Notion databases for sprints:
+
+```javascript
+// UPR OS Sprints Database (Intelligence Engine)
+const DB_OS_ID = "2a266151dd16806c8caae5726ae4bf3e";
+
+// PremiumRadar SaaS Sprints Database (UI/Frontend)
+const DB_SAAS_ID = "2b566151dd1680c59d9fcd7c56acc5bd";
+```
+
+### When to Use DB_OS_ID (UPR OS):
+- upr-os repo work
+- Autonomous engines (S66-S70)
+- SIVA, agents, routing layer
+- Object Intelligence (S64)
+- Evidence System (S65)
+- OS Intelligence API (S71)
+- LLM routing, vertical packs
+- Any backend intelligence work
+
+### When to Use DB_SAAS_ID (PremiumRadar SaaS):
+- premiumradar-saas repo work
+- Journey Engine Runtime (S48)
+- Promptable Journeys (S49)
+- Journey Execution Viewer (S50)
+- Timeline Viewer (S51)
+- Replay Engine (S52)
+- Journey Debugger (S53)
+- Any UI, Next.js, Prisma, React, hooks, components
+
+### RULES:
+1. **Never update both databases for the same sprint**
+2. **Never assume OS and SaaS sprint numbers refer to the same item**
+3. **Always check context** - same number can mean different sprints
+4. **Respect the repo scope** - if working in premiumradar-saas, use DB_SAAS_ID
+
+---
 
 ## Common Issues This Command Fixes
 
@@ -12,6 +54,7 @@ Fix all Notion update issues and ensure complete property population.
 4. ❌ Property types incorrect (checkbox vs multi_select)
 5. ❌ Status not updated properly
 6. ❌ Missing dates, notes, or business value
+7. ❌ Wrong database updated (OS vs SaaS)
 
 ## EXECUTE THESE STEPS IN ORDER:
 
@@ -30,17 +73,19 @@ gcloud auth list
 gcloud auth login
 ```
 
-### Step 2: Load Database IDs
-```bash
-cat .notion-db-ids.json
-```
+### Step 2: Select Correct Database
 
 ```javascript
-const DB_IDS = {
-  sprints: '5c32e26d-641a-4711-a9fb-619703943fb9',
-  features: '26ae5afe-4b5f-4d97-b402-5c459f188944',
-  knowledge: 'f1552250-cafc-4f5f-90b0-edc8419e578b'
-};
+// DETERMINE WHICH DATABASE TO USE BASED ON CONTEXT:
+
+// For OS sprints (upr-os repo, intelligence engine):
+const SPRINTS_DB_ID = "2a266151dd16806c8caae5726ae4bf3e";
+
+// For SaaS sprints (premiumradar-saas repo, UI/frontend):
+const SPRINTS_DB_ID = "2b566151dd1680c59d9fcd7c56acc5bd";
+
+// Features database (shared)
+const FEATURES_DB_ID = "26ae5afe-4b5f-4d97-b402-5c459f188944";
 ```
 
 ### Step 3: Validate Database Schema
@@ -144,13 +189,23 @@ await notion.pages.update({
 ### Step 5: Verify Update Success
 ```bash
 # Run verification script
+# USE THE CORRECT DB_ID FOR YOUR CONTEXT:
+# - OS: 2a266151dd16806c8caae5726ae4bf3e
+# - SaaS: 2b566151dd1680c59d9fcd7c56acc5bd
+
 node -e "
 const { Client } = require('@notionhq/client');
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
-// Check a sample sprint
+// SELECT THE CORRECT DATABASE:
+const DB_OS_ID = '2a266151dd16806c8caae5726ae4bf3e';    // UPR OS
+const DB_SAAS_ID = '2b566151dd1680c59d9fcd7c56acc5bd';  // SaaS
+
+// Change this based on context:
+const SPRINTS_DB_ID = DB_SAAS_ID;  // or DB_OS_ID
+
 notion.databases.query({
-  database_id: '5c32e26d-641a-4711-a9fb-619703943fb9',
+  database_id: SPRINTS_DB_ID,
   page_size: 1,
   sorts: [{ property: 'Sprint', direction: 'descending' }]
 }).then(res => {

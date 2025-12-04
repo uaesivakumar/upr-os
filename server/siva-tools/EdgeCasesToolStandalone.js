@@ -1,11 +1,16 @@
 /**
- * EdgeCasesTool - SIVA Decision Primitive 4 (Standalone) - v2.0
+ * EdgeCasesTool - SIVA Decision Primitive 4 (Standalone) - v3.0
  *
  * Implements: CHECK_EDGE_CASES (STRICT)
  *
- * Purpose: Detect edge cases using INTELLIGENCE, not hardcoded rules
+ * Purpose: Detect edge cases using PERSONA-DRIVEN rules
  * Type: STRICT (deterministic, no LLM calls)
  * SLA: ≤50ms P50, ≤150ms P95
+ *
+ * v3.0 Changes (Sprint 71 - Multi-Vertical):
+ * - Persona-driven blockers and boosters
+ * - Dynamic edge case rules from sub_vertical_personas table
+ * - Backward compatible with v2.0 hardcoded logic
  *
  * v2.0 Changes:
  * - Intelligent enterprise brand detection (heuristic scoring)
@@ -20,11 +25,12 @@ const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 const Sentry = require('@sentry/node');
 const { edgeCasesInputSchema, edgeCasesOutputSchema } = require('./schemas/edgeCasesSchemas');
+const personaLoader = require('./helpers/personaLoader');
 
 class EdgeCasesToolStandalone {
   constructor() {
     this.agentName = 'EdgeCasesTool';
-    this.POLICY_VERSION = 'v2.0'; // Updated to v2.0 for intelligent detection
+    this.POLICY_VERSION = 'v3.0'; // Updated to v3.0 for persona-driven multi-vertical
 
     // Dynamic thresholds by contact tier
     this.RECENT_CONTACT_THRESHOLDS = {
@@ -307,6 +313,121 @@ class EdgeCasesToolStandalone {
   }
 
   /**
+   * Check persona-driven blockers
+   * @private
+   */
+  _checkPersonaBlockers(persona, companyProfile) {
+    const blockers = [];
+    const edgeCases = personaLoader.getEdgeCases(persona);
+
+    if (!edgeCases?.blockers) return blockers;
+
+    for (const blockerRule of edgeCases.blockers) {
+      let matched = null;
+
+      switch (blockerRule.type) {
+        case 'company_name':
+          matched = personaLoader.findBlocker(
+            [blockerRule],
+            'company_name',
+            companyProfile.name
+          );
+          break;
+
+        case 'sector':
+          matched = personaLoader.findBlocker(
+            [blockerRule],
+            'sector',
+            companyProfile.sector
+          );
+          break;
+
+        case 'status':
+          matched = personaLoader.findBlocker(
+            [blockerRule],
+            'status',
+            companyProfile.status
+          );
+          break;
+      }
+
+      if (matched) {
+        const severity = matched.multiplier <= 0.1 ? 'CRITICAL' :
+                        matched.multiplier <= 0.3 ? 'HIGH' : 'MEDIUM';
+
+        blockers.push({
+          type: `PERSONA_BLOCKER_${blockerRule.type.toUpperCase()}`,
+          severity,
+          message: matched.reason || `Persona rule triggered: ${blockerRule.type} matches ${blockerRule.values?.join(', ')}`,
+          can_override: severity !== 'CRITICAL',
+          metadata: {
+            rule_type: blockerRule.type,
+            multiplier: matched.multiplier,
+            source: 'persona'
+          }
+        });
+      }
+    }
+
+    return blockers;
+  }
+
+  /**
+   * Check persona-driven boosters (adds to warnings as opportunities)
+   * @private
+   */
+  _checkPersonaBoosters(persona, companyProfile, signalData = {}) {
+    const opportunities = [];
+    const edgeCases = personaLoader.getEdgeCases(persona);
+
+    if (!edgeCases?.boosters) return opportunities;
+
+    for (const boosterRule of edgeCases.boosters) {
+      let matched = null;
+
+      switch (boosterRule.type) {
+        case 'license_type':
+          matched = personaLoader.findBooster(
+            [boosterRule],
+            'license_type',
+            companyProfile.license_type || companyProfile.license
+          );
+          break;
+
+        case 'signal_recency':
+          if (signalData.days_since_signal !== undefined) {
+            matched = personaLoader.findBooster(
+              [boosterRule],
+              'signal_recency',
+              null,
+              { days_since_signal: signalData.days_since_signal }
+            );
+          }
+          break;
+
+        case 'industry':
+          matched = personaLoader.findBooster(
+            [boosterRule],
+            'industry',
+            companyProfile.industry
+          );
+          break;
+      }
+
+      if (matched) {
+        opportunities.push({
+          type: `PERSONA_BOOSTER_${boosterRule.type.toUpperCase()}`,
+          multiplier: matched.multiplier,
+          reason: matched.reason || `Booster: ${boosterRule.type}`,
+          source: 'persona'
+        });
+      }
+    }
+
+    return opportunities;
+  }
+
+  /**
    * Internal execution logic
    * @private
    */
@@ -326,8 +447,26 @@ class EdgeCasesToolStandalone {
     const {
       company_profile,
       contact_profile = {},
-      historical_data = {}
+      historical_data = {},
+      sub_vertical_slug = null,
+      signal_data = {}
     } = input;
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 0: LOAD PERSONA (v3.0 Multi-Vertical)
+    // ═══════════════════════════════════════════════════════
+    let persona = null;
+    let personaLoaded = false;
+
+    if (sub_vertical_slug) {
+      try {
+        persona = await personaLoader.loadPersona(sub_vertical_slug);
+        personaLoaded = !!persona;
+        console.log(`[EdgeCasesTool] Loaded persona for ${sub_vertical_slug}`);
+      } catch (err) {
+        console.warn(`[EdgeCasesTool] Failed to load persona for ${sub_vertical_slug}, using fallback logic`);
+      }
+    }
 
     const blockers = [];
     const warnings = [];
@@ -382,6 +521,14 @@ class EdgeCasesToolStandalone {
         message: 'Contact has opted out - compliance violation, cannot proceed',
         can_override: false
       });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 1.5: PERSONA-DRIVEN BLOCKERS (v3.0)
+    // ═══════════════════════════════════════════════════════
+    if (personaLoaded && persona) {
+      const personaBlockers = this._checkPersonaBlockers(persona, company_profile);
+      blockers.push(...personaBlockers);
     }
 
     // ═══════════════════════════════════════════════════════
@@ -502,6 +649,14 @@ class EdgeCasesToolStandalone {
     warnings.push(...calendarWarnings);
 
     // ═══════════════════════════════════════════════════════
+    // PHASE 4.5: PERSONA-DRIVEN BOOSTERS (v3.0)
+    // ═══════════════════════════════════════════════════════
+    let boosters = [];
+    if (personaLoaded && persona) {
+      boosters = this._checkPersonaBoosters(persona, company_profile, signal_data);
+    }
+
+    // ═══════════════════════════════════════════════════════
     // PHASE 5: DECISION LOGIC
     // ═══════════════════════════════════════════════════════
 
@@ -568,19 +723,26 @@ class EdgeCasesToolStandalone {
       confidence: parseFloat(confidence.toFixed(2)),
       blockers,
       warnings,
+      boosters, // v3.0: persona-driven opportunities
       reasoning,
       timestamp: new Date().toISOString(),
       metadata: {
         blockers_count: blockers.length,
         warnings_count: warnings.length,
+        boosters_count: boosters.length,
         critical_issues: blockers.filter(b => b.severity === 'CRITICAL').map(b => b.type),
-        overridable
+        persona_blockers: blockers.filter(b => b.metadata?.source === 'persona').length,
+        overridable,
+        // v3.0: Persona info
+        persona_loaded: personaLoaded,
+        sub_vertical_slug: sub_vertical_slug || 'default',
+        persona_name: persona?.persona_name || null
       },
       _meta: {
         latency_ms: latencyMs,
         tool_name: 'check_edge_cases',
         tool_type: 'STRICT',
-        policy_version: this.POLICY_VERSION
+        policy_version: 'v3.0' // Updated for persona-driven logic
       }
     };
 

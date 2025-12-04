@@ -1,11 +1,16 @@
 /**
- * TimingScoreTool - SIVA Decision Primitive 3 (Standalone) - v2.0
+ * TimingScoreTool - SIVA Decision Primitive 3 (Standalone) - v3.0
  *
  * Implements: CALCULATE_TIMING_SCORE (STRICT)
  *
  * Purpose: Calculate timing multiplier from calendar, signal recency, and UAE business context
  * Type: STRICT (deterministic, no LLM calls)
  * SLA: ≤120ms P50, ≤300ms P95
+ *
+ * v3.0 Changes (Sprint 71 - Multi-Vertical):
+ * - Persona-driven timing rules from sub_vertical_personas table
+ * - Dynamic calendar periods and signal freshness thresholds per persona
+ * - Backward compatible with v2.0 hardcoded logic
  *
  * v2.0 Changes:
  * - Natural language reasoning (NO formula exposure - competitive algorithm protected)
@@ -22,6 +27,7 @@ const addFormats = require('ajv-formats');
 const Sentry = require('@sentry/node');
 const { timingScoreInputSchema, timingScoreOutputSchema } = require('./schemas/timingScoreSchemas');
 const { v4: uuidv4 } = require('uuid');
+const personaLoader = require('./helpers/personaLoader');
 
 // Sprint 28: A/B Testing support
 const { ABTestingHelper } = require('../agent-core/ab-testing.js');
@@ -32,7 +38,7 @@ const scoringAdjustments = require('../agent-core/scoring-adjustments.js');
 class TimingScoreToolStandalone {
   constructor() {
     this.agentName = 'TimingScoreTool';
-    this.POLICY_VERSION = 'v2.0';
+    this.POLICY_VERSION = 'v3.0'; // Updated for persona-driven multi-vertical
 
     // Sprint 28: Initialize A/B testing helper
     this.abTesting = new ABTestingHelper('TimingScoreTool');
@@ -179,15 +185,32 @@ class TimingScoreToolStandalone {
       signal_type = 'other',
       signal_age = null,
       current_date,
-      fiscal_context = {}
+      fiscal_context = {},
+      sub_vertical_slug = null
     } = input;
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 0: LOAD PERSONA (v3.0 Multi-Vertical)
+    // ═══════════════════════════════════════════════════════
+    let persona = null;
+    let personaLoaded = false;
+
+    if (sub_vertical_slug) {
+      try {
+        persona = await personaLoader.loadPersona(sub_vertical_slug);
+        personaLoaded = !!persona;
+        console.log(`[TimingScoreTool] Loaded persona for ${sub_vertical_slug}`);
+      } catch (err) {
+        console.warn(`[TimingScoreTool] Failed to load persona for ${sub_vertical_slug}, using fallback logic`);
+      }
+    }
 
     const currentDate = new Date(current_date);
     const month = currentDate.getMonth() + 1; // 1-12
     const quarter = fiscal_context.quarter || this._inferQuarter(month);
 
     // ═══════════════════════════════════════════════════════
-    // PHASE 1: CALENDAR-BASED MULTIPLIER
+    // PHASE 1: CALENDAR-BASED MULTIPLIER (with persona support)
     // ═══════════════════════════════════════════════════════
 
     let calendarMultiplier = 1.0;
@@ -260,7 +283,22 @@ class TimingScoreToolStandalone {
     }
 
     // ═══════════════════════════════════════════════════════
-    // PHASE 2: SIGNAL RECENCY MULTIPLIER
+    // PHASE 1.5: PERSONA-DRIVEN CALENDAR OVERRIDE (v3.0)
+    // ═══════════════════════════════════════════════════════
+    let personaTimingApplied = false;
+    if (personaLoaded && persona) {
+      const personaTiming = personaLoader.getTimingMultiplier(persona, currentDate);
+      if (personaTiming.period) {
+        // Persona has a specific rule for this period - override
+        calendarMultiplier = personaTiming.multiplier;
+        calendarContext = `PERSONA_${personaTiming.period.toUpperCase()}`;
+        personaTimingApplied = true;
+        console.log(`[TimingScoreTool] Applied persona timing: ${personaTiming.period} = ${personaTiming.multiplier}`);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 2: SIGNAL RECENCY MULTIPLIER (with persona support)
     // ═══════════════════════════════════════════════════════
 
     let signalRecencyMultiplier = 1.0;
@@ -297,6 +335,20 @@ class TimingScoreToolStandalone {
       const signalTypeModifier = Math.pow(decayRate, weeksSinceSignal);
 
       signalRecencyMultiplier *= signalTypeModifier;
+
+      // ═══════════════════════════════════════════════════════
+      // PHASE 2.5: PERSONA-DRIVEN SIGNAL FRESHNESS (v3.0)
+      // ═══════════════════════════════════════════════════════
+      if (personaLoaded && persona) {
+        const personaFreshness = personaLoader.getSignalFreshnessMultiplier(persona, signal_age);
+        // Use persona's label if available
+        if (personaFreshness.label !== 'UNKNOWN') {
+          signalFreshness = personaFreshness.label;
+          // Blend persona multiplier with decay-adjusted multiplier
+          signalRecencyMultiplier = (signalRecencyMultiplier + personaFreshness.multiplier) / 2;
+          console.log(`[TimingScoreTool] Applied persona signal freshness: ${personaFreshness.label} = ${personaFreshness.multiplier}`);
+        }
+      }
     } else {
       // No signal age provided - lower confidence
       confidence -= 0.2;
@@ -397,7 +449,12 @@ class TimingScoreToolStandalone {
           adjustment_factor: adjustment.factor,
           adjustment_confidence: adjustment.confidence,
           metadata: adjustment.metadata
-        } : null
+        } : null,
+        // v3.0: Persona info
+        persona_loaded: personaLoaded,
+        persona_timing_applied: personaTimingApplied,
+        sub_vertical_slug: sub_vertical_slug || 'default',
+        persona_name: persona?.persona_name || null
       },
       _meta: {
         latency_ms: latencyMs,
