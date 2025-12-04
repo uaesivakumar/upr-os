@@ -1,11 +1,18 @@
 /**
- * OpeningContextTool - SIVA Decision Primitive 7 (Standalone) - v1.0
+ * OpeningContextTool - SIVA Decision Primitive 7 (Standalone) - v3.0
  *
  * Implements: GENERATE_OPENING_CONTEXT (STRICT)
  *
  * Purpose: Generate opening 2-3 sentences that reference company signal in user's voice
  * Type: STRICT (template-based, no LLM calls)
  * SLA: ≤100ms P50, ≤200ms P95
+ *
+ * v3.0 Features (Sprint 71):
+ * - Persona-driven template selection
+ * - Dynamic value proposition from persona
+ * - Persona tone and formality
+ * - sub_vertical_slug input for persona loading
+ * - Fallback to default templates if no persona
  *
  * v1.0 Features:
  * - 5 signal-based templates (expansion, hiring, funding, news, generic)
@@ -22,40 +29,78 @@ const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 const Sentry = require('@sentry/node');
 const { openingContextInputSchema, openingContextOutputSchema } = require('./schemas/openingContextSchemas');
+const personaLoader = require('./helpers/personaLoader');
 
 class OpeningContextToolStandalone {
   constructor() {
     this.agentName = 'OpeningContextTool';
-    this.POLICY_VERSION = 'v1.0';
+    this.POLICY_VERSION = 'v3.0';
 
-    // Template library (hidden selection logic)
-    this.TEMPLATES = {
+    // Default template library (used when no persona templates)
+    // These are generic templates that will be customized by persona
+    this.DEFAULT_TEMPLATES = {
       expansion: {
         id: 'expansion_template',
-        text: 'I noticed {{company_name}} recently {{signal_headline}} in {{city}}. Many expanding {{industry}} companies face onboarding delays while new employees await Emirates IDs—I can serve as your dedicated banking contact to streamline this process.',
-        value_prop: 'dedicated banking contact',
-        fallback: 'I noticed {{company_name}} recently expanded operations in {{city}}. Many expanding companies face employee onboarding challenges with Emirates ID wait periods—I can serve as your dedicated banking contact to streamline this.'
+        text: 'I noticed {{company_name}} recently {{signal_headline}} in {{city}}. Many expanding {{industry}} companies face {{pain_point}}—I can serve as your {{value_prop}} to streamline this process.',
+        value_prop: 'dedicated contact',
+        fallback: 'I noticed {{company_name}} recently expanded operations in {{city}}. Many expanding companies face operational challenges—I can serve as your {{value_prop}} to streamline this.'
       },
       hiring: {
         id: 'hiring_template',
-        text: 'I saw {{company_name}} is actively hiring{{roles}}. With new employees joining, you\'ll need a banking partner who can facilitate quick account openings despite the Emirates ID wait period.',
-        value_prop: 'banking partner',
-        fallback: 'I saw {{company_name}} is actively hiring in the {{industry}} sector. With new employees joining, you\'ll need a banking partner who can facilitate quick account openings despite the Emirates ID wait period.'
+        text: 'I saw {{company_name}} is actively hiring{{roles}}. With new employees joining, you\'ll need a {{value_prop}} who can facilitate quick onboarding.',
+        value_prop: 'trusted partner',
+        fallback: 'I saw {{company_name}} is actively hiring in the {{industry}} sector. With new employees joining, you\'ll need a {{value_prop}} who can support your growth.'
       },
       funding: {
         id: 'funding_template',
+        text: 'Congratulations on {{company_name}}\'s recent {{funding_details}} funding round. As you scale your operations, I can act as your {{value_prop}} to support rapid growth.',
+        value_prop: 'trusted partner',
+        fallback: 'Congratulations on {{company_name}}\'s recent funding round. As you scale your operations, I can act as your {{value_prop}} to support rapid growth.'
+      },
+      news: {
+        id: 'news_template',
+        text: 'I came across news about {{company_name}}\'s {{achievement}} in {{city}}. If you\'re looking to streamline operations, I\'d be happy to serve as your {{value_prop}}.',
+        value_prop: 'point of contact',
+        fallback: 'I came across news about {{company_name}} in {{city}}. If you\'re looking to streamline operations, I\'d be happy to serve as your {{value_prop}}.'
+      },
+      generic: {
+        id: 'generic_template',
+        text: 'I understand {{company_name}} operates in the {{industry}} sector in {{city}}. Many companies in this space appreciate having a {{value_prop}} to simplify operations—I can provide that support for your team.',
+        value_prop: 'dedicated contact',
+        fallback: 'I understand {{company_name}} operates in {{city}}. Many companies appreciate having a {{value_prop}} to simplify operations—I can provide that support for your team.'
+      }
+    };
+
+    // EB-specific templates (fallback for employee-banking sub-vertical)
+    this.EB_TEMPLATES = {
+      expansion: {
+        id: 'eb_expansion_template',
+        text: 'I noticed {{company_name}} recently {{signal_headline}} in {{city}}. Many expanding {{industry}} companies face onboarding delays while new employees await Emirates IDs—I can serve as your dedicated banking contact to streamline this process.',
+        value_prop: 'dedicated banking contact',
+        pain_point: 'onboarding delays while new employees await Emirates IDs',
+        fallback: 'I noticed {{company_name}} recently expanded operations in {{city}}. Many expanding companies face employee onboarding challenges with Emirates ID wait periods—I can serve as your dedicated banking contact to streamline this.'
+      },
+      hiring: {
+        id: 'eb_hiring_template',
+        text: 'I saw {{company_name}} is actively hiring{{roles}}. With new employees joining, you\'ll need a banking partner who can facilitate quick account openings despite the Emirates ID wait period.',
+        value_prop: 'banking partner',
+        pain_point: 'Emirates ID wait period',
+        fallback: 'I saw {{company_name}} is actively hiring in the {{industry}} sector. With new employees joining, you\'ll need a banking partner who can facilitate quick account openings despite the Emirates ID wait period.'
+      },
+      funding: {
+        id: 'eb_funding_template',
         text: 'Congratulations on {{company_name}}\'s recent {{funding_details}} funding round. As you scale your UAE operations, I can act as your trusted banking partner to support rapid employee onboarding.',
         value_prop: 'trusted banking partner',
         fallback: 'Congratulations on {{company_name}}\'s recent funding round. As you scale your UAE operations, I can act as your trusted banking partner to support rapid employee onboarding.'
       },
       news: {
-        id: 'news_template',
-        text: 'I came across news about {{company_name}}\'s {{achievement}} in {{city}}. If you\'re looking to streamline your employee banking experience, I\'d be happy to serve as your point of contact at Emirates NBD.',
+        id: 'eb_news_template',
+        text: 'I came across news about {{company_name}}\'s {{achievement}} in {{city}}. If you\'re looking to streamline your employee banking experience, I\'d be happy to serve as your point of contact.',
         value_prop: 'point of contact',
-        fallback: 'I came across news about {{company_name}} in {{city}}. If you\'re looking to streamline your employee banking experience, I\'d be happy to serve as your point of contact at Emirates NBD.'
+        fallback: 'I came across news about {{company_name}} in {{city}}. If you\'re looking to streamline your employee banking experience, I\'d be happy to serve as your point of contact.'
       },
       generic: {
-        id: 'generic_template',
+        id: 'eb_generic_template',
         text: 'I understand {{company_name}} operates in the {{industry}} sector in {{city}}. Many companies in this space appreciate having a dedicated banking contact to simplify employee onboarding—I can provide that support for your team.',
         value_prop: 'dedicated banking contact',
         fallback: 'I understand {{company_name}} operates in {{city}}. Many companies appreciate having a dedicated banking contact to simplify employee onboarding—I can provide that support for your team.'
@@ -120,14 +165,41 @@ class OpeningContextToolStandalone {
       signal_headline = '',
       industry = '',
       city = 'UAE',
-      additional_context = ''
+      additional_context = '',
+      sub_vertical_slug = null  // v3.0: Persona selection
     } = input;
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 0.5: PERSONA LOADING (v3.0)
+    // ═══════════════════════════════════════════════════════
+
+    let persona = null;
+    let personaLoaded = false;
+    let templates = this.DEFAULT_TEMPLATES;
+
+    try {
+      if (sub_vertical_slug) {
+        persona = await personaLoader.loadPersona(sub_vertical_slug);
+        personaLoaded = true;
+
+        // Use persona-specific templates if available
+        if (persona.opening_templates) {
+          templates = persona.opening_templates;
+        } else if (sub_vertical_slug === 'employee-banking') {
+          // Fallback to EB templates for employee-banking
+          templates = this.EB_TEMPLATES;
+        }
+      }
+    } catch (error) {
+      console.warn(`[OpeningContextTool] Persona loading failed: ${error.message}, using default templates`);
+      // Continue with default templates
+    }
 
     // ═══════════════════════════════════════════════════════
     // PHASE 1: TEMPLATE SELECTION (HIDDEN LOGIC)
     // ═══════════════════════════════════════════════════════
 
-    const template = this.TEMPLATES[signal_type] || this.TEMPLATES['generic'];
+    const template = templates[signal_type] || templates['generic'];
 
     // ═══════════════════════════════════════════════════════
     // PHASE 2: CONTEXT GENERATION
@@ -194,7 +266,11 @@ class OpeningContextToolStandalone {
       metadata: {
         confidenceLevel: confidence >= 0.9 ? 'HIGH' : confidence >= 0.75 ? 'MEDIUM' : 'LOW',
         signal_freshness: signalFreshness,
-        value_proposition: template.value_prop
+        value_proposition: template.value_prop,
+        // v3.0: Persona metadata
+        persona_loaded: personaLoaded,
+        persona_name: persona?.persona_name || null,
+        sub_vertical_slug: sub_vertical_slug
       },
       _meta: {
         latency_ms: latencyMs,

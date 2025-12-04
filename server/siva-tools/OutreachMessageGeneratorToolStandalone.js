@@ -1,11 +1,18 @@
 /**
- * OutreachMessageGeneratorTool - SIVA Tool 9 (Standalone) - v1.0
+ * OutreachMessageGeneratorTool - SIVA Tool 9 (Standalone) - v3.0
  *
  * Implements: GENERATE_OUTREACH_MESSAGE (DELEGATED)
  *
- * Purpose: Generate complete outreach email messages using LLM with Siva's voice
+ * Purpose: Generate complete outreach email messages using LLM with persona-driven voice
  * Type: DELEGATED (LLM-assisted with schema-locked output)
  * SLA: ≤3000ms P50, ≤5000ms P95
+ *
+ * v3.0 Features (Sprint 71):
+ * - Persona-driven system prompt generation
+ * - Dynamic tone from persona.outreach_doctrine
+ * - NEVER/ALWAYS rules from persona config
+ * - sub_vertical_slug input for persona loading
+ * - Persona identity (name, role, org) injected into prompt
  *
  * v1.0 Features:
  * - GPT-4 Turbo message generation
@@ -24,11 +31,12 @@ const addFormats = require('ajv-formats');
 const Sentry = require('@sentry/node');
 const OpenAI = require('openai');
 const { outreachMessageGeneratorInputSchema, outreachMessageGeneratorOutputSchema } = require('./schemas/outreachMessageGeneratorSchemas');
+const personaLoader = require('./helpers/personaLoader');
 
 class OutreachMessageGeneratorToolStandalone {
   constructor() {
     this.agentName = 'OutreachMessageGeneratorTool';
-    this.POLICY_VERSION = 'v1.0';
+    this.POLICY_VERSION = 'v3.0';
 
     // OpenAI client
     this.openai = new OpenAI({
@@ -41,8 +49,8 @@ class OutreachMessageGeneratorToolStandalone {
     this.validateInput = ajv.compile(outreachMessageGeneratorInputSchema);
     this.validateOutput = ajv.compile(outreachMessageGeneratorOutputSchema);
 
-    // System prompt template
-    this.SYSTEM_PROMPT = `You are Sivakumar, a Senior Retail Banking Officer at Emirates NBD with 10+ years UAE banking experience. You write professional, research-based outreach emails that position you as a "trusted banking partner" for employee onboarding.
+    // Default system prompt (EB fallback)
+    this.DEFAULT_SYSTEM_PROMPT = `You are Sivakumar, a Senior Retail Banking Officer at Emirates NBD with 10+ years UAE banking experience. You write professional, research-based outreach emails that position you as a "trusted banking partner" for employee onboarding.
 
 Your writing style:
 - Professional but approachable
@@ -60,6 +68,55 @@ Output ONLY valid JSON matching this schema:
   "value_proposition": "2-3 sentences explaining benefits",
   "call_to_action": "1-2 sentences with low-friction ask",
   "signature": "Best regards,\\nSivakumar\\nSenior Retail Banking Officer\\nEmirates NBD"
+}`;
+  }
+
+  /**
+   * Build persona-driven system prompt (v3.0)
+   * @private
+   */
+  _buildSystemPrompt(persona) {
+    if (!persona) {
+      return this.DEFAULT_SYSTEM_PROMPT;
+    }
+
+    const doctrine = persona.outreach_doctrine || {};
+    const identity = {
+      name: persona.persona_name || 'Sales Professional',
+      role: persona.persona_role || 'Sales Officer',
+      org: persona.persona_organization || 'Your Organization'
+    };
+
+    // Build ALWAYS rules
+    const alwaysRules = (doctrine.always || [])
+      .map(rule => `- ${rule}`)
+      .join('\n');
+
+    // Build NEVER rules
+    const neverRules = (doctrine.never || [])
+      .map(rule => `- Never ${rule.toLowerCase()}`)
+      .join('\n');
+
+    // Tone and formality
+    const tone = doctrine.tone || 'professional';
+    const formality = doctrine.formality || 'formal';
+
+    return `You are ${identity.name}, a ${identity.role} at ${identity.org}. You write ${tone}, research-based outreach emails.
+
+Your writing style:
+- Tone: ${tone}
+- Formality: ${formality}
+${alwaysRules ? `\nALWAYS:\n${alwaysRules}` : ''}
+${neverRules ? `\nNEVER:\n${neverRules}` : ''}
+
+Output ONLY valid JSON matching this schema:
+{
+  "subject_line": "max 60 chars",
+  "greeting": "Dear [Name], or Hi [Name],",
+  "opening_paragraph": "2-3 sentences referencing company signal",
+  "value_proposition": "2-3 sentences explaining benefits",
+  "call_to_action": "1-2 sentences with low-friction ask",
+  "signature": "Best regards,\\n${identity.name}\\n${identity.role}\\n${identity.org}"
 }`;
   }
 
@@ -115,8 +172,31 @@ Output ONLY valid JSON matching this schema:
       recommended_products = [],
       contact_info,
       message_type,
-      tone_preference = 'PROFESSIONAL'
+      tone_preference = 'PROFESSIONAL',
+      sub_vertical_slug = null  // v3.0: Persona selection
     } = input;
+
+    // ═══════════════════════════════════════════════════════
+    // PHASE 0.5: PERSONA LOADING (v3.0)
+    // ═══════════════════════════════════════════════════════
+
+    let persona = null;
+    let personaLoaded = false;
+    let systemPrompt = this.DEFAULT_SYSTEM_PROMPT;
+
+    try {
+      if (sub_vertical_slug) {
+        persona = await personaLoader.loadPersona(sub_vertical_slug);
+        personaLoaded = true;
+        systemPrompt = this._buildSystemPrompt(persona);
+      }
+    } catch (error) {
+      console.warn(`[OutreachMessageGenerator] Persona loading failed: ${error.message}, using default prompt`);
+      // Continue with default prompt
+    }
+
+    // Get persona tone preference (override input if persona specifies)
+    const effectiveTone = persona?.outreach_doctrine?.tone?.toUpperCase() || tone_preference;
 
     // ═══════════════════════════════════════════════════════
     // PHASE 1: BUILD USER PROMPT
@@ -128,7 +208,8 @@ Output ONLY valid JSON matching this schema:
       recommended_products,
       contact_info,
       message_type,
-      tone_preference
+      tone_preference: effectiveTone,
+      persona  // v3.0: Pass persona for context
     });
 
     // ═══════════════════════════════════════════════════════
@@ -142,7 +223,7 @@ Output ONLY valid JSON matching this schema:
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4-turbo-preview',
         messages: [
-          { role: 'system', content: this.SYSTEM_PROMPT },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
         response_format: { type: 'json_object' },  // Schema-locked
@@ -176,10 +257,10 @@ Output ONLY valid JSON matching this schema:
     const spamScore = this._calculateSpamScore(fullMessage, company_context.company_name);
 
     // ═══════════════════════════════════════════════════════
-    // PHASE 5: CHECK COMPLIANCE
+    // PHASE 5: CHECK COMPLIANCE (v3.0: Persona-driven)
     // ═══════════════════════════════════════════════════════
 
-    const complianceFlags = this._checkCompliance(fullMessage, company_context.company_name);
+    const complianceFlags = this._checkCompliance(fullMessage, company_context.company_name, persona);
 
     // ═══════════════════════════════════════════════════════
     // PHASE 6: CALCULATE METADATA
@@ -199,11 +280,15 @@ Output ONLY valid JSON matching this schema:
     const output = {
       message: messageData,
       metadata: {
-        tone_used: tone_preference,
+        tone_used: effectiveTone,
         estimated_read_time_seconds: estimatedReadTime,
         spam_score: parseFloat(spamScore.toFixed(2)),
         compliance_flags: complianceFlags,
-        confidence: parseFloat(confidence.toFixed(2))
+        confidence: parseFloat(confidence.toFixed(2)),
+        // v3.0: Persona metadata
+        persona_loaded: personaLoaded,
+        persona_name: persona?.persona_name || null,
+        sub_vertical_slug: sub_vertical_slug
       },
       timestamp: new Date().toISOString(),
       _meta: {
@@ -306,29 +391,46 @@ Requirements:
   }
 
   /**
-   * Check compliance with NEVER rules from persona
+   * Check compliance with NEVER rules from persona (v3.0)
    * @private
    */
-  _checkCompliance(message, companyName) {
+  _checkCompliance(message, companyName, persona = null) {
     const flags = [];
     const lower = message.toLowerCase();
 
-    // NEVER rule: Don't mention pricing
-    if (lower.match(/price|cost|rate|fee|charge|payment/i)) {
-      flags.push('PRICING_MENTION');
+    // Get NEVER rules from persona or use defaults
+    const neverRules = persona?.outreach_doctrine?.never || [
+      'Mention pricing',
+      'Use pressure language'
+    ];
+
+    // Check persona NEVER rules dynamically
+    for (const rule of neverRules) {
+      const ruleLower = rule.toLowerCase();
+
+      // Pricing detection
+      if (ruleLower.includes('pricing') || ruleLower.includes('price')) {
+        if (lower.match(/price|cost|rate|fee|charge|payment/i)) {
+          flags.push('PERSONA_NEVER_PRICING');
+        }
+      }
+
+      // Pressure language detection
+      if (ruleLower.includes('pressure')) {
+        if (lower.match(/limited time|hurry|urgent|expires|act now|don't miss/i)) {
+          flags.push('PERSONA_NEVER_PRESSURE');
+        }
+      }
     }
 
-    // NEVER rule: Don't use pressure language
-    if (lower.match(/limited time|hurry|urgent|expires|act now|don't miss/i)) {
-      flags.push('PRESSURE_LANGUAGE');
-    }
+    // Universal rules (always checked)
 
-    // NEVER rule: Must reference company name
+    // Must reference company name
     if (!lower.includes(companyName.toLowerCase())) {
       flags.push('MISSING_COMPANY_REFERENCE');
     }
 
-    // NEVER rule: Don't make unsubstantiated claims
+    // Don't make unsubstantiated claims
     if (lower.match(/guaranteed|best in market|#1|leading|top-rated/i)) {
       flags.push('UNSUBSTANTIATED_CLAIM');
     }
