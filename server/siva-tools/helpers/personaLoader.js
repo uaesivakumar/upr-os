@@ -70,12 +70,70 @@ const FALLBACK_PERSONA = {
 };
 
 /**
+ * Custom error for persona-related issues
+ */
+class PersonaError extends Error {
+  constructor(message, code, subVerticalSlug) {
+    super(message);
+    this.name = 'PersonaError';
+    this.code = code;
+    this.subVerticalSlug = subVerticalSlug;
+  }
+}
+
+/**
+ * Validate persona has minimum required configuration
+ *
+ * @param {Object} persona - Persona to validate
+ * @param {string} subVerticalSlug - Sub-vertical identifier for error messages
+ * @throws {PersonaError} If persona is invalid
+ */
+function validatePersona(persona, subVerticalSlug) {
+  if (!persona) {
+    throw new PersonaError(
+      `No persona found for sub-vertical "${subVerticalSlug}". SIVA cannot function without knowing HOW to think for this role. Please create a persona in Super Admin.`,
+      'PERSONA_NOT_FOUND',
+      subVerticalSlug
+    );
+  }
+
+  if (!persona.persona_name || persona.persona_name.trim() === '') {
+    throw new PersonaError(
+      `Persona for "${subVerticalSlug}" has no name. Please configure persona_name in Super Admin.`,
+      'PERSONA_MISSING_NAME',
+      subVerticalSlug
+    );
+  }
+
+  if (!persona.entity_type) {
+    throw new PersonaError(
+      `Persona for "${subVerticalSlug}" has no entity_type. Please set to 'company', 'individual', or 'family' in Super Admin.`,
+      'PERSONA_MISSING_ENTITY_TYPE',
+      subVerticalSlug
+    );
+  }
+
+  if (!persona.contact_priority_rules?.tiers?.length) {
+    throw new PersonaError(
+      `Persona for "${subVerticalSlug}" has no contact_priority_rules tiers. Please configure at least one tier in Super Admin.`,
+      'PERSONA_MISSING_CONTACT_TIERS',
+      subVerticalSlug
+    );
+  }
+
+  return true;
+}
+
+/**
  * Load persona for a sub-vertical
  *
  * @param {string} subVerticalSlug - Sub-vertical identifier
+ * @param {Object} options - Options
+ * @param {boolean} options.strict - If true, throw error when no persona found. If false, use fallback.
  * @returns {Promise<Object>} Persona object
+ * @throws {PersonaError} If strict mode and no persona found
  */
-async function loadPersona(subVerticalSlug) {
+async function loadPersona(subVerticalSlug, options = { strict: false }) {
   try {
     // Use default if not provided
     const slug = subVerticalSlug || DEFAULT_SUB_VERTICAL;
@@ -84,16 +142,50 @@ async function loadPersona(subVerticalSlug) {
     const persona = await personaService.getPersona(slug);
 
     if (persona) {
+      // Validate persona has minimum config
+      try {
+        validatePersona(persona, slug);
+      } catch (validationError) {
+        console.warn(`[PersonaLoader] Persona validation warning: ${validationError.message}`);
+        // In non-strict mode, return the persona anyway (with warning logged)
+        if (options.strict) {
+          throw validationError;
+        }
+      }
       return persona;
     }
 
+    // No persona found
+    if (options.strict) {
+      throw new PersonaError(
+        `No persona found for sub-vertical "${slug}". SIVA cannot function without knowing HOW to think for this role. Please create a persona in Super Admin.`,
+        'PERSONA_NOT_FOUND',
+        slug
+      );
+    }
+
     // Fallback to default
-    console.warn(`[PersonaLoader] No persona found for ${slug}, using fallback`);
+    console.warn(`[PersonaLoader] No persona found for ${slug}, using fallback. Configure in Super Admin for production.`);
     return FALLBACK_PERSONA;
 
   } catch (error) {
+    // Re-throw PersonaError as-is
+    if (error instanceof PersonaError) {
+      throw error;
+    }
+
     console.error(`[PersonaLoader] Error loading persona:`, error);
-    // Return fallback on error
+
+    // In strict mode, don't swallow errors
+    if (options.strict) {
+      throw new PersonaError(
+        `Failed to load persona for "${subVerticalSlug}": ${error.message}`,
+        'PERSONA_LOAD_ERROR',
+        subVerticalSlug
+      );
+    }
+
+    // Return fallback on error in non-strict mode
     return FALLBACK_PERSONA;
   }
 }
@@ -332,18 +424,31 @@ function getTargetTitles(persona, companySize) {
 }
 
 module.exports = {
+  // Core functions
   loadPersona,
+  validatePersona,
+
+  // Getter functions
   getEdgeCases,
   getTimingRules,
   getContactPriorityRules,
   getOutreachDoctrine,
   getQualityStandards,
   getScoringConfig,
+
+  // Matcher functions
   findBlocker,
   findBooster,
+
+  // Timing functions
   getTimingMultiplier,
   getSignalFreshnessMultiplier,
+
+  // Contact functions
   getTargetTitles,
+
+  // Classes and constants
+  PersonaError,
   FALLBACK_PERSONA,
   DEFAULT_SUB_VERTICAL
 };
