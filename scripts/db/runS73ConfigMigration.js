@@ -15,15 +15,13 @@
  * - confidence_thresholds
  */
 
-const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
+// Use the existing db utility which handles Cloud SQL socket connections
+const { pool } = require('../../utils/db');
+
 async function runMigration() {
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-  });
 
   try {
     console.log('🚀 Running S73 Config Migration...\n');
