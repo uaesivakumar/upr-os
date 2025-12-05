@@ -9,12 +9,31 @@
 -- 4. Scoring configuration per vertical/sub-vertical
 -- ============================================================================
 
+BEGIN;
+
+-- ============================================================================
+-- CLEANUP: Drop any existing incompatible tables (safe - recreated below)
+-- ============================================================================
+DROP TABLE IF EXISTS llm_vertical_model_preferences CASCADE;
+DROP TABLE IF EXISTS scoring_config CASCADE;
+DROP TABLE IF EXISTS prompt_templates CASCADE;
+DROP TABLE IF EXISTS campaign_scoring_config CASCADE;
+DROP TABLE IF EXISTS lifecycle_stage_keywords CASCADE;
+DROP TABLE IF EXISTS company_size_bands CASCADE;
+DROP TABLE IF EXISTS provider_health_thresholds CASCADE;
+DROP TABLE IF EXISTS email_pattern_config CASCADE;
+DROP TABLE IF EXISTS confidence_thresholds CASCADE;
+
+-- Drop functions if they exist
+DROP FUNCTION IF EXISTS get_vertical_model_preferences(VARCHAR, VARCHAR, VARCHAR);
+DROP FUNCTION IF EXISTS get_scoring_config(VARCHAR, VARCHAR, VARCHAR);
+
 -- ============================================================================
 -- 1. VERTICAL MODEL PREFERENCES
 -- Replaces hardcoded VERTICAL_MODEL_PREFERENCES in services/llm/router.js
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS llm_vertical_model_preferences (
+CREATE TABLE llm_vertical_model_preferences (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Scope
@@ -78,7 +97,7 @@ ON CONFLICT (vertical, sub_vertical, task_type) DO UPDATE SET
 -- Replaces hardcoded weights in companyPreview.js:494-505
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS scoring_config (
+CREATE TABLE scoring_config (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Scope
@@ -182,7 +201,7 @@ ON CONFLICT (vertical, sub_vertical, config_type) DO NOTHING;
 -- Replaces hardcoded prompts in various services
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS prompt_templates (
+CREATE TABLE prompt_templates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Identity
@@ -239,7 +258,7 @@ CREATE INDEX idx_prompt_templates_slug
 -- Replaces hardcoded values in campaignIntelligence.js:109-183
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS campaign_scoring_config (
+CREATE TABLE campaign_scoring_config (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Scope
@@ -303,7 +322,7 @@ ON CONFLICT (vertical, sub_vertical) DO NOTHING;
 -- Replaces hardcoded stageKeywords in campaignIntelligence.js:216-232
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS lifecycle_stage_keywords (
+CREATE TABLE lifecycle_stage_keywords (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Scope
@@ -339,7 +358,7 @@ ON CONFLICT (vertical, stage) DO NOTHING;
 -- Replaces hardcoded thresholds in campaignIntelligence.js:246-250
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS company_size_bands (
+CREATE TABLE company_size_bands (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Scope
@@ -378,7 +397,7 @@ ON CONFLICT (vertical, band_name) DO NOTHING;
 -- Replaces hardcoded values in providerRegistry.js:458-459
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS provider_health_thresholds (
+CREATE TABLE provider_health_thresholds (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   threshold_type VARCHAR(50) NOT NULL, -- 'healthy', 'degraded', 'unhealthy'
@@ -405,7 +424,7 @@ ON CONFLICT (threshold_type) DO NOTHING;
 -- Replaces hardcoded patterns in emailEnhancedOptimized.js
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS email_pattern_config (
+CREATE TABLE email_pattern_config (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Pattern definition
@@ -442,7 +461,7 @@ ON CONFLICT (pattern) DO NOTHING;
 -- General-purpose threshold configuration
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS confidence_thresholds (
+CREATE TABLE confidence_thresholds (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Scope
