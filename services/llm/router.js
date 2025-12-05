@@ -282,46 +282,78 @@ function evaluateConditions(conditions, context) {
 // VERTICAL-AWARE BRANCHING
 // ============================================================================
 
+// Cache for vertical preferences (refreshed every 5 minutes)
+let verticalPreferencesCache = null;
+let verticalPreferencesCacheTime = 0;
+const VERTICAL_PREFS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 /**
- * Vertical-specific model preferences
+ * Load vertical model preferences from database
+ * Replaces the hardcoded VERTICAL_MODEL_PREFERENCES constant
  */
-const VERTICAL_MODEL_PREFERENCES = {
-  banking: {
-    outreach_generation: ['claude-3-5-sonnet', 'gpt-4o'], // Better compliance tone
-    company_analysis: ['gpt-4o', 'claude-3-opus'], // Thorough analysis
-    data_extraction: ['gpt-4o-mini', 'gemini-1-5-flash'] // Cost effective
-  },
-  insurance: {
-    outreach_generation: ['claude-3-5-sonnet', 'gpt-4o'],
-    company_analysis: ['gpt-4o', 'claude-3-5-sonnet'],
-    data_extraction: ['gpt-4o-mini', 'gemini-1-5-flash']
-  },
-  saas: {
-    outreach_generation: ['gpt-4o', 'claude-3-5-sonnet'], // More casual
-    company_analysis: ['claude-3-5-sonnet', 'gpt-4o'],
-    data_extraction: ['gemini-1-5-flash', 'gpt-4o-mini'] // Fast
-  },
-  recruitment: {
-    outreach_generation: ['claude-3-5-sonnet', 'gpt-4o'], // Personal touch
-    contact_lookup: ['gpt-4o-mini', 'gemini-1-5-flash'],
-    data_extraction: ['gpt-4o-mini', 'gemini-1-5-flash']
-  },
-  real_estate: {
-    outreach_generation: ['gpt-4o', 'claude-3-5-sonnet'],
-    company_analysis: ['gpt-4o', 'claude-3-5-sonnet'],
-    data_extraction: ['gpt-4o-mini', 'gemini-1-5-flash']
+async function loadVerticalModelPreferences() {
+  const now = Date.now();
+
+  // Return cached if still valid
+  if (verticalPreferencesCache && (now - verticalPreferencesCacheTime) < VERTICAL_PREFS_CACHE_TTL) {
+    return verticalPreferencesCache;
   }
-};
+
+  try {
+    const result = await pool.query(`
+      SELECT vertical, sub_vertical, task_type, model_preferences
+      FROM llm_vertical_model_preferences
+      WHERE is_active = true
+      ORDER BY priority
+    `);
+
+    // Build preferences map
+    const preferences = {};
+    for (const row of result.rows) {
+      const key = row.sub_vertical
+        ? `${row.vertical}:${row.sub_vertical}`
+        : row.vertical;
+
+      if (!preferences[key]) {
+        preferences[key] = {};
+      }
+      preferences[key][row.task_type] = row.model_preferences;
+    }
+
+    verticalPreferencesCache = preferences;
+    verticalPreferencesCacheTime = now;
+
+    return preferences;
+  } catch (error) {
+    console.error('[LLM Router] Failed to load vertical preferences from DB:', error.message);
+    // Return empty object - will fall through to default model selection
+    return {};
+  }
+}
 
 /**
  * Check vertical-specific model preferences
+ * Now loads from database instead of hardcoded constant
  */
-async function checkVerticalPreferences(taskType, vertical) {
-  if (!vertical || !VERTICAL_MODEL_PREFERENCES[vertical]) {
+async function checkVerticalPreferences(taskType, vertical, subVertical = null) {
+  if (!vertical) {
     return null;
   }
 
-  const preferences = VERTICAL_MODEL_PREFERENCES[vertical][taskType];
+  const allPreferences = await loadVerticalModelPreferences();
+
+  // Try sub-vertical specific first
+  let preferences = null;
+  if (subVertical) {
+    const subKey = `${vertical}:${subVertical}`;
+    preferences = allPreferences[subKey]?.[taskType];
+  }
+
+  // Fall back to vertical-level
+  if (!preferences) {
+    preferences = allPreferences[vertical]?.[taskType];
+  }
+
   if (!preferences || preferences.length === 0) {
     return null;
   }
@@ -332,12 +364,20 @@ async function checkVerticalPreferences(taskType, vertical) {
     if (model) {
       return {
         ...model,
-        selectionReason: `Vertical preference: ${vertical}/${taskType}`
+        selectionReason: `Vertical preference: ${vertical}${subVertical ? '/' + subVertical : ''}/${taskType}`
       };
     }
   }
 
   return null;
+}
+
+/**
+ * Invalidate vertical preferences cache (for use after Super Admin updates)
+ */
+function invalidateVerticalPreferencesCache() {
+  verticalPreferencesCache = null;
+  verticalPreferencesCacheTime = 0;
 }
 
 // ============================================================================
@@ -743,7 +783,8 @@ export {
   // Routing
   checkRoutingRules,
   checkVerticalPreferences,
-  VERTICAL_MODEL_PREFERENCES,
+  loadVerticalModelPreferences,
+  invalidateVerticalPreferencesCache,
 
   // Cost tracking
   recordUsage,

@@ -12,6 +12,121 @@ const { findLinkedInURL } = require('../utils/linkedinEnrichment');
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const SERPAPI_KEY = process.env.SERPAPI_KEY;
 
+// ============================================================================
+// SCORING CONFIG CACHE (S73: Config Migration)
+// ============================================================================
+let scoringConfigCache = {
+  weights: null,
+  grades: null,
+  loadedAt: null,
+  ttlMs: 5 * 60 * 1000 // 5 minutes cache
+};
+
+// Default fallbacks if DB unavailable
+const DEFAULT_QSCORE_WEIGHTS = {
+  domain: 25,
+  linkedin: 20,
+  signals: 20,
+  uaeContext: 25,
+  recency: 10
+};
+
+const DEFAULT_QSCORE_GRADES = {
+  A: { min: 80, max: 100 },
+  B: { min: 60, max: 79 },
+  C: { min: 40, max: 59 },
+  D: { min: 0, max: 39 }
+};
+
+/**
+ * Load Q-Score weights from database with caching
+ * @param {string} vertical - Vertical (defaults to 'banking')
+ * @returns {Promise<Object>} Weights object
+ */
+async function loadQScoreWeights(vertical = 'banking') {
+  // Check cache validity
+  if (
+    scoringConfigCache.weights &&
+    scoringConfigCache.loadedAt &&
+    (Date.now() - scoringConfigCache.loadedAt) < scoringConfigCache.ttlMs
+  ) {
+    return scoringConfigCache.weights;
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT config
+      FROM scoring_config
+      WHERE vertical = $1
+        AND config_type = 'qscore_weights'
+        AND is_active = true
+      ORDER BY sub_vertical NULLS LAST
+      LIMIT 1
+    `, [vertical]);
+
+    if (result.rows.length > 0) {
+      scoringConfigCache.weights = result.rows[0].config;
+      scoringConfigCache.loadedAt = Date.now();
+      console.log('[QScore] Loaded weights from DB:', scoringConfigCache.weights);
+      return scoringConfigCache.weights;
+    }
+  } catch (error) {
+    console.log('[QScore] DB unavailable, using defaults:', error.message);
+  }
+
+  // Fallback to defaults
+  return DEFAULT_QSCORE_WEIGHTS;
+}
+
+/**
+ * Load Q-Score grade thresholds from database with caching
+ * @param {string} vertical - Vertical (defaults to 'banking')
+ * @returns {Promise<Object>} Grades object
+ */
+async function loadQScoreGrades(vertical = 'banking') {
+  // Check cache validity
+  if (
+    scoringConfigCache.grades &&
+    scoringConfigCache.loadedAt &&
+    (Date.now() - scoringConfigCache.loadedAt) < scoringConfigCache.ttlMs
+  ) {
+    return scoringConfigCache.grades;
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT config
+      FROM scoring_config
+      WHERE vertical = $1
+        AND config_type = 'qscore_grades'
+        AND is_active = true
+      ORDER BY sub_vertical NULLS LAST
+      LIMIT 1
+    `, [vertical]);
+
+    if (result.rows.length > 0) {
+      scoringConfigCache.grades = result.rows[0].config;
+      console.log('[QScore] Loaded grades from DB:', scoringConfigCache.grades);
+      return scoringConfigCache.grades;
+    }
+  } catch (error) {
+    console.log('[QScore] DB unavailable for grades, using defaults');
+  }
+
+  // Fallback to defaults
+  return DEFAULT_QSCORE_GRADES;
+}
+
+/**
+ * Invalidate scoring config cache (called when Super Admin updates config)
+ */
+function invalidateScoringConfigCache() {
+  scoringConfigCache.weights = null;
+  scoringConfigCache.grades = null;
+  scoringConfigCache.loadedAt = null;
+  console.log('[QScore] Cache invalidated');
+}
+
 /**
  * Main preview generation function
  * @param {string} companyName - Company name to search
@@ -142,7 +257,7 @@ async function generateCompanyPreview(companyName) {
     }
 
     // 5️⃣ COMPUTE Q-SCORE (AFTER signals query, using dbHiringSignals)
-    const qscore = computeQScore(extracted, serpData, linkedinUrl, dbHiringSignals);
+    const qscore = await computeQScore(extracted, serpData, linkedinUrl, dbHiringSignals);
 
     // 6️⃣ BUILD FINAL PROFILE
     const profile = {
@@ -472,13 +587,21 @@ function detectUAEPresence(extracted, serpData) {
 }
 
 /**
- * Compute Q-Score (0-100) with UAE emphasis
- * NOW USES DATABASE SIGNALS INSTEAD OF LLM-SCRAPED SIGNALS
+ * Compute Q-Score (0-100) with configurable weights from DB
+ * NOW USES DATABASE SIGNALS AND DATABASE WEIGHTS (S73: Config Migration)
+ * @param {Object} extracted - Extracted company data
+ * @param {Object} serpData - SERP API response
+ * @param {string|null} linkedinUrl - LinkedIn URL if found
+ * @param {Array} dbHiringSignals - Hiring signals from database
+ * @param {string} vertical - Vertical for weight lookup (defaults to 'banking')
  */
-function computeQScore(extracted, serpData, linkedinUrl = null, dbHiringSignals = []) {
-  console.log('[computeQScore] CALCULATING Q-SCORE');
+async function computeQScore(extracted, serpData, linkedinUrl = null, dbHiringSignals = [], vertical = 'banking') {
+  console.log('[computeQScore] CALCULATING Q-SCORE for vertical:', vertical);
   console.log('[computeQScore] dbHiringSignals param:', Array.isArray(dbHiringSignals) ? `Array(${dbHiringSignals.length})` : typeof dbHiringSignals);
-  console.log('[computeQScore] dbHiringSignals.length:', dbHiringSignals?.length);
+
+  // Load weights from database (with caching)
+  const weights = await loadQScoreWeights(vertical);
+  const grades = await loadQScoreGrades(vertical);
 
   const metrics = {
     domain: extracted.domain ? 1 : 0,
@@ -489,31 +612,34 @@ function computeQScore(extracted, serpData, linkedinUrl = null, dbHiringSignals 
   };
 
   console.log('[computeQScore] Metrics calculated:', JSON.stringify(metrics, null, 2));
+  console.log('[computeQScore] Using weights:', JSON.stringify(weights, null, 2));
 
-  // Weighted scoring (UAE-focused)
+  // Weighted scoring using DB config
   const score = Math.round(
-    metrics.domain * 25 +        // Domain found: 25%
-    metrics.linkedin * 20 +       // LinkedIn found: 20%
-    metrics.signals * 20 +        // Active signals: 20%
-    metrics.uaeContext * 25 +     // UAE context: 25% ⭐
-    metrics.recency * 10          // Recent news: 10%
+    metrics.domain * (weights.domain || 25) +
+    metrics.linkedin * (weights.linkedin || 20) +
+    metrics.signals * (weights.signals || 20) +
+    metrics.uaeContext * (weights.uaeContext || 25) +
+    metrics.recency * (weights.recency || 10)
   );
 
+  // Determine rating using DB grade thresholds
   let rating = 'D';
-  if (score >= 80) rating = 'A';
-  else if (score >= 60) rating = 'B';
-  else if (score >= 40) rating = 'C';
+  if (score >= (grades.A?.min || 80)) rating = 'A';
+  else if (score >= (grades.B?.min || 60)) rating = 'B';
+  else if (score >= (grades.C?.min || 40)) rating = 'C';
 
   const result = {
     value: score,
     rating,
     breakdown: {
-      domain: metrics.domain * 25,
-      linkedin: metrics.linkedin * 20,
-      signals: metrics.signals * 20,
-      uae_presence: metrics.uaeContext * 25,
-      recency: metrics.recency * 10
-    }
+      domain: metrics.domain * (weights.domain || 25),
+      linkedin: metrics.linkedin * (weights.linkedin || 20),
+      signals: metrics.signals * (weights.signals || 20),
+      uae_presence: metrics.uaeContext * (weights.uaeContext || 25),
+      recency: metrics.recency * (weights.recency || 10)
+    },
+    weightsUsed: weights  // Include for debugging/transparency
   };
 
   console.log('[computeQScore] Final Q-Score:', score);
@@ -538,5 +664,10 @@ function calculateTrustScore(serpData) {
 }
 
 module.exports = {
-  generateCompanyPreview
+  generateCompanyPreview,
+  // S73: Scoring config utilities for Super Admin
+  loadQScoreWeights,
+  loadQScoreGrades,
+  invalidateScoringConfigCache,
+  computeQScore
 };
