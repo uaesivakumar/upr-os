@@ -18,6 +18,7 @@ const MIGRATIONS = [
   '2025_11_30_s52_vertical_pack_system.sql',
   '2025_11_30_s53_territory_management.sql',
   '2025_11_30_s55_os_kernel_config.sql',
+  '2025_12_06_fix_s55_fk_constraint.sql',  // Must run before cleanup
   '2025_12_06_cleanup_seed_data.sql',
 ];
 
@@ -59,7 +60,9 @@ async function runMigrations() {
     'vertical_packs',
     'vertical_model_preferences',
     'territories',
-    'os_config_namespaces'
+    'os_config_namespaces',
+    'os_kernel_config',
+    'os_kernel_config_versions'
   ];
 
   for (const table of tables) {
