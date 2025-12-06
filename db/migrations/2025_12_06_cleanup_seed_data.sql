@@ -7,34 +7,67 @@
 -- ============================================================================
 
 -- ============================================================================
--- 1. CLEANUP API PROVIDERS
--- Only keep providers we're actually using: Apollo, LinkedIn MCP, SalesNav MCP
+-- 1. ADD MISSING API PROVIDERS
+-- SERP API was missing from original seed
+-- ============================================================================
+
+INSERT INTO api_providers (slug, name, description, provider_type, base_url, docs_url, capabilities, default_rate_limit_per_minute, default_rate_limit_per_day, cost_per_request, baseline_accuracy_score, status)
+VALUES
+    ('serp_api', 'SERP API', 'Google Search Results API for company research', 'scraper',
+     'https://serpapi.com', 'https://serpapi.com/docs',
+     '["search", "company_news", "job_listings", "reviews"]'::jsonb,
+     100, 10000, 0.005, 0.95, 'active')
+ON CONFLICT (slug) DO UPDATE SET
+    name = EXCLUDED.name,
+    description = EXCLUDED.description,
+    capabilities = EXCLUDED.capabilities,
+    status = 'active',
+    updated_at = NOW();
+
+-- ============================================================================
+-- 2. CLEANUP API PROVIDERS
+-- Only keep providers we're actually using: Apollo, LinkedIn MCP, SalesNav MCP, NeverBounce, SERP
 -- Mark others as disabled (not delete, for reference)
 -- Note: api_providers uses 'status' column, not 'is_active'
 -- ============================================================================
 
 UPDATE api_providers SET status = 'disabled', updated_at = NOW()
-WHERE slug NOT IN ('apollo', 'linkedin_scraper', 'salesnav_mcp')
-  AND status = 'active';
+WHERE slug NOT IN ('apollo', 'linkedin_scraper', 'salesnav_mcp', 'neverbounce', 'serp_api')
+  AND status IN ('active', 'beta');
 
 -- Fix descriptions for active providers
 UPDATE api_providers SET
   description = 'Contact & company enrichment API - PRIMARY',
+  status = 'active',
   updated_at = NOW()
 WHERE slug = 'apollo';
 
 UPDATE api_providers SET
   description = 'LinkedIn profile scraping via MCP',
+  status = 'active',
   updated_at = NOW()
 WHERE slug = 'linkedin_scraper';
 
 UPDATE api_providers SET
   description = 'Sales Navigator search via MCP',
+  status = 'active',
   updated_at = NOW()
 WHERE slug = 'salesnav_mcp';
 
+UPDATE api_providers SET
+  description = 'Email verification service - API key in GCP secrets',
+  status = 'active',
+  updated_at = NOW()
+WHERE slug = 'neverbounce';
+
+UPDATE api_providers SET
+  description = 'Google Search Results API for company research',
+  status = 'active',
+  updated_at = NOW()
+WHERE slug = 'serp_api';
+
 -- ============================================================================
--- 2. CLEANUP LLM PROVIDERS
+-- 3. CLEANUP LLM PROVIDERS
 -- Only keep OpenAI and Anthropic as active
 -- ============================================================================
 
@@ -49,7 +82,7 @@ WHERE provider_id NOT IN (
 );
 
 -- ============================================================================
--- 3. CLEANUP VERTICAL PACKS
+-- 4. CLEANUP VERTICAL PACKS
 -- Per CLAUDE.md: Only Banking is active, others are "Coming Soon"
 -- ============================================================================
 
@@ -68,7 +101,7 @@ UPDATE vertical_packs SET
 WHERE slug IN ('banking', 'employee_banking', 'corporate_banking', 'sme_banking');
 
 -- ============================================================================
--- 4. ADD VERTICAL MODEL PREFERENCES (Task-to-Model Mappings)
+-- 5. ADD VERTICAL MODEL PREFERENCES (Task-to-Model Mappings)
 -- These define which LLM model to use for each task type per vertical
 -- ============================================================================
 
@@ -133,7 +166,7 @@ ON CONFLICT (vertical_slug, task_type) DO UPDATE SET
   updated_at = NOW();
 
 -- ============================================================================
--- 5. CLEANUP TERRITORIES
+-- 6. CLEANUP TERRITORIES
 -- Keep only UAE hierarchy relevant to Banking vertical
 -- Note: territories uses 'status' column, not 'is_active'
 -- ============================================================================
