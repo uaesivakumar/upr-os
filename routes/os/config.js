@@ -14,6 +14,7 @@ import {
   getConfigSnapshot,
   setConfig
 } from '../../services/configLoader.js';
+import { query } from '../../db/index.js';
 
 const router = express.Router();
 
@@ -37,25 +38,41 @@ function getContext(req) {
 
 /**
  * GET /api/os/config
- * Get config summary
+ * Get config summary - returns namespaces with counts from database
  */
 router.get('/', async (req, res) => {
   try {
-    const namespaces = ['discovery', 'enrichment', 'scoring', 'llm', 'pipeline', 'outreach', 'system'];
-    const summary = {};
+    // Get namespaces from database (os_config_namespaces table)
+    const namespacesResult = await query(`
+      SELECT
+        n.slug as namespace,
+        n.name,
+        n.description,
+        n.icon,
+        COUNT(c.id) as total,
+        COUNT(c.id) FILTER (WHERE c.is_active = true) as active
+      FROM os_config_namespaces n
+      LEFT JOIN os_kernel_config c ON c.namespace = n.slug
+      WHERE n.is_active = true
+      GROUP BY n.slug, n.name, n.description, n.icon, n.sort_order
+      ORDER BY n.sort_order
+    `);
 
-    for (const ns of namespaces) {
-      const configs = await getNamespaceConfig(ns, getContext(req));
-      summary[ns] = {
-        keys: Object.keys(configs),
-        count: Object.keys(configs).length
-      };
-    }
+    const namespaces = namespacesResult.rows.map(row => ({
+      namespace: row.namespace,
+      name: row.name,
+      description: row.description,
+      icon: row.icon,
+      total: parseInt(row.total) || 0,
+      active: parseInt(row.active) || 0
+    }));
 
     res.json({
       success: true,
-      environment: process.env.NODE_ENV || 'production',
-      namespaces: summary
+      data: {
+        environment: process.env.NODE_ENV || 'production',
+        namespaces
+      }
     });
   } catch (error) {
     console.error('Error getting config summary:', error);
@@ -73,14 +90,30 @@ router.get('/', async (req, res) => {
 router.get('/:namespace', async (req, res) => {
   try {
     const { namespace } = req.params;
-    const context = getContext(req);
 
-    const configs = await getNamespaceConfig(namespace, context);
+    // Get configs from database with full metadata
+    const configsResult = await query(`
+      SELECT
+        namespace,
+        key,
+        value,
+        data_type as value_type,
+        description,
+        is_active,
+        version,
+        updated_by,
+        updated_at
+      FROM os_kernel_config
+      WHERE namespace = $1
+      ORDER BY key
+    `, [namespace]);
 
     res.json({
       success: true,
-      namespace,
-      data: configs
+      data: {
+        namespace,
+        configs: configsResult.rows
+      }
     });
   } catch (error) {
     console.error('Error getting namespace config:', error);

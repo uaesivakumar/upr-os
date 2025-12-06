@@ -353,20 +353,23 @@ router.get('/fallback-chains', async (req, res) => {
 
 /**
  * GET /api/os/llm/task-mappings
- * Get vertical model preferences (Task-to-Model Mapping)
+ * Get vertical model preferences (Task-to-Model Mapping) from database
  */
 router.get('/task-mappings', async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 
   try {
+    const mappings = await llmService.getTaskMappings();
+
     res.json(createOSResponse({
       success: true,
       data: {
-        mappings: llmService.VERTICAL_MODEL_PREFERENCES,
-        verticals: Object.keys(llmService.VERTICAL_MODEL_PREFERENCES)
+        mappings,
+        total: mappings.length,
+        verticals: [...new Set(mappings.map(m => m.vertical_slug))]
       },
-      reason: 'Vertical model preferences',
+      reason: `Found ${mappings.length} task mappings`,
       confidence: 100,
       endpoint: '/api/os/llm/task-mappings',
       executionTimeMs: Date.now() - startTime,

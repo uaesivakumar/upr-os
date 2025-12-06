@@ -18,6 +18,7 @@ const MIGRATIONS = [
   '2025_11_30_s52_vertical_pack_system.sql',
   '2025_11_30_s53_territory_management.sql',
   '2025_11_30_s55_os_kernel_config.sql',
+  '2025_12_06_cleanup_seed_data.sql',
 ];
 
 async function runMigrations() {
@@ -56,6 +57,7 @@ async function runMigrations() {
     'llm_providers',
     'llm_models',
     'vertical_packs',
+    'vertical_model_preferences',
     'territories',
     'os_config_namespaces'
   ];

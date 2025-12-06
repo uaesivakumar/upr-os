@@ -24,6 +24,238 @@ const { pool } = db;
 const router = express.Router();
 
 // ============================================================================
+// STATIC ROUTES (must be defined BEFORE dynamic :idOrSlug routes)
+// ============================================================================
+
+/**
+ * GET /api/os/providers/health
+ * Health check for provider service
+ */
+router.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    service: 'os-providers',
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * GET /api/os/providers/dashboard
+ * Get provider dashboard data
+ */
+router.get('/dashboard', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    // Get all providers with health info
+    const providers = await providerRegistry.getAllProviders({ includeHealth: true });
+
+    // Calculate summary statistics
+    const summary = {
+      total: providers.length,
+      byStatus: {},
+      byHealth: {},
+      totalRequestsToday: 0,
+      avgResponseTime: 0
+    };
+
+    let responseTimeSum = 0;
+    let responseTimeCount = 0;
+
+    providers.forEach(p => {
+      summary.byStatus[p.status] = (summary.byStatus[p.status] || 0) + 1;
+      const healthStatus = p.health?.status || 'unknown';
+      summary.byHealth[healthStatus] = (summary.byHealth[healthStatus] || 0) + 1;
+      summary.totalRequestsToday += p.requests_today || 0;
+
+      if (p.health?.avg_response_time_ms) {
+        responseTimeSum += p.health.avg_response_time_ms;
+        responseTimeCount++;
+      }
+    });
+
+    summary.avgResponseTime = responseTimeCount > 0 ?
+      Math.round(responseTimeSum / responseTimeCount) : 0;
+
+    res.json(createOSResponse({
+      success: true,
+      data: {
+        summary,
+        providers
+      },
+      reason: 'Dashboard data retrieved',
+      confidence: 100,
+      endpoint: '/api/os/providers/dashboard',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Providers] Error getting dashboard:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_PROVIDER_DASHBOARD_ERROR',
+      endpoint: '/api/os/providers/dashboard',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/providers/chains
+ * List all fallback chains
+ */
+router.get('/chains', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const result = await pool.query(`
+      SELECT * FROM v_fallback_chains_overview
+      ORDER BY capability, vertical NULLS FIRST
+    `);
+
+    res.json(createOSResponse({
+      success: true,
+      data: {
+        chains: result.rows,
+        total: result.rows.length
+      },
+      reason: `Found ${result.rows.length} fallback chains`,
+      confidence: 100,
+      endpoint: '/api/os/providers/chains',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Providers] Error listing chains:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_PROVIDER_CHAINS_ERROR',
+      endpoint: '/api/os/providers/chains',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * GET /api/os/providers/chains/:slugOrCapability
+ * Get a specific fallback chain
+ */
+router.get('/chains/:slugOrCapability', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { slugOrCapability } = req.params;
+    const { vertical } = req.query;
+    const tenantId = getTenantId(req);
+
+    const chain = await providerRegistry.getFallbackChain(slugOrCapability, {
+      vertical,
+      tenantId
+    });
+
+    if (!chain) {
+      return res.status(404).json(createOSError({
+        error: `Fallback chain not found: ${slugOrCapability}`,
+        code: 'OS_CHAIN_NOT_FOUND',
+        endpoint: `/api/os/providers/chains/${slugOrCapability}`,
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    res.json(createOSResponse({
+      success: true,
+      data: chain,
+      reason: 'Fallback chain found',
+      confidence: 100,
+      endpoint: `/api/os/providers/chains/${slugOrCapability}`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Providers] Error getting chain:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_PROVIDER_CHAIN_ERROR',
+      endpoint: `/api/os/providers/chains/${req.params.slugOrCapability}`,
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+/**
+ * POST /api/os/providers/select
+ * Select the best provider(s) for a capability
+ */
+router.post('/select', async (req, res) => {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+
+  try {
+    const { capability, vertical, limit = 5 } = req.body;
+    const tenantId = getTenantId(req);
+
+    if (!capability) {
+      return res.status(400).json(createOSError({
+        error: 'capability is required',
+        code: 'OS_PROVIDER_INVALID_INPUT',
+        endpoint: '/api/os/providers/select',
+        executionTimeMs: Date.now() - startTime,
+        requestId
+      }));
+    }
+
+    const providers = await providerRegistry.getProvidersForCapability(capability, {
+      vertical,
+      tenantId
+    });
+
+    res.json(createOSResponse({
+      success: true,
+      data: {
+        capability,
+        vertical,
+        providers: providers.slice(0, limit),
+        total: providers.length
+      },
+      reason: `Found ${providers.length} providers for ${capability}`,
+      confidence: 100,
+      endpoint: '/api/os/providers/select',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+
+  } catch (error) {
+    console.error('[OS:Providers] Error selecting providers:', error);
+    Sentry.captureException(error);
+
+    res.status(500).json(createOSError({
+      error: error.message,
+      code: 'OS_PROVIDER_SELECT_ERROR',
+      endpoint: '/api/os/providers/select',
+      executionTimeMs: Date.now() - startTime,
+      requestId
+    }));
+  }
+});
+
+// ============================================================================
 // PROVIDER CRUD ENDPOINTS
 // ============================================================================
 
@@ -565,241 +797,5 @@ router.post('/:idOrSlug/health/check', async (req, res) => {
   }
 });
 
-// ============================================================================
-// FALLBACK CHAIN ENDPOINTS
-// ============================================================================
-
-/**
- * GET /api/os/providers/chains
- * List all fallback chains
- */
-router.get('/chains', async (req, res) => {
-  const startTime = Date.now();
-  const requestId = generateRequestId();
-
-  try {
-    const result = await pool.query(`
-      SELECT * FROM v_fallback_chains_overview
-      ORDER BY capability, vertical NULLS FIRST
-    `);
-
-    res.json(createOSResponse({
-      success: true,
-      data: {
-        chains: result.rows,
-        total: result.rows.length
-      },
-      reason: `Found ${result.rows.length} fallback chains`,
-      confidence: 100,
-      endpoint: '/api/os/providers/chains',
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-
-  } catch (error) {
-    console.error('[OS:Providers] Error listing chains:', error);
-    Sentry.captureException(error);
-
-    res.status(500).json(createOSError({
-      error: error.message,
-      code: 'OS_PROVIDER_CHAINS_ERROR',
-      endpoint: '/api/os/providers/chains',
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-  }
-});
-
-/**
- * GET /api/os/providers/chains/:slugOrCapability
- * Get a specific fallback chain
- */
-router.get('/chains/:slugOrCapability', async (req, res) => {
-  const startTime = Date.now();
-  const requestId = generateRequestId();
-
-  try {
-    const { slugOrCapability } = req.params;
-    const { vertical } = req.query;
-    const tenantId = getTenantId(req);
-
-    const chain = await providerRegistry.getFallbackChain(slugOrCapability, {
-      vertical,
-      tenantId
-    });
-
-    if (!chain) {
-      return res.status(404).json(createOSError({
-        error: `Fallback chain not found: ${slugOrCapability}`,
-        code: 'OS_CHAIN_NOT_FOUND',
-        endpoint: `/api/os/providers/chains/${slugOrCapability}`,
-        executionTimeMs: Date.now() - startTime,
-        requestId
-      }));
-    }
-
-    res.json(createOSResponse({
-      success: true,
-      data: chain,
-      reason: 'Fallback chain found',
-      confidence: 100,
-      endpoint: `/api/os/providers/chains/${slugOrCapability}`,
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-
-  } catch (error) {
-    console.error('[OS:Providers] Error getting chain:', error);
-    Sentry.captureException(error);
-
-    res.status(500).json(createOSError({
-      error: error.message,
-      code: 'OS_PROVIDER_CHAIN_ERROR',
-      endpoint: `/api/os/providers/chains/${req.params.slugOrCapability}`,
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-  }
-});
-
-/**
- * POST /api/os/providers/select
- * Select the best provider(s) for a capability
- */
-router.post('/select', async (req, res) => {
-  const startTime = Date.now();
-  const requestId = generateRequestId();
-
-  try {
-    const { capability, vertical, limit = 5 } = req.body;
-    const tenantId = getTenantId(req);
-
-    if (!capability) {
-      return res.status(400).json(createOSError({
-        error: 'capability is required',
-        code: 'OS_PROVIDER_INVALID_INPUT',
-        endpoint: '/api/os/providers/select',
-        executionTimeMs: Date.now() - startTime,
-        requestId
-      }));
-    }
-
-    const providers = await providerRegistry.getProvidersForCapability(capability, {
-      vertical,
-      tenantId
-    });
-
-    res.json(createOSResponse({
-      success: true,
-      data: {
-        capability,
-        vertical,
-        providers: providers.slice(0, limit),
-        total: providers.length
-      },
-      reason: `Found ${providers.length} providers for ${capability}`,
-      confidence: 100,
-      endpoint: '/api/os/providers/select',
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-
-  } catch (error) {
-    console.error('[OS:Providers] Error selecting providers:', error);
-    Sentry.captureException(error);
-
-    res.status(500).json(createOSError({
-      error: error.message,
-      code: 'OS_PROVIDER_SELECT_ERROR',
-      endpoint: '/api/os/providers/select',
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-  }
-});
-
-// ============================================================================
-// DASHBOARD ENDPOINT
-// ============================================================================
-
-/**
- * GET /api/os/providers/dashboard
- * Get provider dashboard data
- */
-router.get('/dashboard', async (req, res) => {
-  const startTime = Date.now();
-  const requestId = generateRequestId();
-
-  try {
-    const result = await pool.query(`
-      SELECT * FROM v_provider_dashboard
-    `);
-
-    // Calculate summary statistics
-    const providers = result.rows;
-    const summary = {
-      total: providers.length,
-      byStatus: {},
-      byHealth: {},
-      totalRequestsToday: 0,
-      avgResponseTime: 0
-    };
-
-    let responseTimeSum = 0;
-    let responseTimeCount = 0;
-
-    providers.forEach(p => {
-      summary.byStatus[p.status] = (summary.byStatus[p.status] || 0) + 1;
-      summary.byHealth[p.health_status || 'unknown'] = (summary.byHealth[p.health_status || 'unknown'] || 0) + 1;
-      summary.totalRequestsToday += p.requests_today || 0;
-
-      if (p.avg_response_time_ms) {
-        responseTimeSum += p.avg_response_time_ms;
-        responseTimeCount++;
-      }
-    });
-
-    summary.avgResponseTime = responseTimeCount > 0 ?
-      Math.round(responseTimeSum / responseTimeCount) : 0;
-
-    res.json(createOSResponse({
-      success: true,
-      data: {
-        summary,
-        providers
-      },
-      reason: 'Dashboard data retrieved',
-      confidence: 100,
-      endpoint: '/api/os/providers/dashboard',
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-
-  } catch (error) {
-    console.error('[OS:Providers] Error getting dashboard:', error);
-    Sentry.captureException(error);
-
-    res.status(500).json(createOSError({
-      error: error.message,
-      code: 'OS_PROVIDER_DASHBOARD_ERROR',
-      endpoint: '/api/os/providers/dashboard',
-      executionTimeMs: Date.now() - startTime,
-      requestId
-    }));
-  }
-});
-
-/**
- * GET /api/os/providers/health
- * Health check for provider service
- */
-router.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    service: 'os-providers',
-    status: 'healthy',
-    timestamp: new Date().toISOString()
-  });
-});
-
 export default router;
+// Force rebuild $(date)
