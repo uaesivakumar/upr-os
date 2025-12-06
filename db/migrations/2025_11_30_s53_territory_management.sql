@@ -2,6 +2,9 @@
 -- UPR OS - Intelligence Engine
 -- Hierarchical territory management with config inheritance
 
+-- Enable ltree extension for hierarchical path queries
+CREATE EXTENSION IF NOT EXISTS ltree;
+
 -- ============================================================================
 -- TERRITORY HIERARCHY
 -- ============================================================================

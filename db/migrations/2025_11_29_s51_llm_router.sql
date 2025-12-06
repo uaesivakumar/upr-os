@@ -392,21 +392,21 @@ ORDER BY m.priority, m.quality_score DESC;
 -- Cost tracking view
 CREATE OR REPLACE VIEW v_llm_cost_summary AS
 SELECT
-  DATE_TRUNC('day', created_at) as day,
+  DATE_TRUNC('day', l.created_at) as day,
   m.slug as model_slug,
   m.name as model_name,
   p.name as provider_name,
   t.slug as task_type,
   COUNT(*) as request_count,
-  SUM(input_tokens) as total_input_tokens,
-  SUM(output_tokens) as total_output_tokens,
-  SUM(total_cost) as total_cost,
-  AVG(latency_ms) as avg_latency_ms
+  SUM(l.input_tokens) as total_input_tokens,
+  SUM(l.output_tokens) as total_output_tokens,
+  SUM(l.total_cost) as total_cost,
+  AVG(l.latency_ms) as avg_latency_ms
 FROM llm_usage_logs l
 JOIN llm_models m ON l.model_id = m.id
 JOIN llm_providers p ON m.provider_id = p.id
 LEFT JOIN llm_task_types t ON l.task_type_id = t.id
-GROUP BY DATE_TRUNC('day', created_at), m.slug, m.name, p.name, t.slug
+GROUP BY DATE_TRUNC('day', l.created_at), m.slug, m.name, p.name, t.slug
 ORDER BY day DESC, total_cost DESC;
 
 -- ============================================================================

@@ -185,10 +185,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER config_version_trigger
-    BEFORE INSERT OR UPDATE ON os_kernel_config
-    FOR EACH ROW
-    EXECUTE FUNCTION record_config_version();
+-- NOTE: Trigger will be created AFTER seed data (at end of migration)
 
 -- ============================================================================
 -- HELPER FUNCTIONS
@@ -523,3 +520,39 @@ LEFT JOIN LATERAL (
     ORDER BY version DESC
     LIMIT 1
 ) v ON true;
+
+-- ============================================================================
+-- CREATE TRIGGER (after seed data to avoid FK issues during initial insert)
+-- ============================================================================
+
+DROP TRIGGER IF EXISTS config_version_trigger ON os_kernel_config;
+CREATE TRIGGER config_version_trigger
+    BEFORE INSERT OR UPDATE ON os_kernel_config
+    FOR EACH ROW
+    EXECUTE FUNCTION record_config_version();
+
+-- ============================================================================
+-- CONFIG NAMESPACES (for Super Admin UI)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS os_config_namespaces (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    icon VARCHAR(50),
+    sort_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+INSERT INTO os_config_namespaces (slug, name, description, icon, sort_order)
+VALUES
+    ('discovery', 'Discovery', 'Entity discovery and signal detection', 'search', 1),
+    ('enrichment', 'Enrichment', 'Data enrichment provider settings', 'database', 2),
+    ('scoring', 'Scoring', 'Lead scoring weights and thresholds', 'chart', 3),
+    ('llm', 'LLM Engine', 'AI model configuration', 'cpu', 4),
+    ('outreach', 'Outreach', 'Outreach channel settings', 'mail', 5),
+    ('pipeline', 'Pipeline', 'Processing pipeline configuration', 'git-branch', 6),
+    ('system', 'System', 'Core system configuration', 'settings', 7)
+ON CONFLICT (slug) DO NOTHING;
