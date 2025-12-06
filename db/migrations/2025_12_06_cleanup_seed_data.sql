@@ -9,12 +9,13 @@
 -- ============================================================================
 -- 1. CLEANUP API PROVIDERS
 -- Only keep providers we're actually using: Apollo, LinkedIn MCP, SalesNav MCP
--- Mark others as inactive (not delete, for reference)
+-- Mark others as disabled (not delete, for reference)
+-- Note: api_providers uses 'status' column, not 'is_active'
 -- ============================================================================
 
-UPDATE api_providers SET is_active = false, updated_at = NOW()
+UPDATE api_providers SET status = 'disabled', updated_at = NOW()
 WHERE slug NOT IN ('apollo', 'linkedin_scraper', 'salesnav_mcp')
-  AND is_active = true;
+  AND status = 'active';
 
 -- Fix descriptions for active providers
 UPDATE api_providers SET
@@ -134,13 +135,14 @@ ON CONFLICT (vertical_slug, task_type) DO UPDATE SET
 -- ============================================================================
 -- 5. CLEANUP TERRITORIES
 -- Keep only UAE hierarchy relevant to Banking vertical
+-- Note: territories uses 'status' column, not 'is_active'
 -- ============================================================================
 
 -- Mark non-UAE territories as inactive (keep data for reference)
-UPDATE territories SET is_active = false, updated_at = NOW()
+UPDATE territories SET status = 'inactive', updated_at = NOW()
 WHERE slug NOT IN ('global', 'middle_east', 'uae', 'dubai', 'abu_dhabi', 'sharjah')
   AND slug NOT LIKE 'uae_%'
-  AND is_active = true;
+  AND status = 'active';
 
 -- ============================================================================
 -- VERIFICATION QUERIES (for manual check)
