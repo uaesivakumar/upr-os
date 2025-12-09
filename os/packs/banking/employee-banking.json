@@ -1,0 +1,281 @@
+{
+  "pack_id": "banking-employee-banking",
+  "version": "1.0.0",
+  "vertical": "banking",
+  "sub_vertical": "employee_banking",
+  "name": "Employee Banking Intelligence Pack",
+  "description": "Intelligence pack for Employee Banking (EB) salespeople targeting companies for payroll, salary accounts, and employee benefits",
+  "target_entity": "company",
+  "active": true,
+  "created_at": "2025-12-09",
+  "updated_at": "2025-12-09",
+
+  "signal_types": [
+    {
+      "slug": "hiring_expansion",
+      "name": "Hiring Expansion",
+      "category": "growth",
+      "description": "Company actively hiring, indicating headcount growth and potential payroll needs",
+      "weight": 0.9,
+      "decay_rate": 0.90,
+      "freshness_window_days": 30,
+      "sources": ["linkedin", "job_boards", "serp"],
+      "priority": 1
+    },
+    {
+      "slug": "headcount_jump",
+      "name": "Headcount Jump",
+      "category": "growth",
+      "description": "Significant increase in employee count detected",
+      "weight": 0.85,
+      "decay_rate": 0.92,
+      "freshness_window_days": 45,
+      "sources": ["linkedin", "company_data"],
+      "priority": 2
+    },
+    {
+      "slug": "office_opening",
+      "name": "Office Opening",
+      "category": "expansion",
+      "description": "New office location opened, indicating expansion",
+      "weight": 0.8,
+      "decay_rate": 0.95,
+      "freshness_window_days": 60,
+      "sources": ["news", "press_releases", "linkedin"],
+      "priority": 3
+    },
+    {
+      "slug": "market_entry_uae",
+      "name": "UAE Market Entry",
+      "category": "expansion",
+      "description": "Company entering or expanding in UAE market",
+      "weight": 0.95,
+      "decay_rate": 0.98,
+      "freshness_window_days": 90,
+      "sources": ["news", "regulatory", "company_announcements"],
+      "priority": 1
+    },
+    {
+      "slug": "funding_round",
+      "name": "Funding Round",
+      "category": "financial",
+      "description": "Company raised funding, indicating growth capital for hiring",
+      "weight": 0.75,
+      "decay_rate": 0.95,
+      "freshness_window_days": 60,
+      "sources": ["news", "crunchbase", "pitchbook"],
+      "priority": 4
+    },
+    {
+      "slug": "project_award",
+      "name": "Project Award",
+      "category": "financial",
+      "description": "Major contract or project won, likely to trigger hiring",
+      "weight": 0.7,
+      "decay_rate": 0.93,
+      "freshness_window_days": 45,
+      "sources": ["news", "tenders", "press_releases"],
+      "priority": 5
+    },
+    {
+      "slug": "subsidiary_creation",
+      "name": "Subsidiary Creation",
+      "category": "structure",
+      "description": "New subsidiary or entity created, needs banking setup",
+      "weight": 0.85,
+      "decay_rate": 0.97,
+      "freshness_window_days": 90,
+      "sources": ["regulatory", "company_filings"],
+      "priority": 3
+    },
+    {
+      "slug": "leadership_change",
+      "name": "Leadership Change",
+      "category": "organizational",
+      "description": "New C-level or senior HR leadership, opportunity for new relationship",
+      "weight": 0.6,
+      "decay_rate": 0.88,
+      "freshness_window_days": 30,
+      "sources": ["linkedin", "news", "press_releases"],
+      "priority": 6
+    }
+  ],
+
+  "scoring_weights": {
+    "quality": 0.35,
+    "timing": 0.25,
+    "likelihood": 0.20,
+    "evidence": 0.20
+  },
+
+  "qtle_config": {
+    "q_score": {
+      "salary_presence_max": 40,
+      "size_sweet_spot_max": 20,
+      "industry_bonus_max": 15,
+      "free_zone_multiplier": 1.3,
+      "preferred_industries": ["FinTech", "Technology", "Healthcare", "SaaS", "E-commerce", "Professional Services"],
+      "preferred_size_range": { "min": 50, "max": 500 }
+    },
+    "t_score": {
+      "calendar_rules": {
+        "Q1_budget_season": { "months": [1, 2], "multiplier": 1.3 },
+        "Q2_pre_ramadan": { "months": [3], "multiplier": 1.2 },
+        "Q3_summer_slowdown": { "months": [7, 8], "multiplier": 0.7 },
+        "Q4_budget_freeze": { "months": [12], "multiplier": 0.6 },
+        "ramadan_pause": { "multiplier": 0.3 }
+      },
+      "freshness_tiers": {
+        "hot": { "max_days": 7, "multiplier": 1.5 },
+        "warm": { "max_days": 14, "multiplier": 1.3 },
+        "recent": { "max_days": 30, "multiplier": 1.1 },
+        "standard": { "max_days": 60, "multiplier": 1.0 },
+        "cooling": { "max_days": 90, "multiplier": 0.8 },
+        "stale": { "max_days": 180, "multiplier": 0.5 }
+      }
+    },
+    "l_score": {
+      "size_bucket_modifiers": {
+        "startup": 0.2,
+        "scaleup": 0.25,
+        "midmarket": 0.1,
+        "enterprise": -0.1
+      },
+      "uae_domain_boost": 0.1,
+      "recent_founding_boost": 0.1
+    },
+    "e_score": {
+      "signal_weight_multiplier": 1.0,
+      "evidence_base_confidence": 0.5
+    }
+  },
+
+  "edge_cases": [
+    {
+      "type": "ENTERPRISE_BRAND",
+      "condition": "Company is a major UAE enterprise brand (Etihad, Emirates, ADNOC, Emaar, DP World)",
+      "action": "SKIP",
+      "severity": "MEDIUM",
+      "multiplier": 0.1,
+      "can_override": true
+    },
+    {
+      "type": "GOVERNMENT_SECTOR",
+      "condition": "Company is government or semi-government entity",
+      "action": "BLOCK",
+      "severity": "CRITICAL",
+      "multiplier": 0.05,
+      "can_override": false
+    },
+    {
+      "type": "FREE_ZONE",
+      "condition": "Company is registered in a Free Zone (DIFC, JAFZA, etc.)",
+      "action": "BOOST",
+      "severity": "LOW",
+      "multiplier": 1.3,
+      "can_override": false
+    },
+    {
+      "type": "SMALL_STARTUP",
+      "condition": "Company has fewer than 10 employees",
+      "action": "WARN",
+      "severity": "LOW",
+      "multiplier": 0.8,
+      "can_override": true
+    },
+    {
+      "type": "SIZE_TOO_LARGE",
+      "condition": "Company has more than 1000 employees",
+      "action": "WARN",
+      "severity": "MEDIUM",
+      "multiplier": 0.9,
+      "can_override": true
+    },
+    {
+      "type": "RECENT_CONTACT",
+      "condition": "Contact made within last 90 days",
+      "action": "BLOCK",
+      "severity": "HIGH",
+      "multiplier": 0,
+      "can_override": false
+    },
+    {
+      "type": "EXCESSIVE_ATTEMPTS",
+      "condition": "3+ contact attempts with no response",
+      "action": "BLOCK",
+      "severity": "HIGH",
+      "multiplier": 0,
+      "can_override": true
+    }
+  ],
+
+  "persona_rules": {
+    "slug": "eb-rm",
+    "name": "Employee Banking Relationship Manager",
+    "always": [
+      "Reference specific hiring signals or expansion news",
+      "Position as payroll/salary solution partner",
+      "Frame as time-saver for HR/Finance teams",
+      "Mention UAE market expertise",
+      "Lead with business value, not product features"
+    ],
+    "never": [
+      "Discuss pricing in initial outreach",
+      "Use pressure language or artificial urgency",
+      "Send identical templates to multiple contacts at same company",
+      "Contact government entities without approval",
+      "Contact enterprise brands without special approval"
+    ],
+    "contact_priority": [
+      "HR Director / Head of HR",
+      "CFO / Finance Director",
+      "CEO / Founder (for startups)",
+      "Payroll Manager / Benefits Manager",
+      "HR Business Partner"
+    ],
+    "outreach_doctrine": [
+      "Verify UAE presence before contact",
+      "Validate email deliverability",
+      "Check 90-day contact embargo",
+      "Deduplicate by domain",
+      "Maximum 3 attempts per contact",
+      "Wait 2 weeks between follow-ups"
+    ]
+  },
+
+  "territory_rules": {
+    "primary_region": "UAE",
+    "allowed_regions": ["UAE", "GCC"],
+    "location_keywords": ["Dubai", "Abu Dhabi", "Sharjah", "DIFC", "JAFZA", "DAFZA", "Ajman", "RAK", "Fujairah", "UAE"],
+    "required_presence": {
+      "has_uae_address": true,
+      "or_has_ae_domain": true,
+      "or_has_uae_linkedin": true
+    }
+  },
+
+  "outreach_channels": [
+    {
+      "channel": "email",
+      "priority": 1,
+      "rules": ["Verify email before sending", "Personalize first line"]
+    },
+    {
+      "channel": "linkedin",
+      "priority": 2,
+      "rules": ["Connect first, then message", "Reference mutual connections"]
+    },
+    {
+      "channel": "phone",
+      "priority": 3,
+      "rules": ["Only after email/LinkedIn engagement", "Have talking points ready"]
+    }
+  ],
+
+  "enrichment_sources": [
+    { "source": "linkedin", "priority": 1, "type": "company" },
+    { "source": "apollo", "priority": 2, "type": "contact" },
+    { "source": "clearbit", "priority": 3, "type": "company" },
+    { "source": "serp", "priority": 4, "type": "signals" }
+  ]
+}
