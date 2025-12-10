@@ -20,6 +20,12 @@ import {
   generateRequestId
 } from './types.js';
 import * as verticalPack from '../../services/verticalPack.js';
+import {
+  verticalConfigCache,
+  signalTypesCache,
+  scoringTemplatesCache,
+  invalidateVerticalCache
+} from '../../middleware/caching.js';
 
 const router = express.Router();
 
@@ -114,9 +120,9 @@ router.get('/dashboard', async (req, res) => {
 
 /**
  * GET /api/os/verticals/:slug
- * Get vertical by slug
+ * Get vertical by slug (cached for 5 minutes)
  */
-router.get('/:slug', async (req, res) => {
+router.get('/:slug', verticalConfigCache(), async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 
@@ -160,9 +166,9 @@ router.get('/:slug', async (req, res) => {
 
 /**
  * GET /api/os/verticals/:slug/config
- * Get complete vertical configuration
+ * Get complete vertical configuration (cached for 5 minutes)
  */
-router.get('/:slug/config', async (req, res) => {
+router.get('/:slug/config', verticalConfigCache(), async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 
@@ -272,6 +278,9 @@ router.patch('/:slug', async (req, res) => {
     const { slug } = req.params;
     const vertical = await verticalPack.updateVertical(slug, req.body);
 
+    // Invalidate cache on update
+    invalidateVerticalCache(slug);
+
     res.json(createOSResponse({
       success: true,
       data: vertical,
@@ -307,6 +316,9 @@ router.delete('/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
     await verticalPack.deleteVertical(slug);
+
+    // Invalidate cache on delete
+    invalidateVerticalCache(slug);
 
     res.json(createOSResponse({
       success: true,
@@ -386,9 +398,9 @@ router.post('/:slug/clone', async (req, res) => {
 
 /**
  * GET /api/os/verticals/:slug/signals
- * Get signal types for a vertical
+ * Get signal types for a vertical (cached for 5 minutes)
  */
-router.get('/:slug/signals', async (req, res) => {
+router.get('/:slug/signals', signalTypesCache(), async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 
@@ -462,9 +474,9 @@ router.post('/:slug/signals', async (req, res) => {
 
 /**
  * GET /api/os/verticals/:slug/scoring
- * Get scoring templates for a vertical
+ * Get scoring templates for a vertical (cached for 5 minutes)
  */
-router.get('/:slug/scoring', async (req, res) => {
+router.get('/:slug/scoring', scoringTemplatesCache(), async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 

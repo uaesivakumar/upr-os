@@ -42,7 +42,9 @@ import verticalsRouter from './verticals.js';
 import territoriesRouter from './territories.js';
 import configRouter from './config.js';
 import targetsRouter from './targets.js';
+import aiAdminRouter from './ai-admin.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
+import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
 
 const router = express.Router();
 
@@ -184,6 +186,25 @@ router.get('/version', (req, res) => {
   });
 });
 
+/**
+ * GET /api/os/cache/stats
+ * Get cache statistics (S151: Performance & Caching)
+ */
+router.get('/cache/stats', cacheStatsHandler);
+
+/**
+ * POST /api/os/cache/clear
+ * Clear all caches (admin only)
+ */
+router.post('/cache/clear', (req, res) => {
+  const cleared = cacheClear();
+  res.json({
+    success: true,
+    message: `Cleared ${cleared} cache entries`,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Mount sub-routers
 router.use('/discovery', discoveryRouter);
 router.use('/enrich', enrichRouter);
@@ -200,5 +221,6 @@ router.use('/verticals', verticalsRouter);
 router.use('/territories', territoriesRouter);
 router.use('/config', configRouter);
 router.use('/targets', targetsRouter);
+router.use('/ai-admin', aiAdminRouter);
 
 export default router;
