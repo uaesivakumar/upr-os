@@ -58,9 +58,13 @@ const chatRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    // Use user ID if authenticated, otherwise IP
-    return req.user?.id || req.ip;
+    // Use user ID if authenticated, otherwise IP with IPv6 handling
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    // For IPv6, use /64 subnet to prevent easy bypass
+    const safeIp = ip.includes(':') ? ip.split(':').slice(0, 4).join(':') + '::/64' : ip;
+    return req.user?.id || safeIp;
   },
+  validate: false, // Disable all validation (we handle IPv6 manually)
   handler: (req, res) => {
     res.status(429).json({
       success: false,

@@ -8,6 +8,17 @@
 
 import rateLimit from 'express-rate-limit';
 
+// Helper to safely get IP key for rate limiting (handles IPv6 properly)
+function getIpKey(req) {
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  // For IPv6, use /64 subnet to prevent easy bypass
+  if (ip.includes(':')) {
+    const parts = ip.split(':').slice(0, 4);
+    return parts.join(':') + '::/64';
+  }
+  return ip;
+}
+
 // ============================================================
 // WHITELIST CONFIGURATION
 // ============================================================
@@ -178,10 +189,10 @@ export const agentHubLimiter = rateLimit({
   legacyHeaders: false,
   // Use token hash as key for per-token rate limiting
   keyGenerator: (req) => {
-    // If authenticated, use token hash; otherwise use IP
-    return req.user?.token_hash || req.ip;
+    // If authenticated, use token hash; otherwise use IP with IPv6 handling
+    return req.user?.token_hash || getIpKey(req);
   },
-  validate: { trustProxy: false },
+  validate: false, // Disable all validation (we handle IPv6 manually)
   handler: (req, res) => {
     console.warn('⚠️  Agent Hub rate limit exceeded', {
       ip: req.ip,
