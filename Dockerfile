@@ -65,6 +65,7 @@ COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/workers ./workers
 COPY --from=builder /app/services ./services
 COPY --from=builder /app/server ./server
+COPY --from=builder /app/middleware ./middleware
 COPY --from=builder /app/jobs ./jobs
 COPY --from=builder /app/db ./db
 
