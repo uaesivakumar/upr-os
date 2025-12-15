@@ -41,7 +41,7 @@ class MultiSourceOrchestrator {
         id: 'news',
         name: 'News Scraping (SerpAPI)',
         enabled: true,
-        timeout: 30000, // 30 seconds
+        timeout: 60000, // 60 seconds (21 parallel queries)
         maxRetries: 2,
         priority: 0.8,
         handler: this.executeNewsSource.bind(this)
@@ -682,7 +682,10 @@ class MultiSourceOrchestrator {
       { query: 'UAE executive appointment leadership', signalType: 'leadership-change' },
     ];
 
-    for (const { query, signalType } of searchQueries) {
+    // Execute all queries in PARALLEL for speed
+    console.log(`[Orchestrator:News] Executing ${searchQueries.length} queries in parallel...`);
+
+    const queryPromises = searchQueries.map(async ({ query, signalType }) => {
       try {
         const url = new URL('https://serpapi.com/search.json');
         url.searchParams.set('engine', 'google_news');
@@ -692,34 +695,42 @@ class MultiSourceOrchestrator {
         url.searchParams.set('num', '10');
         url.searchParams.set('api_key', SERPAPI_KEY);
 
-        console.log(`[Orchestrator:News] Searching: ${query}`);
-
         const response = await fetch(url.toString(), {
           method: 'GET',
           headers: { 'Accept': 'application/json' }
         });
 
         if (!response.ok) {
-          console.error(`[Orchestrator:News] SerpAPI error: ${response.status}`);
-          continue;
+          console.error(`[Orchestrator:News] SerpAPI error ${response.status} for: ${signalType}`);
+          return [];
         }
 
         const data = await response.json();
         const newsResults = data.news_results || [];
 
-        console.log(`[Orchestrator:News] Found ${newsResults.length} results for: ${signalType}`);
+        console.log(`[Orchestrator:News] ${signalType}: ${newsResults.length} results`);
 
+        const querySignals = [];
         for (const article of newsResults) {
           const signal = this.parseNewsToSignal(article, signalType, filters);
           if (signal) {
-            signals.push(signal);
+            querySignals.push(signal);
           }
         }
+        return querySignals;
 
       } catch (error) {
         console.error(`[Orchestrator:News] Error for ${signalType}:`, error.message);
-        // Continue with next query
+        return [];
       }
+    });
+
+    // Wait for all queries to complete
+    const results = await Promise.all(queryPromises);
+
+    // Flatten results
+    for (const querySignals of results) {
+      signals.push(...querySignals);
     }
 
     console.log(`[Orchestrator:News] Total signals extracted: ${signals.length}`);
