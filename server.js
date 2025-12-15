@@ -338,10 +338,13 @@ async function loadESModuleRoutes() {
     console.log('✅ Embedding health check endpoint registered at /health/embeddings');
     console.log('✅ ES module routes loaded successfully');
   } catch (error) {
-    console.error('❌ Failed to load ES module routes:', error);
-    console.error('Error stack:', error.stack);
-    console.error('Error message:', error.message);
-    console.warn('⚠️  Application will continue without these routes');
+    console.error('💀 FATAL: Failed to load ES module routes');
+    console.error('Error:', error.message);
+    console.error('Stack:', error.stack);
+    console.error('');
+    console.error('🚨 OS routes NOT MOUNTED - service cannot function without /api/os/*');
+    console.error('🚨 Exiting with code 1 to prevent zombie service');
+    process.exit(1);
   }
 }
 

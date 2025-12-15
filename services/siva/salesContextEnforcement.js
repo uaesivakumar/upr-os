@@ -21,10 +21,10 @@ const { pool } = db;
 // ============================================================================
 
 // Currently active verticals (Banking only for now)
-const ACTIVE_VERTICALS = new Set(['banking']);
+export const ACTIVE_VERTICALS = new Set(['banking']);
 
 // Valid sub-verticals per vertical
-const VALID_SUB_VERTICALS = {
+export const VALID_SUB_VERTICALS = {
   banking: new Set(['employee_banking', 'corporate_banking', 'sme_banking']),
   insurance: new Set(['individual', 'corporate', 'health']),
   recruitment: new Set(['tech_talent', 'executive_search']),
@@ -32,7 +32,7 @@ const VALID_SUB_VERTICALS = {
 };
 
 // Valid regions (currently UAE only)
-const ACTIVE_REGIONS = new Set(['UAE', 'uae']);
+export const ACTIVE_REGIONS = new Set(['UAE', 'uae']);
 
 // Context cache (TTL: 5 minutes)
 let verticalCache = null;
@@ -464,25 +464,11 @@ export class SalesContextError extends Error {
 }
 
 // ============================================================================
-// EXPORTS
+// DEFAULT EXPORT (for CommonJS compatibility)
 // ============================================================================
 
-// Named exports for ES module imports
-export {
-  validateSalesContext,
-  normalizeContext,
-  enforceSalesContext,
-  withSalesContext,
-  isVerticalActive,
-  logContextEvent,
-  salesContextMiddleware,
-  SalesContextError,
-  ACTIVE_VERTICALS,
-  VALID_SUB_VERTICALS,
-  ACTIVE_REGIONS,
-};
-
-// Default export for CommonJS compatibility
+// All named exports are defined inline above (export function, export class, export const)
+// Default export aggregates them for CommonJS require() compatibility
 export default {
   validateSalesContext,
   normalizeContext,
