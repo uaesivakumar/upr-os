@@ -49,6 +49,7 @@ import territoriesRouter from './territories.js';
 import configRouter from './config.js';
 import targetsRouter from './targets.js';
 import aiAdminRouter from './ai-admin.js';
+import discoveryTemplatesRouter from './discovery-templates.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
 import { osAuthMiddleware, osAuditMiddleware, validateOsAuthConfig } from '../../middleware/osAuth.js';
@@ -146,6 +147,11 @@ router.get('/', (req, res) => {
         path: '/api/os/targets',
         method: 'GET/POST/PATCH/DELETE',
         description: 'Discovery target types, sources, strategies, execution'
+      },
+      discoveryTemplates: {
+        path: '/api/os/discovery-templates',
+        method: 'GET/POST/PATCH/DELETE',
+        description: 'Configurable search query templates for live discovery (Super Admin managed)'
       }
     },
     profiles: OS_PROFILES,
@@ -254,5 +260,6 @@ router.use('/territories', territoriesRouter);
 router.use('/config', configRouter);
 router.use('/targets', targetsRouter);
 router.use('/ai-admin', aiAdminRouter);
+router.use('/discovery-templates', discoveryTemplatesRouter);
 
 export default router;

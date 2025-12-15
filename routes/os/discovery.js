@@ -37,6 +37,10 @@ import BankingProductMatchTool from '../../server/siva-tools/BankingProductMatch
 import SerpTool from '../../server/tools/serp.js';
 import HiringSignalExtractionTool from '../../server/siva-tools/HiringSignalExtractionToolStandalone.js';
 
+// Sprint 77: Import EdgeCasesTool for Primitive 4: CHECK_EDGE_CASES
+// This provides intelligent enterprise/government detection (no hardcoded lists)
+import EdgeCasesToolStandalone from '../../server/siva-tools/EdgeCasesToolStandalone.js';
+
 const router = express.Router();
 
 // Initialize live discovery tools
@@ -44,6 +48,7 @@ const hiringSignalExtractionTool = new HiringSignalExtractionTool();
 
 // Initialize SIVA tools
 const companyQualityTool = new CompanyQualityTool();
+const edgeCasesTool = new EdgeCasesToolStandalone();
 
 /**
  * Sprint 77: Load intelligent search queries from database
@@ -284,12 +289,124 @@ async function scoreCompanyWithSIVA(company) {
     productFit: 50,
     overall: 50,
     tier: 'WARM',
-    reasoning: []
+    reasoning: [],
+    edgeCases: null
   };
 
   const headcount = company.headcount || estimateHeadcount(company);
   const sizeBucket = getSizeBucket(headcount);
   const domain = normalizeDomain(company.domain);
+
+  // ===========================================================================
+  // Sprint 77: EB PERSONA - INTELLIGENT EDGE CASE DETECTION (Primitive 4)
+  //
+  // KEY PRINCIPLE: Don't EXCLUDE, apply score MULTIPLIERS based on signals
+  // - Enterprise WITH expansion signals → GOOD target (×1.0 - they need new PoC)
+  // - Enterprise WITHOUT signals → LOW priority (×0.3)
+  // - Government → Very low priority (×0.1)
+  // - Free Zone companies → BOOST (×1.3)
+  // - Recent expansion signals → BOOST (×1.5)
+  //
+  // The EdgeCasesTool provides INTELLIGENT detection using:
+  // - Heuristic scoring (size, revenue, market presence) for enterprises
+  // - Pattern matching (domain, name, ownership) for government entities
+  // ===========================================================================
+
+  // Detect if company has expansion/hiring signals (positive indicators)
+  const hasExpansionSignals = company.signals?.some(s => {
+    const type = (s.type || '').toLowerCase();
+    return type.includes('expansion') || type.includes('hiring') ||
+           type.includes('funding') || type.includes('market-entry') ||
+           type.includes('office') || type.includes('headcount');
+  }) || false;
+
+  const recentSignalAge = company.latestSignalDate
+    ? Math.floor((Date.now() - new Date(company.latestSignalDate).getTime()) / (1000 * 60 * 60 * 24))
+    : 999;
+  const hasRecentSignals = recentSignalAge < 30;
+
+  // Build company profile for EdgeCasesTool
+  const companyProfile = {
+    name: company.name || '',
+    domain: domain || '',
+    size: headcount,
+    sector: company.sector || company.industry || '',
+    revenue: estimateRevenue(company),
+    linkedin_followers: company.linkedin_followers || 0,
+    stock_exchange: company.stock_exchange || null,
+    number_of_locations: company.locations?.length || 1
+  };
+
+  // Use EdgeCasesTool for intelligent detection
+  let edgeCaseResult = null;
+  try {
+    edgeCaseResult = await edgeCasesTool.execute({
+      company_profile: companyProfile,
+      contact_profile: {},
+      historical_data: {}
+    });
+    scores.edgeCases = edgeCaseResult;
+  } catch (edgeError) {
+    console.warn(`[OS:Discovery] EdgeCases detection error for ${company.name}:`, edgeError.message);
+  }
+
+  // Determine entity type from EdgeCasesTool results
+  const isEnterprise = edgeCaseResult?.blockers?.some(b => b.type === 'ENTERPRISE_BRAND') || false;
+  const isGovernment = edgeCaseResult?.blockers?.some(b => b.type === 'GOVERNMENT_SECTOR') || false;
+  const isSemiGovernment = edgeCaseResult?.warnings?.some(w => w.type === 'SEMI_GOVERNMENT') || false;
+
+  // Calculate edge case multiplier based on SIGNALS
+  let edgeCaseMultiplier = 1.0;
+  let edgeCaseReason = '';
+
+  if (isGovernment) {
+    // Government entities: Always low priority (policy restriction)
+    edgeCaseMultiplier = 0.1;
+    edgeCaseReason = `Government entity detected - reduced priority (policy restriction)`;
+  } else if (isSemiGovernment) {
+    // Semi-government: Moderate reduction
+    edgeCaseMultiplier = 0.4;
+    edgeCaseReason = `Semi-government affiliation - proceed with caution`;
+  } else if (isEnterprise) {
+    // Enterprise logic: WITH signals = good target, WITHOUT signals = low priority
+    if (hasExpansionSignals) {
+      edgeCaseMultiplier = 1.0; // Keep normal - they need new PoC
+      edgeCaseReason = `Enterprise WITH expansion signals - potential new PoC opportunity`;
+      if (hasRecentSignals) {
+        edgeCaseMultiplier = 1.2; // Slight boost for recent expansion
+        edgeCaseReason = `Enterprise with RECENT expansion (${recentSignalAge}d ago) - high priority opportunity`;
+      }
+    } else {
+      edgeCaseMultiplier = 0.3; // Reduce - established relationships, no new opportunity
+      edgeCaseReason = `Enterprise WITHOUT expansion signals - likely has established banking`;
+    }
+  }
+
+  // Free Zone boost (positive indicator for EB)
+  const isFreeZone = (company.licenseType || '').toLowerCase().includes('free zone') ||
+                     (company.location || '').toLowerCase().includes('jafza') ||
+                     (company.location || '').toLowerCase().includes('difc') ||
+                     (company.location || '').toLowerCase().includes('dafza') ||
+                     (company.location || '').toLowerCase().includes('free zone');
+  if (isFreeZone && edgeCaseMultiplier >= 1.0) {
+    edgeCaseMultiplier *= 1.3;
+    edgeCaseReason += (edgeCaseReason ? '. ' : '') + 'Free Zone company - higher conversion probability';
+  }
+
+  // Recent signal boost
+  if (hasRecentSignals && !isGovernment && edgeCaseMultiplier >= 0.5) {
+    edgeCaseMultiplier *= 1.2;
+    edgeCaseReason += (edgeCaseReason ? '. ' : '') + `Fresh signals (${recentSignalAge}d old) - active opportunity`;
+  }
+
+  if (edgeCaseReason) {
+    scores.reasoning.push(`Edge Cases: ${edgeCaseReason}`);
+  }
+
+  let detectedSector = company.sector || company.industry || '';
+  if (isGovernment) {
+    detectedSector = 'government';
+  }
 
   try {
     // Q-Score: Company Quality
@@ -297,6 +414,7 @@ async function scoreCompanyWithSIVA(company) {
       company_name: company.name,
       domain: domain || 'unknown.com',
       industry: company.industry || company.sector || 'Business Services',
+      sector: detectedSector, // Sprint 77: Pass sector for government detection
       uae_signals: {
         has_ae_domain: domain?.endsWith('.ae') || false,
         has_uae_address: (company.location || '').toLowerCase().includes('uae') ||
@@ -370,13 +488,23 @@ async function scoreCompanyWithSIVA(company) {
     console.error(`[OS:Discovery] Product fit scoring error for ${company.name}:`, error.message);
   }
 
-  // Calculate overall score (weighted average)
-  scores.overall = Math.round((scores.quality * 0.35 + scores.timing * 0.35 + scores.productFit * 0.30));
+  // Calculate base score (weighted average)
+  const baseScore = Math.round((scores.quality * 0.35 + scores.timing * 0.35 + scores.productFit * 0.30));
+
+  // Apply edge case multiplier (Primitive 4: CHECK_EDGE_CASES)
+  // This implements persona rules: enterprise/government reduce, signals boost
+  scores.overall = Math.round(Math.min(100, Math.max(5, baseScore * edgeCaseMultiplier)));
+  scores.edgeCaseMultiplier = edgeCaseMultiplier;
 
   // Determine tier based on overall score
-  if (scores.overall >= 75) scores.tier = 'HOT';
-  else if (scores.overall >= 50) scores.tier = 'WARM';
+  if (scores.overall >= 70) scores.tier = 'HOT';
+  else if (scores.overall >= 45) scores.tier = 'WARM';
   else scores.tier = 'COOL';
+
+  // Log edge case adjustment for transparency
+  if (edgeCaseMultiplier !== 1.0) {
+    console.log(`[OS:Discovery] ${company.name}: Base=${baseScore}, Multiplier=${edgeCaseMultiplier.toFixed(2)}, Final=${scores.overall} (${scores.tier})`);
+  }
 
   return scores;
 }
