@@ -145,15 +145,37 @@ class SivaDiscoveryIntegration {
     const edgeCasesResult = await this.checkEdgeCases(signal, { sessionId, tenantId });
     sivaMetadata.tools.edgeCases = edgeCasesResult;
 
-    // If blockers detected, filter signal
-    if (edgeCasesResult.has_blockers) {
+    // GATE-2 FIX: Severity-aware blocker handling
+    // CRITICAL → EXCLUDE, MEDIUM → TAG + PENALIZE (do NOT exclude)
+    const blockers = edgeCasesResult.blockers || [];
+    const criticalBlockers = blockers.filter(b => b.severity === 'CRITICAL');
+    const mediumBlockers = blockers.filter(b => b.severity === 'MEDIUM' || b.severity === 'HIGH');
+
+    // CRITICAL blockers → EXCLUDE (government, sanctioned, bounced, opted-out)
+    if (criticalBlockers.length > 0) {
+      console.log('[Gate2] CRITICAL blockers - EXCLUDING', {
+        company: signal.company_name || signal.company,
+        blockers: criticalBlockers.map(b => b.type || b.category)
+      });
       sivaMetadata.passed = false;
-      sivaMetadata.filterReason = `Blockers detected: ${edgeCasesResult.blockers.map(b => b.category).join(', ')}`;
+      sivaMetadata.filterReason = `Critical blockers: ${criticalBlockers.map(b => b.type || b.category).join(', ')}`;
       return {
         signal: { ...signal, sivaMetadata },
         passed: false,
         filterReason: sivaMetadata.filterReason
       };
+    }
+
+    // MEDIUM/HIGH blockers → TAG + PENALIZE (do NOT exclude)
+    if (mediumBlockers.length > 0) {
+      console.log('[Gate2] MEDIUM blockers - TAGGING (not excluding)', {
+        company: signal.company_name || signal.company,
+        blockers: mediumBlockers.map(b => b.type || b.category)
+      });
+      // Add tags for explainability
+      signal.blocker_tags = mediumBlockers.map(b => `BLOCKER_${b.type || b.category}`);
+      // Apply penalty hint (not a hard filter)
+      signal.discovery_penalty = Math.min(mediumBlockers.length * 10, 30);
     }
 
     // Step 3: Timing Score (Tool 3) - Calculate optimal timing
