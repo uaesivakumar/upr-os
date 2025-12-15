@@ -80,6 +80,41 @@ router.post('/', async (req, res) => {
 
     let signals = orchestrationResult.signals || [];
 
+    // ========== FORENSIC LOG: After orchestrate() returns ==========
+    console.log('[FORENSIC:Discovery] Raw orchestration result:', {
+      requestId,
+      totalRawSignals: signals.length,
+      signalsBySlug: signals.reduce((acc, s) => {
+        const slug = s.type || s.signal_type || s.slug || 'unknown';
+        acc[slug] = (acc[slug] || 0) + 1;
+        return acc;
+      }, {}),
+      sampleSignals: signals.slice(0, 3).map(s => ({
+        slug: s.type || s.signal_type || s.slug,
+        company: s.company_name || s.company || s.domain || 'N/A',
+        source: s.source || 'unknown',
+        created: s.created_at || s.discovered_at || 'N/A'
+      })),
+      sourcesRan: orchestrationResult.sources,
+      sourcesSucceeded: orchestrationResult.successfulSources,
+      sourcesFailed: orchestrationResult.failedSources,
+      sivaStats: orchestrationResult.siva
+    });
+
+    // If zero signals, log request context
+    if (signals.length === 0) {
+      console.log('[FORENSIC:Discovery] ZERO SIGNALS - Request context:', {
+        requestId,
+        vertical: filters.vertical || filters.industry || industry,
+        subVertical: filters.sub_vertical || filters.subVertical,
+        region: filters.region || filters.location,
+        tenantId,
+        allFilters: filters,
+        sourceBreakdown: orchestrationResult.sourceResults || 'N/A'
+      });
+    }
+    // ========== END FORENSIC LOG ==========
+
     // Apply quality filtering
     if (minQuality > 0) {
       signals = signalQualityScoring.filterByQuality(signals, minQuality);

@@ -150,6 +150,25 @@ class MultiSourceOrchestrator {
       // Step 3: Aggregate results
       const aggregatedResults = this.aggregateResults(sourceResults);
 
+      // ========== FORENSIC LOG: After source aggregation ==========
+      console.log('[FORENSIC:Orchestrator] After source aggregation:', {
+        orchestrationId,
+        totalSignalsFromSources: aggregatedResults.signals?.length || 0,
+        successfulSources: aggregatedResults.successfulSources,
+        failedSources: aggregatedResults.failedSources,
+        sourceResultsSummary: sourceResults.map(r => ({
+          source: r.sourceId,
+          success: r.success,
+          signalCount: r.signals?.length || 0,
+          error: r.error || null
+        }))
+      });
+
+      if (!aggregatedResults.signals || aggregatedResults.signals.length === 0) {
+        console.log('[FORENSIC:Orchestrator] ZERO SIGNALS from sources - no SIVA will run');
+      }
+      // ========== END FORENSIC LOG ==========
+
       // Step 3.5: Deduplicate signals across sources (Sprint 19 Task 2)
       let finalSignals = aggregatedResults.signals;
       let deduplicationStats = null;
@@ -225,11 +244,42 @@ class MultiSourceOrchestrator {
       // Step 3.7: Process signals through SIVA Foundation tools (Sprint 20 Task 3)
       let sivaStats = null;
       if (finalSignals && finalSignals.length > 0) {
+        // ========== FORENSIC LOG: Before SIVA ==========
+        const uniqueCompanies = new Set(finalSignals.map(s => s.company_id || s.company_name || s.company || s.domain).filter(Boolean));
+        console.log('[FORENSIC:Orchestrator] BEFORE SIVA:', {
+          orchestrationId,
+          finalSignalsCount: finalSignals.length,
+          uniqueCompanyIdentifiers: uniqueCompanies.size,
+          sampleCompanyIds: [...uniqueCompanies].slice(0, 5)
+        });
+        // ========== END FORENSIC LOG ==========
+
         try {
           const sivaResult = await sivaDiscoveryIntegration.processDiscoveredSignals(finalSignals, {
             sessionId: orchestrationId,
             tenantId
           });
+
+          // ========== FORENSIC LOG: After SIVA ==========
+          const filteredByReason = (sivaResult.filtered || []).reduce((acc, s) => {
+            const reason = s.filterReason || 'unknown';
+            const key = reason.includes('Critical') ? 'CRITICAL' : reason.includes('quality') ? 'QUALITY' : 'OTHER';
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+          }, {});
+          console.log('[FORENSIC:Orchestrator] AFTER SIVA:', {
+            orchestrationId,
+            inputCount: sivaResult.totalSignals,
+            passedCount: sivaResult.processedSignals?.length || 0,
+            filteredCount: sivaResult.filtered?.length || 0,
+            filteredByReason,
+            sampleFiltered: (sivaResult.filtered || []).slice(0, 3).map(s => ({
+              company: s.company_name || s.company || 'N/A',
+              reason: s.filterReason
+            })),
+            sivaStats: sivaResult.stats
+          });
+          // ========== END FORENSIC LOG ==========
 
           // Update signals with SIVA enrichment
           finalSignals = sivaResult.processedSignals;
