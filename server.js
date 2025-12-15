@@ -79,6 +79,7 @@ const monitoringRouter = require('./routes/monitoring');  // Sprint 28: Automate
 const agentHubRouter = require('./routes/agent-hub');  // Sprint 29: Centralized Agentic Hub
 const agentsActivityRouter = require('./routes/agents/activity');  // Sprint 50: SIVA Visualization
 const chatRouter = require('./routes/chat');  // Sprint 53: AI Chat Interface
+const sivaRouter = require('./routes/siva');  // Sprint 76: SIVA Intelligence API
 
 // Mount CommonJS routes immediately
 // NOTE: /api/auth and /api/enrich mounted in ES module section
@@ -105,6 +106,7 @@ app.use('/api/telemetry', telemetryRouter);
 app.use('/api/monitoring', monitoringRouter);  // Sprint 28: Rule performance monitoring
 app.use('/api/agent-hub', agentHubRouter);  // Sprint 29: Centralized Agentic Hub REST API
 app.use('/api/chat', chatRouter);  // Sprint 53: AI Chat Interface
+app.use('/api/siva', sivaRouter);  // Sprint 76: SIVA Intelligence API
 
 // ES Module routes - Load asynchronously
 async function loadESModuleRoutes() {

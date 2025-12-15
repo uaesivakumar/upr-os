@@ -17,6 +17,16 @@ const rateLimit = require('express-rate-limit');
 const { pool } = require('../utils/db');
 const { ChatNLUService, INTENT_DEFINITIONS } = require('../server/services/chatNLUService');
 
+// Import Entity Context Service for REAL data
+const {
+  getCompanyContext,
+  getLeadContext,
+  getSignalsForCompany,
+  getTopCompaniesForAnalysis,
+  searchCompanies,
+  DEMO_TENANT_ID
+} = require('../server/services/sivaEntityContext');
+
 // Import SIVA tools
 const CompanyQualityTool = require('../server/siva-tools/CompanyQualityToolStandalone');
 const ContactTierTool = require('../server/siva-tools/ContactTierToolStandalone');
@@ -147,11 +157,79 @@ async function getSessionHistory(sessionId, limit = 20) {
 }
 
 // ============================================================================
-// SIVA Tool Execution
+// SIVA Tool Execution with REAL Data
 // ============================================================================
 
-async function executeTools(toolNames, context) {
+/**
+ * Resolve entity context from various sources:
+ * 1. Direct entity_id/company_id in context
+ * 2. Company name extracted from entities
+ * 3. Search by query if no direct match
+ */
+async function resolveEntityContext(context, tenantId) {
+  const { entity_id, company_id, companyData, entities } = context;
+
+  // 1. Direct ID lookup
+  if (entity_id || company_id) {
+    const companyContext = await getCompanyContext({
+      companyId: entity_id || company_id,
+      tenantId
+    });
+    if (companyContext) {
+      console.log(`[Chat] Resolved entity by ID: ${companyContext.name}`);
+      return companyContext;
+    }
+  }
+
+  // 2. If companyData already provided (from UI), enrich it with DB data
+  if (companyData?.name) {
+    const companyContext = await getCompanyContext({
+      companyName: companyData.name,
+      tenantId
+    });
+    if (companyContext) {
+      console.log(`[Chat] Resolved entity by name: ${companyContext.name}`);
+      return { ...companyData, ...companyContext };
+    }
+  }
+
+  // 3. Extract company name from NLU entities
+  if (entities && Array.isArray(entities)) {
+    const companyEntity = entities.find(e =>
+      e.type === 'company_name' || e.type === 'company' || e.type === 'organization'
+    );
+    if (companyEntity?.value) {
+      const companyContext = await getCompanyContext({
+        companyName: companyEntity.value,
+        tenantId
+      });
+      if (companyContext) {
+        console.log(`[Chat] Resolved entity from NLU: ${companyContext.name}`);
+        return companyContext;
+      }
+    }
+  }
+
+  // 4. No specific entity - get top companies for general queries
+  console.log(`[Chat] No specific entity, using top companies`);
+  const topCompanies = await getTopCompaniesForAnalysis(tenantId, 1);
+  return topCompanies[0] || null;
+}
+
+/**
+ * Execute SIVA tools with REAL data from database
+ */
+async function executeTools(toolNames, context, tenantId) {
   const results = [];
+
+  // Resolve entity context from DB FIRST
+  const entityContext = await resolveEntityContext(context, tenantId);
+
+  if (!entityContext) {
+    console.warn(`[Chat] No entity context available, tools may use limited data`);
+  } else {
+    console.log(`[Chat] Entity context resolved: ${entityContext.name} (${entityContext.signal_count || 0} signals)`);
+  }
 
   for (const toolName of toolNames) {
     const tool = tools[toolName];
@@ -163,8 +241,8 @@ async function executeTools(toolNames, context) {
     try {
       const startTime = Date.now();
 
-      // Build tool input from context
-      const input = buildToolInput(toolName, context);
+      // Build tool input from REAL entity context
+      const input = buildToolInput(toolName, entityContext, context);
 
       // Execute tool
       const output = await tool.execute(input);
@@ -173,11 +251,16 @@ async function executeTools(toolNames, context) {
         tool: toolName,
         input,
         output,
+        entity: entityContext ? {
+          name: entityContext.name,
+          id: entityContext.id,
+          signal_count: entityContext.signal_count
+        } : null,
         latency_ms: Date.now() - startTime,
         success: true
       });
 
-      console.log(`[Chat] Tool ${toolName} executed in ${Date.now() - startTime}ms`);
+      console.log(`[Chat] Tool ${toolName} executed on "${entityContext?.name || 'unknown'}" in ${Date.now() - startTime}ms`);
 
     } catch (error) {
       console.error(`[Chat] Tool ${toolName} failed:`, error.message);
@@ -192,65 +275,85 @@ async function executeTools(toolNames, context) {
   return results;
 }
 
-function buildToolInput(toolName, context) {
-  // Extract company/lead data from context for tool execution
-  const { companyData, leadData, entities } = context;
+/**
+ * Build tool input from REAL entity context (no more mock data!)
+ */
+function buildToolInput(toolName, entityContext, rawContext = {}) {
+  const { leadData } = rawContext;
 
-  // Default test data if no context provided
-  const defaultCompany = {
-    name: 'Tech Innovations LLC',
-    domain: 'techinnovations.ae',
-    industry: 'Technology',
-    employee_count: 150,
-    revenue: 25000000,
-    founded_year: 2018,
-    location: 'Dubai, UAE'
+  // Use real entity context or minimal fallback
+  const company = entityContext || {
+    name: 'Unknown Company',
+    industry: 'Business Services',
+    employee_count: 100,
+    revenue_usd: 15000000,
+    location: 'UAE'
   };
-
-  const company = companyData || defaultCompany;
 
   switch (toolName) {
     case 'CompanyQualityTool':
       return {
         company_name: company.name,
         domain: company.domain,
-        industry: company.industry,
+        industry: company.industry || company.sector,
         employee_count: company.employee_count,
-        revenue_usd: company.revenue,
-        founded_year: company.founded_year
+        revenue_usd: company.revenue_usd,
+        founded_year: company.founded_year,
+        // Include signal data for richer analysis
+        hiring_signals: company.signals?.map(s => s.type) || [],
+        signal_count: company.signal_count || 0,
+        confidence_score: company.confidence_score,
+        quality_score: company.quality_score
       };
 
     case 'ContactTierTool':
       return {
-        title: leadData?.title || 'CEO',
-        seniority: leadData?.seniority || 'C-Level',
-        department: leadData?.department || 'Executive',
-        company_size: company.employee_count
+        title: leadData?.title || inferTargetTitle(company),
+        seniority: leadData?.seniority || inferSeniority(leadData?.title),
+        department: leadData?.department || inferDepartment(leadData?.title),
+        company_size: company.employee_count,
+        industry: company.industry || company.sector
       };
 
     case 'TimingScoreTool':
       return {
         company_name: company.name,
-        industry: company.industry,
-        recent_funding: company.recent_funding || false,
-        hiring_signals: company.hiring_signals || [],
-        news_sentiment: company.news_sentiment || 'neutral'
+        industry: company.industry || company.sector,
+        // Use REAL signal data
+        recent_funding: company.signals?.some(s =>
+          s.type?.toLowerCase().includes('funding') || s.type?.toLowerCase().includes('investment')
+        ) || false,
+        hiring_signals: company.signals?.filter(s =>
+          s.type?.toLowerCase().includes('hiring') || s.type?.toLowerCase().includes('expansion')
+        ).map(s => ({
+          type: s.type,
+          date: s.source_date,
+          confidence: s.confidence
+        })) || [],
+        news_sentiment: company.hiring_likelihood_score >= 4 ? 'positive' :
+                        company.hiring_likelihood_score >= 3 ? 'neutral' : 'negative',
+        signal_freshness_days: calculateSignalFreshness(company.latest_signal_date)
       };
 
     case 'BankingProductMatchTool':
       return {
         company_name: company.name,
-        industry: company.industry,
+        industry: company.industry || company.sector,
         employee_count: company.employee_count,
-        revenue_usd: company.revenue,
-        geography: company.location
+        revenue_usd: company.revenue_usd,
+        geography: company.location,
+        // Include signal types for product matching
+        active_signals: company.signal_types || [],
+        hiring_likelihood: company.hiring_likelihood
       };
 
     case 'CompositeScoreTool':
+      // Use real scores if available
       return {
-        company_quality_score: 75,
-        timing_score: 80,
-        contact_tier_score: 85
+        company_quality_score: Math.round((company.quality_score || 0.5) * 100),
+        timing_score: Math.round((company.confidence_score || 0.5) * 100),
+        contact_tier_score: company.hiring_likelihood_score ? company.hiring_likelihood_score * 20 : 60,
+        signal_count: company.signal_count || 0
       };
 
     case 'OutreachMessageGeneratorTool':
@@ -258,14 +361,99 @@ function buildToolInput(toolName, context) {
       return {
         company_name: company.name,
         contact_name: leadData?.name || 'Decision Maker',
-        contact_title: leadData?.title || 'CEO',
-        industry: company.industry,
-        pain_points: ['growth', 'efficiency', 'digital transformation']
+        contact_title: leadData?.title || inferTargetTitle(company),
+        industry: company.industry || company.sector,
+        location: company.location,
+        // Include real signals for personalized outreach
+        key_signals: company.signals?.slice(0, 3).map(s => ({
+          type: s.type,
+          description: s.description,
+          date: s.source_date
+        })) || [],
+        pain_points: inferPainPoints(company)
       };
 
     default:
-      return { company_name: company.name };
+      return {
+        company_name: company.name,
+        industry: company.industry || company.sector,
+        signals: company.signals?.slice(0, 5) || []
+      };
   }
+}
+
+/**
+ * Helper: Infer target title based on company sector
+ */
+function inferTargetTitle(company) {
+  const sector = (company.sector || company.industry || '').toLowerCase();
+  if (sector.includes('bank') || sector.includes('financial')) return 'Head of Corporate Banking';
+  if (sector.includes('tech')) return 'CTO';
+  if (sector.includes('retail')) return 'CFO';
+  return 'CEO';
+}
+
+/**
+ * Helper: Infer seniority from title
+ */
+function inferSeniority(title) {
+  if (!title) return 'Director';
+  const t = title.toLowerCase();
+  if (t.includes('ceo') || t.includes('cto') || t.includes('cfo') || t.includes('chief')) return 'C-Level';
+  if (t.includes('vp') || t.includes('vice president')) return 'VP';
+  if (t.includes('director') || t.includes('head')) return 'Director';
+  if (t.includes('manager')) return 'Manager';
+  return 'Director';
+}
+
+/**
+ * Helper: Infer department from title
+ */
+function inferDepartment(title) {
+  if (!title) return 'Executive';
+  const t = title.toLowerCase();
+  if (t.includes('finance') || t.includes('cfo')) return 'Finance';
+  if (t.includes('hr') || t.includes('human')) return 'HR';
+  if (t.includes('tech') || t.includes('cto')) return 'Technology';
+  if (t.includes('sales')) return 'Sales';
+  return 'Executive';
+}
+
+/**
+ * Helper: Calculate signal freshness in days
+ */
+function calculateSignalFreshness(latestSignalDate) {
+  if (!latestSignalDate) return 90; // Default to 90 days
+  const signalDate = new Date(latestSignalDate);
+  const now = new Date();
+  return Math.floor((now - signalDate) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Helper: Infer pain points from company signals
+ */
+function inferPainPoints(company) {
+  const painPoints = [];
+  const signals = company.signals || [];
+  const signalTypes = company.signal_types || [];
+
+  if (signalTypes.some(t => t?.toLowerCase().includes('hiring') || t?.toLowerCase().includes('expansion'))) {
+    painPoints.push('scaling operations');
+  }
+  if (signalTypes.some(t => t?.toLowerCase().includes('funding'))) {
+    painPoints.push('capital deployment');
+  }
+  if (signalTypes.some(t => t?.toLowerCase().includes('office') || t?.toLowerCase().includes('relocation'))) {
+    painPoints.push('growth infrastructure');
+  }
+  if (company.employee_count > 200) {
+    painPoints.push('enterprise efficiency');
+  }
+  if (painPoints.length === 0) {
+    painPoints.push('business growth', 'operational efficiency');
+  }
+
+  return painPoints;
 }
 
 // ============================================================================
@@ -321,16 +509,17 @@ router.post('/', chatRateLimiter, async (req, res) => {
       latency_ms: intentResult.latency_ms
     });
 
-    // 3. Execute SIVA tools based on intent
+    // 3. Execute SIVA tools based on intent (with REAL data from DB)
     const toolsToRun = nluService.getToolsForIntent(intentResult.intent);
     let toolResults = [];
 
     if (toolsToRun.length > 0) {
       console.log(`[Chat] Executing tools: ${toolsToRun.join(', ')}`);
+      // Pass tenantId for entity context resolution
       toolResults = await executeTools(toolsToRun, {
         ...context,
         entities: intentResult.entities
-      });
+      }, tenantId || DEMO_TENANT_ID);
     }
 
     // 4. Generate response
