@@ -197,8 +197,27 @@ class SivaDiscoveryIntegration {
         founded: signal.founded_year || null
       };
 
-      const result = await this.companyQualityTool.execute(input);
+      const toolResult = await this.companyQualityTool.execute(input);
       const executionTimeMs = Date.now() - startTime;
+
+      // GATE-1 FIX: Normalize quality_score to outcome
+      // Tool returns quality_score (0-100), but Gate-1 expects outcome ('PASS'/'FAIL')
+      const qualityScore = toolResult.quality_score ?? 0;
+      const outcome = qualityScore < 40 ? 'FAIL' : 'PASS';
+
+      // Staging log: Gate-1 decision (remove after verification)
+      console.log('[Gate1] CompanyQuality', {
+        company: input.companyName,
+        qualityScore,
+        outcome
+      });
+
+      const result = {
+        ...toolResult,
+        outcome,
+        score: qualityScore,
+        tier: toolResult.tier || (qualityScore >= 80 ? 'EXCELLENT' : qualityScore >= 60 ? 'GOOD' : qualityScore >= 40 ? 'FAIR' : 'POOR')
+      };
 
       // Log decision to database (async)
       agentPersistence.logDecision({
