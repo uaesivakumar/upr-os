@@ -1,10 +1,14 @@
 /**
  * UPR OS Scoring Endpoint
  * Sprint 64: Unified OS API Layer
+ * VS2: AI-Powered QTLE Explanations
  *
  * POST /api/os/score
  *
  * Unified scoring endpoint combining Q-Score, T-Score, L-Score, E-Score
+ * Now with optional AI-powered explanations via SIVA.
+ *
+ * Authorization Code: VS1-VS9-APPROVED-20251213
  */
 
 import express from 'express';
@@ -19,6 +23,15 @@ import {
   OS_PROFILES,
   SCORE_TYPES
 } from './types.js';
+// VS2: AI Explanation Service
+import {
+  generateAIQScoreExplanation,
+  generateAITScoreExplanation,
+  generateAILScoreExplanation,
+  generateAIEScoreExplanation,
+  generateAICompositeExplanation,
+  generateAllExplanations
+} from '../../services/siva/aiExplanationService.js';
 
 const router = express.Router();
 
@@ -60,6 +73,7 @@ router.post('/', async (req, res) => {
     const {
       include_breakdown = true,
       include_explanation = true,
+      ai_explanation = false, // VS2: Enable AI-powered explanations
       profile = OS_PROFILES.DEFAULT
     } = options;
 
@@ -111,70 +125,95 @@ router.post('/', async (req, res) => {
 
     // Calculate requested scores
     const scores = {};
-    const explanations = {};
+    let explanations = {};
+
+    // Internal score objects for AI explanation generation
+    let qScoreResult, tScoreResult, lScoreResult, eScoreResult, compositeResult;
 
     // Q-Score (Quality Score)
     if (score_types.includes(SCORE_TYPES.Q_SCORE) || score_types.includes(SCORE_TYPES.COMPOSITE)) {
-      const qScore = computeQScore(entityToScore, entitySignals);
+      qScoreResult = computeQScore(entityToScore, entitySignals);
       scores.q_score = {
-        value: qScore.value,
-        rating: qScore.rating,
-        breakdown: include_breakdown ? qScore.breakdown : undefined
+        value: qScoreResult.value,
+        rating: qScoreResult.rating,
+        breakdown: include_breakdown ? qScoreResult.breakdown : undefined
       };
-      if (include_explanation) {
-        explanations.q_score = generateQScoreExplanation(qScore);
+      if (include_explanation && !ai_explanation) {
+        explanations.q_score = generateQScoreExplanation(qScoreResult);
       }
     }
 
     // T-Score (Timing Score)
     if (score_types.includes(SCORE_TYPES.T_SCORE) || score_types.includes(SCORE_TYPES.COMPOSITE)) {
-      const tScore = calculateTimingScore(entityToScore, entitySignals);
+      tScoreResult = calculateTimingScore(entityToScore, entitySignals);
       scores.t_score = {
-        value: tScore.value,
-        category: tScore.category,
-        breakdown: include_breakdown ? tScore.breakdown : undefined
+        value: tScoreResult.value,
+        category: tScoreResult.category,
+        breakdown: include_breakdown ? tScoreResult.breakdown : undefined
       };
-      if (include_explanation) {
-        explanations.t_score = tScore.explanation;
+      if (include_explanation && !ai_explanation) {
+        explanations.t_score = tScoreResult.explanation;
       }
     }
 
     // L-Score (Lead Score)
     if (score_types.includes(SCORE_TYPES.L_SCORE) || score_types.includes(SCORE_TYPES.COMPOSITE)) {
-      const lScore = calculateLeadScore(entityToScore, entitySignals, profile);
+      lScoreResult = calculateLeadScore(entityToScore, entitySignals, profile);
       scores.l_score = {
-        value: lScore.value,
-        tier: lScore.tier,
-        breakdown: include_breakdown ? lScore.breakdown : undefined
+        value: lScoreResult.value,
+        tier: lScoreResult.tier,
+        breakdown: include_breakdown ? lScoreResult.breakdown : undefined
       };
-      if (include_explanation) {
-        explanations.l_score = lScore.explanation;
+      if (include_explanation && !ai_explanation) {
+        explanations.l_score = lScoreResult.explanation;
       }
     }
 
     // E-Score (Evidence/Composite Score)
     if (score_types.includes(SCORE_TYPES.E_SCORE) || score_types.includes(SCORE_TYPES.COMPOSITE)) {
-      const eScore = calculateEvidenceScore(entitySignals);
+      eScoreResult = calculateEvidenceScore(entitySignals);
       scores.e_score = {
-        value: eScore.value,
-        strength: eScore.strength,
-        breakdown: include_breakdown ? eScore.breakdown : undefined
+        value: eScoreResult.value,
+        strength: eScoreResult.strength,
+        breakdown: include_breakdown ? eScoreResult.breakdown : undefined
       };
-      if (include_explanation) {
-        explanations.e_score = eScore.explanation;
+      if (include_explanation && !ai_explanation) {
+        explanations.e_score = eScoreResult.explanation;
       }
     }
 
     // Calculate composite score if requested
     if (score_types.includes(SCORE_TYPES.COMPOSITE)) {
-      const composite = calculateCompositeScore(scores, profile);
+      compositeResult = calculateCompositeScore(scores, profile);
       scores.composite = {
-        value: composite.value,
-        tier: composite.tier,
-        grade: gradeFromScore(composite.value)
+        value: compositeResult.value,
+        tier: compositeResult.tier,
+        grade: gradeFromScore(compositeResult.value)
       };
-      if (include_explanation) {
-        explanations.composite = composite.explanation;
+      if (include_explanation && !ai_explanation) {
+        explanations.composite = compositeResult.explanation;
+      }
+    }
+
+    // VS2: Generate AI-powered explanations if requested
+    if (include_explanation && ai_explanation) {
+      try {
+        console.log(`[OS:Score] Generating AI explanations for ${requestId}`);
+        explanations = await generateAllExplanations(scores, entityToScore, entitySignals, profile);
+        console.log(`[OS:Score] AI explanations generated for ${requestId}`);
+      } catch (aiError) {
+        // Fallback to template explanations if AI fails
+        console.error(`[OS:Score] AI explanation failed, using fallback:`, aiError.message);
+        Sentry.captureException(aiError, {
+          tags: { os_endpoint: '/api/os/score', ai_feature: 'explanation' },
+          extra: { requestId }
+        });
+        // Use template explanations as fallback
+        if (qScoreResult) explanations.q_score = generateQScoreExplanation(qScoreResult);
+        if (tScoreResult) explanations.t_score = tScoreResult.explanation;
+        if (lScoreResult) explanations.l_score = lScoreResult.explanation;
+        if (eScoreResult) explanations.e_score = eScoreResult.explanation;
+        if (compositeResult) explanations.composite = compositeResult.explanation;
       }
     }
 

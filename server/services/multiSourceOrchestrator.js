@@ -652,12 +652,34 @@ class MultiSourceOrchestrator {
     const signals = [];
 
     // Signal-specific search queries for UAE + Banking context
+    // Wide net - all relevant business signals
     const searchQueries = [
+      // Hiring & Expansion
       { query: 'UAE company hiring expansion Dubai', signalType: 'hiring-expansion' },
+      { query: 'Dubai company workforce growth hiring', signalType: 'hiring-expansion' },
+      { query: 'UAE business expansion new jobs', signalType: 'hiring-expansion' },
+      // Office & Branch
       { query: 'UAE bank new branch opening', signalType: 'office-opening' },
+      { query: 'Dubai new office headquarters', signalType: 'office-opening' },
+      { query: 'company opens UAE office', signalType: 'office-opening' },
+      // Market Entry
       { query: 'company enters UAE market Dubai', signalType: 'market-entry' },
+      { query: 'company launches UAE operations', signalType: 'market-entry' },
+      { query: 'international company Dubai expansion', signalType: 'market-entry' },
+      // Project Awards
       { query: 'UAE company wins contract project award', signalType: 'project-award' },
+      { query: 'Dubai company secures deal contract', signalType: 'project-award' },
+      // Subsidiary & Formation
       { query: 'UAE new subsidiary company formation Dubai', signalType: 'subsidiary-creation' },
+      { query: 'company establishes UAE entity', signalType: 'subsidiary-creation' },
+      // Funding & Investment
+      { query: 'UAE startup funding investment round', signalType: 'funding-round' },
+      { query: 'Dubai company raises capital investment', signalType: 'funding-round' },
+      { query: 'UAE venture capital funding', signalType: 'funding-round' },
+      // Leadership Changes
+      { query: 'UAE company appoints CEO director', signalType: 'leadership-change' },
+      { query: 'Dubai company new CEO appointment', signalType: 'leadership-change' },
+      { query: 'UAE executive appointment leadership', signalType: 'leadership-change' },
     ];
 
     for (const { query, signalType } of searchQueries) {

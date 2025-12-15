@@ -61,6 +61,7 @@ console.log('Schema:', JSON.stringify(schema, null, 2));
 {
   "Sprint": "title",
   "Status": "select",           // Options: Done, In Progress, Backlog
+  "Repo": "select",             // Options: OS, SaaS Frontend, Super Admin (REQUIRED)
   "Goal": "rich_text",
   "Sprint Notes": "rich_text",
   "Outcomes": "rich_text",
@@ -84,6 +85,7 @@ console.log('Schema:', JSON.stringify(schema, null, 2));
   "Features": "title",
   "Sprint": "number",
   "Status": "select",           // Options: Done, In Progress, Backlog
+  "Repo": "select",             // Options: OS, SaaS Frontend, Super Admin (REQUIRED)
   "Priority": "select",         // Options: High, Medium, Low
   "Complexity": "select",       // Options: High, Medium, Low
   "Type": "select",             // Options: Feature, Bug, Infrastructure, Testing

@@ -20,6 +20,7 @@ Create new sprints and features in Notion with proper schema and full property p
 {
   "Sprint": "title",              // "Sprint SX" or "SX: Name"
   "Status": "select",             // Backlog → In Progress → Done
+  "Repo": "select",               // OS | SaaS Frontend | Super Admin (REQUIRED)
   "Goal": "rich_text",            // Sprint objective
   "Sprint Notes": "rich_text",    // Stream/phase context
   "Outcomes": "rich_text",        // Expected deliverables
@@ -45,6 +46,7 @@ Create new sprints and features in Notion with proper schema and full property p
   "Features": "title",            // Feature name
   "Sprint": "number",             // Sprint number (e.g., 26)
   "Status": "select",             // Backlog → In Progress → Done
+  "Repo": "select",               // OS | SaaS Frontend | Super Admin (REQUIRED)
   "Priority": "select",           // High, Medium, Low
   "Complexity": "select",         // High, Medium, Low
   "Type": "select",               // Feature, Bug, Infrastructure, Testing
@@ -99,12 +101,18 @@ Before creating, plan the sprint breakdown:
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const SPRINTS_DB = '5c32e26d-641a-4711-a9fb-619703943fb9';
 
-async function createSprint(sprintNumber, name, goal, stream) {
+// IMPORTANT: Repo must be one of: 'OS', 'SaaS Frontend', 'Super Admin'
+// - 'OS' for UPR OS backend work
+// - 'SaaS Frontend' for premiumradar-saas frontend work
+// - 'Super Admin' for admin panel work
+
+async function createSprint(sprintNumber, name, goal, stream, repo = 'OS') {
   return await notion.pages.create({
     parent: { database_id: SPRINTS_DB },
     properties: {
       'Sprint': { title: [{ text: { content: `S${sprintNumber}: ${name}` } }] },
       'Status': { select: { name: 'Backlog' } },
+      'Repo': { select: { name: repo } },  // REQUIRED: OS | SaaS Frontend | Super Admin
       'Goal': { rich_text: [{ text: { content: goal } }] },
       'Sprint Notes': { rich_text: [{ text: { content: `${stream}. ${goal}` } }] },
       'Outcomes': { rich_text: [{ text: { content: 'To be filled upon completion' } }] },
@@ -121,13 +129,14 @@ async function createSprint(sprintNumber, name, goal, stream) {
 ```javascript
 const FEATURES_DB = '26ae5afe-4b5f-4d97-b402-5c459f188944';
 
-async function createFeature(name, sprintNumber, type, priority, complexity, notes, tags) {
+async function createFeature(name, sprintNumber, type, priority, complexity, notes, tags, repo = 'OS') {
   return await notion.pages.create({
     parent: { database_id: FEATURES_DB },
     properties: {
       'Features': { title: [{ text: { content: name } }] },
       'Sprint': { number: sprintNumber },
       'Status': { select: { name: 'Backlog' } },
+      'Repo': { select: { name: repo } },  // REQUIRED: OS | SaaS Frontend | Super Admin
       'Priority': { select: { name: priority } },
       'Complexity': { select: { name: complexity } },
       'Type': { select: { name: type } },

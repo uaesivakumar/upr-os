@@ -8,8 +8,14 @@
  * Sprint 53: Added Territory Management endpoints
  * Sprint 55: Added Config-Driven OS Kernel
  * Sprint 56: Added Discovery Target Types
+ * VS1: OS Security Wall - Added authentication middleware
+ * VS3: Prompt Injection Defense - Added input validation middleware
+ * VS4: SalesContext Enforcement - Added sales context validation
  *
  * Combines all OS endpoints into a single router mounted at /api/os
+ *
+ * SECURITY: All routes (except /health and /version) require x-pr-os-token header
+ * Authorization Code: VS1-VS9-APPROVED-20251213
  *
  * Endpoints:
  * - POST /api/os/discovery    - Signal discovery
@@ -45,8 +51,20 @@ import targetsRouter from './targets.js';
 import aiAdminRouter from './ai-admin.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
+import { osAuthMiddleware, osAuditMiddleware, validateOsAuthConfig } from '../../middleware/osAuth.js';
+// VS3 + VS4: SIVA Security Middleware
+import { promptInjectionMiddleware, salesContextMiddleware } from '../../services/siva/index.js';
 
 const router = express.Router();
+
+// Validate OS auth configuration at startup
+validateOsAuthConfig();
+
+// Apply OS authentication to all routes (except /health, /version which are handled in middleware)
+router.use(osAuthMiddleware);
+
+// Apply audit logging to all authenticated routes
+router.use(osAuditMiddleware);
 
 /**
  * GET /api/os
@@ -205,13 +223,27 @@ router.post('/cache/clear', (req, res) => {
   });
 });
 
+// VS3 + VS4: Create middleware instances for AI-enabled routes
+const aiInputValidation = promptInjectionMiddleware({
+  fieldsToCheck: ['prompt', 'message', 'query', 'input', 'text', 'content', 'context'],
+  blockOnDetection: true,
+  logAttempts: true,
+});
+
+const salesContextValidation = salesContextMiddleware({
+  requireContext: false, // Make optional for now to avoid breaking changes
+  allowedVerticals: ['banking'], // Only Banking active
+  extractFrom: 'all',
+});
+
 // Mount sub-routers
 router.use('/discovery', discoveryRouter);
 router.use('/enrich', enrichRouter);
-router.use('/score', scoreRouter);
+// VS3 + VS4: AI-enabled routes get additional security middleware
+router.use('/score', aiInputValidation, salesContextValidation, scoreRouter);
 router.use('/rank', rankRouter);
-router.use('/outreach', outreachRouter);
-router.use('/pipeline', pipelineRouter);
+router.use('/outreach', aiInputValidation, salesContextValidation, outreachRouter);
+router.use('/pipeline', aiInputValidation, salesContextValidation, pipelineRouter);
 router.use('/settings', settingsRouter);
 router.use('/entities', entitiesRouter);
 router.use('/providers', providersRouter);

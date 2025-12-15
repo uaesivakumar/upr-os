@@ -137,11 +137,52 @@ router.post('/', async (req, res) => {
       ? `Discovered ${signals.length} signals from ${orchestrationResult.successfulSources?.length || 0} sources`
       : 'No signals found matching criteria';
 
+    // Extract unique companies from signals
+    const companiesMap = new Map();
+    for (const signal of signals) {
+      const companyName = signal.company || signal.company_name;
+      if (!companyName) continue;
+
+      // Skip obviously bad company names
+      if (companyName.length < 3) continue;
+      if (/^(the|a|an|is|are|was|were|how|why|what|when|where|who|which|this|that|these|those|top|new|best|first|latest)$/i.test(companyName)) continue;
+
+      if (!companiesMap.has(companyName)) {
+        companiesMap.set(companyName, {
+          name: companyName,
+          domain: signal.domain || null,
+          sector: signal.sector || null,
+          location: signal.location || 'UAE',
+          signals: [],
+          signalCount: 0,
+          latestSignalDate: null
+        });
+      }
+
+      const company = companiesMap.get(companyName);
+      company.signals.push({
+        type: signal.trigger_type || signal.type,
+        date: signal.source_date,
+        source: signal.source
+      });
+      company.signalCount++;
+
+      // Track latest signal date
+      if (!company.latestSignalDate || signal.source_date > company.latestSignalDate) {
+        company.latestSignalDate = signal.source_date;
+      }
+    }
+
+    const companies = Array.from(companiesMap.values())
+      .sort((a, b) => b.signalCount - a.signalCount);
+
     const response = createOSResponse({
       success: true,
       data: {
         signals,
+        companies,
         total: signals.length,
+        companyCount: companies.length,
         sources: {
           requested: orchestrationResult.sources,
           successful: orchestrationResult.successfulSources,
@@ -150,6 +191,22 @@ router.post('/', async (req, res) => {
         statistics: {
           deduplication: orchestrationResult.deduplication,
           quality: orchestrationResult.quality
+        },
+        meta: {
+          sourceCounts: {
+            news: signals.filter(s => s.source === 'serpapi_news').length,
+            linkedin: signals.filter(s => s.source === 'linkedin').length,
+            other: signals.filter(s => !['serpapi_news', 'linkedin'].includes(s.source)).length
+          },
+          timestamps: {
+            requested: new Date().toISOString(),
+            completed: new Date().toISOString()
+          },
+          filters: {
+            industry,
+            location: filters.location,
+            minQuality
+          }
         }
       },
       reason,

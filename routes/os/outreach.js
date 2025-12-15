@@ -1,10 +1,14 @@
 /**
  * UPR OS Outreach Endpoint
  * Sprint 64: Unified OS API Layer
+ * VS2.3: Persona-Specific AI Outreach
  *
  * POST /api/os/outreach
  *
- * Unified outreach generation with persona and channel support
+ * Unified outreach generation with persona and channel support.
+ * Now with AI-powered persona-specific outreach via SIVA.
+ *
+ * Authorization Code: VS1-VS9-APPROVED-20251213
  */
 
 import express from 'express';
@@ -18,6 +22,8 @@ import {
   generateRequestId,
   OS_PROFILES
 } from './types.js';
+// VS2.3: AI Outreach Service
+import { generateAIOutreach } from '../../services/siva/aiOutreachService.js';
 
 const router = express.Router();
 
@@ -103,7 +109,8 @@ router.post('/', async (req, res) => {
       template_id,
       personalization_level = 'medium',
       profile = OS_PROFILES.DEFAULT,
-      context = {}
+      context = {},
+      ai_outreach = false // VS2.3: Enable SIVA AI-powered outreach
     } = options;
 
     console.log(`[OS:Outreach] Request ${requestId} - ${leads.length} leads, Channel: ${channel}`);
@@ -133,14 +140,28 @@ router.post('/', async (req, res) => {
     // Generate outreach for each lead
     const outreachResults = await Promise.all(leads.map(async (lead) => {
       try {
-        const content = await generateOutreachContent(lead, {
-          channel,
-          tone,
-          template,
-          personalization_level,
-          profile,
-          context
-        });
+        let content;
+
+        // VS2.3: Use SIVA AI outreach if enabled
+        if (ai_outreach) {
+          console.log(`[OS:Outreach] Using SIVA AI for ${lead.name}`);
+          content = await generateAIOutreach(lead, {
+            channel,
+            tone,
+            profile,
+            personalization_level,
+            context
+          }, lead.score);
+        } else {
+          content = await generateOutreachContent(lead, {
+            channel,
+            tone,
+            template,
+            personalization_level,
+            profile,
+            context
+          });
+        }
 
         return {
           lead_id: lead.id,
