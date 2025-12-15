@@ -149,35 +149,43 @@ async function performLiveDiscovery(queries, context, requestId) {
         continue;
       }
 
-      // 2. Extract signals from search result snippets
-      // Combine snippets for batch extraction
-      const content = searchResult.results
-        .map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nURL: ${r.link}`)
-        .join('\n\n---\n\n');
+      // 2. Extract signals from each search result
+      for (const result of searchResult.results.slice(0, 5)) {
+        if (!result.title || !result.snippet) continue;
 
-      try {
-        const extractionResult = await hiringSignalExtractionTool.execute({
-          source_url: 'search_results',
-          source_type: 'NEWS',
-          content_text: content.slice(0, 8000), // Limit content size
-          tenant_id: context.tenantId || 'live-discovery'
-        });
+        try {
+          const extractionResult = await hiringSignalExtractionTool.execute({
+            source: {
+              url: result.link || 'https://search.google.com',
+              domain: new URL(result.link || 'https://search.google.com').hostname.replace(/^www\./, '')
+            },
+            content: {
+              title: result.title,
+              body_text: result.snippet || result.title
+            },
+            context: {
+              search_query: query,
+              source_type: 'NEWS',
+              request_id: requestId
+            }
+          });
 
-        if (extractionResult.signals?.length > 0) {
-          // Add source metadata to each signal
-          const signalsWithMeta = extractionResult.signals.map(s => ({
-            ...s,
-            discoveredAt: new Date().toISOString(),
-            sourceQuery: query,
-            discoveryMode: 'live'
-          }));
-          allSignals.push(...signalsWithMeta);
-          console.log(`[OS:Discovery:LIVE] Query "${query}" extracted ${signalsWithMeta.length} signals`);
+          if (extractionResult.signals?.length > 0) {
+            // Add source metadata to each signal
+            const signalsWithMeta = extractionResult.signals.map(s => ({
+              ...s,
+              discoveredAt: new Date().toISOString(),
+              sourceQuery: query,
+              sourceUrl: result.link,
+              discoveryMode: 'live'
+            }));
+            allSignals.push(...signalsWithMeta);
+            console.log(`[OS:Discovery:LIVE] Extracted ${signalsWithMeta.length} signals from "${result.title?.slice(0, 50)}..."`);
+          }
+        } catch (extractError) {
+          console.error(`[OS:Discovery:LIVE] Extraction error:`, extractError.message);
         }
-      } catch (extractError) {
-        console.error(`[OS:Discovery:LIVE] Extraction error for query "${query}":`, extractError.message);
       }
-
     } catch (searchError) {
       console.error(`[OS:Discovery:LIVE] Search error for query "${query}":`, searchError.message);
     }
