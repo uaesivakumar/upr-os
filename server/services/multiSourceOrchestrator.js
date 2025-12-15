@@ -639,12 +639,249 @@ class MultiSourceOrchestrator {
 
   /**
    * News source handler (SerpAPI)
+   * Searches Google News for UAE companies with hiring/expansion signals
    */
   async executeNewsSource(filters, tenantId) {
-    // TODO: Implement news scraping via SerpAPI
-    // For now, return empty result
-    console.log('[Orchestrator] News source not yet implemented');
-    return { signals: [] };
+    const SERPAPI_KEY = process.env.SERPAPI_KEY;
+
+    if (!SERPAPI_KEY) {
+      console.error('[Orchestrator] SERPAPI_KEY not configured');
+      return { signals: [] };
+    }
+
+    const signals = [];
+
+    // Signal-specific search queries for UAE + Banking context
+    const searchQueries = [
+      { query: 'UAE company hiring expansion Dubai', signalType: 'hiring-expansion' },
+      { query: 'UAE bank new branch opening', signalType: 'office-opening' },
+      { query: 'company enters UAE market Dubai', signalType: 'market-entry' },
+      { query: 'UAE company wins contract project award', signalType: 'project-award' },
+      { query: 'UAE new subsidiary company formation Dubai', signalType: 'subsidiary-creation' },
+    ];
+
+    for (const { query, signalType } of searchQueries) {
+      try {
+        const url = new URL('https://serpapi.com/search.json');
+        url.searchParams.set('engine', 'google_news');
+        url.searchParams.set('q', query);
+        url.searchParams.set('gl', 'ae'); // UAE
+        url.searchParams.set('hl', 'en');
+        url.searchParams.set('num', '10');
+        url.searchParams.set('api_key', SERPAPI_KEY);
+
+        console.log(`[Orchestrator:News] Searching: ${query}`);
+
+        const response = await fetch(url.toString(), {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) {
+          console.error(`[Orchestrator:News] SerpAPI error: ${response.status}`);
+          continue;
+        }
+
+        const data = await response.json();
+        const newsResults = data.news_results || [];
+
+        console.log(`[Orchestrator:News] Found ${newsResults.length} results for: ${signalType}`);
+
+        for (const article of newsResults) {
+          const signal = this.parseNewsToSignal(article, signalType, filters);
+          if (signal) {
+            signals.push(signal);
+          }
+        }
+
+      } catch (error) {
+        console.error(`[Orchestrator:News] Error for ${signalType}:`, error.message);
+        // Continue with next query
+      }
+    }
+
+    console.log(`[Orchestrator:News] Total signals extracted: ${signals.length}`);
+    return { signals };
+  }
+
+  /**
+   * Parse news article into signal format
+   * @private
+   */
+  parseNewsToSignal(article, signalType, filters) {
+    const title = article.title || '';
+    const snippet = article.snippet || article.description || '';
+    const source = article.source?.name || 'News';
+    const link = article.link || '';
+    const date = article.date || new Date().toISOString();
+
+    // Extract company name from title (first capitalized words before common words)
+    const companyName = this.extractCompanyFromTitle(title);
+
+    if (!companyName) {
+      return null; // Skip if no company identified
+    }
+
+    // Check UAE relevance
+    const fullText = `${title} ${snippet}`.toLowerCase();
+    const uaeKeywords = ['uae', 'dubai', 'abu dhabi', 'sharjah', 'emirates', 'gulf'];
+    const hasUaeRelevance = uaeKeywords.some(kw => fullText.includes(kw));
+
+    if (!hasUaeRelevance) {
+      return null; // Skip non-UAE news
+    }
+
+    return {
+      company: companyName,
+      company_name: companyName,
+      domain: this.extractDomainFromText(fullText),
+      sector: filters.industry || 'Banking',
+      trigger_type: signalType,
+      type: signalType,
+      signal_type: signalType,
+      description: this.truncateText(`${title}. ${snippet}`, 500),
+      source_url: link,
+      source_date: this.parseDate(date),
+      evidence_quote: this.truncateText(snippet, 300),
+      evidence_note: `${source} - ${signalType}`,
+      location: this.extractLocation(fullText) || 'UAE',
+      geo_status: hasUaeRelevance ? 'confirmed' : 'probable',
+      geo_hints: this.extractGeoHints(fullText),
+      source_type: 'NEWS',
+      source: 'serpapi_news',
+      source_reliability_score: 75,
+      confidence: 0.7,
+      raw_data: {
+        title,
+        snippet,
+        source: source,
+        link,
+        originalDate: date
+      }
+    };
+  }
+
+  /**
+   * Extract company name from news title
+   * @private
+   */
+  extractCompanyFromTitle(title) {
+    if (!title) return null;
+
+    // Common patterns: "Company Name announces...", "Company Name to expand..."
+    // Remove common prefixes and extract first proper noun phrase
+    const cleanTitle = title
+      .replace(/^(Breaking|Update|News|Report):\s*/i, '')
+      .replace(/^(UAE|Dubai|Abu Dhabi)['']?s?\s*/i, '');
+
+    // Match capitalized words at the start (likely company name)
+    const match = cleanTitle.match(/^([A-Z][A-Za-z0-9&\-\.\s]*?)(?:\s+(?:to|will|has|is|announces|expands|opens|wins|launches|enters|plans|signs|reports|reveals|unveils|secures|acquires|partners|hires|appoints|sets|targets|eyes|mulls|considers|seeks))/i);
+
+    if (match && match[1]) {
+      const name = match[1].trim();
+      // Filter out too short or generic names
+      if (name.length > 2 && !['The', 'A', 'An', 'New', 'UAE', 'Dubai'].includes(name)) {
+        return name;
+      }
+    }
+
+    // Fallback: Take first 3-4 capitalized words
+    const words = cleanTitle.split(/\s+/);
+    const nameWords = [];
+    for (const word of words) {
+      if (/^[A-Z]/.test(word) && word.length > 1) {
+        nameWords.push(word);
+        if (nameWords.length >= 4) break;
+      } else if (nameWords.length > 0) {
+        break;
+      }
+    }
+
+    if (nameWords.length > 0) {
+      return nameWords.join(' ');
+    }
+
+    return null;
+  }
+
+  /**
+   * Extract domain from text
+   * @private
+   */
+  extractDomainFromText(text) {
+    const domainMatch = text.match(/(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})/);
+    return domainMatch ? domainMatch[1] : null;
+  }
+
+  /**
+   * Parse date string to ISO format
+   * @private
+   */
+  parseDate(dateStr) {
+    try {
+      // Handle relative dates like "2 hours ago", "1 day ago"
+      if (dateStr.includes('ago')) {
+        return new Date().toISOString().split('T')[0];
+      }
+      const parsed = new Date(dateStr);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0];
+      }
+    } catch (e) {
+      // Ignore
+    }
+    return new Date().toISOString().split('T')[0];
+  }
+
+  /**
+   * Extract location from text
+   * @private
+   */
+  extractLocation(text) {
+    const locations = {
+      'dubai': 'Dubai',
+      'abu dhabi': 'Abu Dhabi',
+      'sharjah': 'Sharjah',
+      'ajman': 'Ajman',
+      'ras al khaimah': 'Ras Al Khaimah',
+      'fujairah': 'Fujairah',
+      'umm al quwain': 'Umm Al Quwain'
+    };
+
+    const lowerText = text.toLowerCase();
+    for (const [key, value] of Object.entries(locations)) {
+      if (lowerText.includes(key)) {
+        return value;
+      }
+    }
+    return 'UAE';
+  }
+
+  /**
+   * Extract geo hints from text
+   * @private
+   */
+  extractGeoHints(text) {
+    const hints = [];
+    const lowerText = text.toLowerCase();
+
+    const geoTerms = ['uae', 'dubai', 'abu dhabi', 'emirates', 'gulf', 'gcc', 'mena', 'middle east'];
+    for (const term of geoTerms) {
+      if (lowerText.includes(term)) {
+        hints.push(term);
+      }
+    }
+    return hints;
+  }
+
+  /**
+   * Truncate text to max length
+   * @private
+   */
+  truncateText(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 3) + '...';
   }
 
   /**
