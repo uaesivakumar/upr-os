@@ -326,16 +326,25 @@ async function scoreCompanyWithSIVA(company) {
   const hasRecentSignals = recentSignalAge < 30;
 
   // Build company profile for EdgeCasesTool
+  // Schema requires sector to be enum: ['private', 'government', 'semi-government', 'unknown']
+  const sectorValue = (company.sector || company.industry || '').toLowerCase();
+  const mappedSector = sectorValue.includes('government') ? 'government' :
+                       sectorValue.includes('semi-gov') ? 'semi-government' :
+                       sectorValue.includes('public') ? 'government' : 'private';
+
   const companyProfile = {
     name: company.name || '',
-    domain: domain || '',
+    domain: domain || undefined, // Don't pass empty string
     size: headcount,
-    sector: company.sector || company.industry || '',
+    sector: mappedSector,
     revenue: estimateRevenue(company),
     linkedin_followers: company.linkedin_followers || 0,
-    stock_exchange: company.stock_exchange || null,
     number_of_locations: company.locations?.length || 1
   };
+  // Only add stock_exchange if it's a valid string
+  if (company.stock_exchange && typeof company.stock_exchange === 'string') {
+    companyProfile.stock_exchange = company.stock_exchange;
+  }
 
   // Use EdgeCasesTool for intelligent detection
   let edgeCaseResult = null;
