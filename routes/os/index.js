@@ -50,6 +50,7 @@ import configRouter from './config.js';
 import targetsRouter from './targets.js';
 import aiAdminRouter from './ai-admin.js';
 import discoveryTemplatesRouter from './discovery-templates.js';
+import discoveryPoolRouter from './discoveryPool.js';
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
 import { osAuthMiddleware, osAuditMiddleware, validateOsAuthConfig } from '../../middleware/osAuth.js';
@@ -152,6 +153,11 @@ router.get('/', (req, res) => {
         path: '/api/os/discovery-templates',
         method: 'GET/POST/PATCH/DELETE',
         description: 'Configurable search query templates for live discovery (Super Admin managed)'
+      },
+      discoveryPool: {
+        path: '/api/os/discovery-pool',
+        method: 'GET/POST/DELETE',
+        description: 'Intelligent discovery pool with lead assignment, collision prevention, and territory mapping (S121)'
       }
     },
     profiles: OS_PROFILES,
@@ -178,7 +184,8 @@ router.get('/health', async (req, res) => {
     verticals: 'checking',
     territories: 'checking',
     config: 'checking',
-    targets: 'checking'
+    targets: 'checking',
+    discoveryPool: 'checking'
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -261,5 +268,6 @@ router.use('/config', configRouter);
 router.use('/targets', targetsRouter);
 router.use('/ai-admin', aiAdminRouter);
 router.use('/discovery-templates', discoveryTemplatesRouter);
+router.use('/discovery-pool', discoveryPoolRouter);
 
 export default router;
