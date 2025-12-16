@@ -10,7 +10,7 @@
  * - Logs all crawl activity for audit
  */
 
-import { getPool } from '../../database/pool.js';
+import { getPool } from '../../db/index.js';
 import { DiscoveryPoolService } from './DiscoveryPoolService.js';
 import SerpTool from '../../server/tools/serp.js';
 import HiringSignalExtractionTool from '../../server/siva-tools/HiringSignalExtractionToolStandalone.js';

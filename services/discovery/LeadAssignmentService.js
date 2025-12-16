@@ -11,7 +11,7 @@
  * - Auto-release after 7 days no action
  */
 
-import { getPool } from '../../database/pool.js';
+import { getPool } from '../../db/index.js';
 
 class LeadAssignmentService {
   constructor() {

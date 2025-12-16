@@ -11,7 +11,7 @@
  */
 
 import crypto from 'crypto';
-import { getPool } from '../../database/pool.js';
+import { getPool } from '../../db/index.js';
 
 class DiscoveryPoolService {
   constructor() {

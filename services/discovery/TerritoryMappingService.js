@@ -10,7 +10,7 @@
  * - No territory overlap conflicts
  */
 
-import { getPool } from '../../database/pool.js';
+import { getPool } from '../../db/index.js';
 
 class TerritoryMappingService {
   constructor() {
