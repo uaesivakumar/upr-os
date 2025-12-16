@@ -10,16 +10,20 @@
  * - Logs all crawl activity for audit
  */
 
+import { createRequire } from 'module';
 import { getPool } from '../../db/index.js';
 import { DiscoveryPoolService } from './DiscoveryPoolService.js';
-import SerpTool from '../../server/tools/serp.js';
-import HiringSignalExtractionTool from '../../server/siva-tools/HiringSignalExtractionToolStandalone.js';
-import EdgeCasesToolStandalone from '../../server/siva-tools/EdgeCasesToolStandalone.js';
+import serpToolInstance from '../../server/tools/serp.js';
+
+// Import CommonJS modules using createRequire
+const require = createRequire(import.meta.url);
+const HiringSignalExtractionTool = require('../../server/siva-tools/HiringSignalExtractionToolStandalone.js');
+const EdgeCasesToolStandalone = require('../../server/siva-tools/EdgeCasesToolStandalone.js');
 
 class DiscoveryCrawlerService {
   constructor() {
     this.poolService = new DiscoveryPoolService();
-    this.serpTool = new SerpTool();
+    this.serpTool = serpToolInstance; // Singleton instance
     this.signalExtractionTool = new HiringSignalExtractionTool();
     this.edgeCasesTool = new EdgeCasesToolStandalone();
   }
@@ -178,17 +182,17 @@ class DiscoveryCrawlerService {
 
     for (const template of templates) {
       try {
-        const serpResult = await this.serpTool.execute({
+        const serpResult = await this.serpTool.search({
           query: template.query_template,
-          num_results: 10
+          num: 10
         });
 
-        if (serpResult && serpResult.results) {
+        if (serpResult && serpResult.organic_results) {
           results.push({
             templateId: template.id,
             queryType: template.query_type,
             query: template.query_template,
-            results: serpResult.results
+            results: serpResult.organic_results
           });
         }
       } catch (error) {
