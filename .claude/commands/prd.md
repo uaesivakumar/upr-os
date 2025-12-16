@@ -6,6 +6,14 @@
 
 ---
 
+## MANDATORY INVOCATION RULE
+
+**No architecture discussion, design proposal, or implementation begins without /prd.**
+
+If this command was not run at session start, run it now before proceeding.
+
+---
+
 ## ARCHITECTURAL LAWS (NON-NEGOTIABLE)
 
 These 5 laws override ALL feature discussions, suggestions, and implementations:
@@ -15,6 +23,33 @@ These 5 laws override ALL feature discussions, suggestions, and implementations:
 3. **SIVA never mutates the world** - SIVA interprets, OS acts
 4. **Every output must be explainable or escalated** - No black boxes
 5. **If it cannot be replayed, it did not happen** - Deterministic replay required
+
+---
+
+## VIOLATION COUNTER
+
+When a proposal, suggestion, or implementation violates an architectural law:
+
+```
+ARCHITECTURE_VIOLATION_COUNT += 1
+```
+
+**Log format:**
+```
+[VIOLATION #N] Law X: <description>
+  Proposed: <what was suggested>
+  Conflict: <why it violates>
+  Signal: <what this might indicate>
+```
+
+**Violations are SIGNAL, not failure.**
+
+Repeated violations of the same law indicate:
+- Missing abstraction in the architecture
+- Missing section in PRD
+- Candidate for v1.3 amendment
+
+Track them. They reveal where the architecture is under pressure.
 
 ---
 
@@ -42,6 +77,19 @@ For this session, Claude Code will:
 - Explicit version bump proposal (v1.2 → v1.3)
 - Written rationale explaining why the law must change
 - Impact analysis on all affected systems
+
+---
+
+## WHAT /prd DOES NOT DO
+
+| Forbidden | Why |
+|-----------|-----|
+| Auto-summarize PRD | Weakens authority - this is law, not documentation |
+| Allow "temporary bypass" | No exceptions. If it hurts, that's a design smell |
+| Become optional for speed | Deadlines don't override architecture |
+| Weaken under pressure | Pain from /prd = signal to fix design, not tooling |
+
+**If something hurts because of /prd, that's a design smell, not a tooling problem.**
 
 ---
 
@@ -97,11 +145,21 @@ Anything else is noise
 
 ---
 
+## SESSION STATE
+
+```
+PRD_VERSION: 1.2 FINAL
+ARCHITECTURE_LOCKED: true
+VIOLATION_COUNT: 0
+BYPASS_ALLOWED: false
+```
+
 **PRD v1.2 FINAL - LOCKED**
 
-This session is now bound to PRD v1.2. Any proposed change that conflicts with this document will be flagged with:
-
-> **ARCHITECTURE VIOLATION**: [Law #] - [Description]
-> **Required**: Version bump to v1.3 with rationale and impact analysis
+Any proposed change that conflicts with this document will:
+1. Increment VIOLATION_COUNT
+2. Log the violation with law reference
+3. Flag with architecture violation notice
+4. Require version bump to proceed
 
 Read the full PRD: `/Users/skc/Projects/UPR/MASTER PRD v1.2.pdf`
