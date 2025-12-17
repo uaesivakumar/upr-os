@@ -685,7 +685,8 @@ router.post('/', envelopeMiddleware(), async (req, res) => {
 
   try {
     // Use envelope values (authoritative) instead of body extraction
-    const tenantId = envelope.tenant_id;
+    // NOTE: Using let because tenantId may be reassigned to SEED_DATA_TENANT_ID for fallback
+    let tenantId = envelope.tenant_id;
     const personaId = envelope.persona_id;
 
     const {
