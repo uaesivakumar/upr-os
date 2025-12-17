@@ -18,7 +18,8 @@ echo ""
 echo "Building Docker image..."
 gcloud builds submit --region=$REGION --tag=$IMAGE .
 
-# Step 2: Deploy with all required secrets
+# Step 2: Deploy with ALL required secrets
+# IMPORTANT: This list must include ALL secrets the service needs
 echo ""
 echo "Deploying with secrets..."
 gcloud run deploy $SERVICE \
@@ -26,7 +27,15 @@ gcloud run deploy $SERVICE \
   --image=$IMAGE \
   --platform=managed \
   --allow-unauthenticated \
-  --set-secrets="PR_OS_TOKEN=PR_OS_TOKEN:latest,DATABASE_URL=DATABASE_URL:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest" \
+  --set-secrets="\
+DATABASE_URL=DATABASE_URL:latest,\
+REDIS_URL=REDIS_URL:latest,\
+JWT_SECRET=JWT_SECRET:latest,\
+APOLLO_API_KEY=APOLLO_API_KEY:latest,\
+SERPAPI_KEY=SERPAPI_KEY:latest,\
+OPENAI_API_KEY=OPENAI_API_KEY:latest,\
+ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,\
+PR_OS_TOKEN=PR_OS_TOKEN:latest" \
   --set-env-vars="NODE_ENV=production"
 
 echo ""
