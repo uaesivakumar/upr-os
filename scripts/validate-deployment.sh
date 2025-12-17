@@ -90,7 +90,7 @@ else
 fi
 
 # Test OS health
-if curl -s --max-time 10 "$OS_URL/health" | grep -q '"status":"ok"'; then
+if curl -s --max-time 10 "$OS_URL/api/os/health" | grep -q '"status":"healthy"'; then
   echo "  ✅ OS health: OK"
 else
   echo "  ❌ OS health: FAILED"

@@ -1,117 +1,48 @@
 #!/bin/bash
-# One-command deployment script
-# Usage: ./scripts/deploy.sh "commit message" [service-name]
+# UPR OS Service Deployment Script
+# This script ensures all required secrets are preserved during deployment
 
-set -e  # Exit on error
+set -e
 
-COMMIT_MSG="$1"
-SERVICE="${2:-upr-web-service}"  # Default to web service
 REGION="us-central1"
+SERVICE="upr-os-service"
+PROJECT="applied-algebra-474804-e6"
+IMAGE="us-central1-docker.pkg.dev/$PROJECT/cloud-run-source-deploy/$SERVICE:latest"
 
-if [ -z "$COMMIT_MSG" ]; then
-  echo "❌ Error: Commit message required"
-  echo "Usage: ./scripts/deploy.sh 'feat: your message' [service-name]"
+echo "=========================================="
+echo "Deploying UPR OS Service"
+echo "=========================================="
+
+# Step 1: Build the image
+echo ""
+echo "Building Docker image..."
+gcloud builds submit --region=$REGION --tag=$IMAGE .
+
+# Step 2: Deploy with all required secrets
+echo ""
+echo "Deploying with secrets..."
+gcloud run deploy $SERVICE \
+  --region=$REGION \
+  --image=$IMAGE \
+  --platform=managed \
+  --allow-unauthenticated \
+  --set-secrets="PR_OS_TOKEN=PR_OS_TOKEN:latest,DATABASE_URL=DATABASE_URL:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest" \
+  --set-env-vars="NODE_ENV=production"
+
+echo ""
+echo "Deployment complete!"
+echo ""
+echo "Service URL: https://$SERVICE-191599223867.$REGION.run.app"
+
+# Step 3: Verify health
+echo ""
+echo "Verifying health..."
+sleep 5
+HEALTH=$(curl -s "https://$SERVICE-191599223867.$REGION.run.app/api/os/health" 2>/dev/null)
+if echo "$HEALTH" | grep -q '"status":"healthy"'; then
+  echo "Health check: PASSED"
+else
+  echo "Health check: FAILED"
+  echo "$HEALTH"
   exit 1
 fi
-
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 UPR Deployment Pipeline"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "Service: $SERVICE"
-echo "Message: $COMMIT_MSG"
-echo "Branch: $(git branch --show-current)"
-echo ""
-
-# 1. Git operations
-echo "📦 Committing changes..."
-git add .
-git commit -m "$COMMIT_MSG"
-
-echo "⬆️  Pushing to remote..."
-git push origin $(git branch --show-current)
-
-# 2. Deploy to Cloud Run
-echo ""
-echo "☁️  Deploying to Cloud Run..."
-gcloud run deploy "$SERVICE" \
-  --source . \
-  --region "$REGION" \
-  --allow-unauthenticated \
-  --quiet
-
-# 3. Get service URL
-SERVICE_URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format="value(status.url)")
-
-# 4. Sync to Notion
-echo ""
-echo "📝 Syncing to Notion..."
-npm run notion -- sync
-
-# 5. Send Slack notification (if webhook configured)
-if [ -n "$SLACK_WEBHOOK_URL" ]; then
-  echo ""
-  echo "📢 Sending Slack notification..."
-
-  BRANCH=$(git branch --show-current)
-  COMMIT_SHA=$(git rev-parse --short HEAD)
-
-  curl -X POST "$SLACK_WEBHOOK_URL" \
-    -H 'Content-Type: application/json' \
-    -d @- << EOF
-{
-  "blocks": [
-    {
-      "type": "header",
-      "text": {
-        "type": "plain_text",
-        "text": "🚀 Deployment Complete"
-      }
-    },
-    {
-      "type": "section",
-      "fields": [
-        {
-          "type": "mrkdwn",
-          "text": "*Service:*\n$SERVICE"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Branch:*\n$BRANCH"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Commit:*\n$COMMIT_SHA"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Message:*\n$COMMIT_MSG"
-        }
-      ]
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "<$SERVICE_URL|🌐 View Service> | <https://www.notion.so/UPR-Roadmap-2a266151dd16806c8caae5726ae4bf3e|📊 Notion>"
-      }
-    }
-  ]
-}
-EOF
-
-  echo "✅ Slack notification sent"
-fi
-
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "✅ Deployment Complete!"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "🌐 Service URL: $SERVICE_URL"
-echo "📊 Notion: https://www.notion.so/UPR-Roadmap-2a266151dd16806c8caae5726ae4bf3e"
-echo ""
-echo "Next steps:"
-echo "  1. Test at: $SERVICE_URL"
-echo "  2. If tests pass: git checkout main && git merge $(git branch --show-current)"
-echo ""
