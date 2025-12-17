@@ -216,9 +216,13 @@ export function createEnvelopeFromRequest(req) {
     region = 'UAE',
   } = req.body?.sales_context || req.body || {};
 
+  // Use valid UUID fallbacks (required for DB audit log)
+  const DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000001';
+  const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
+
   return createEnvelope({
-    tenant_id: tenant_id || 'unknown',
-    user_id: user_id || 'unknown',
+    tenant_id: tenant_id || DEFAULT_TENANT_ID,
+    user_id: user_id || DEFAULT_USER_ID,
     persona_id,
     vertical,
     sub_vertical,
