@@ -152,6 +152,15 @@
 
   "edge_cases": [
     {
+      "type": "COMPETITOR_BANK",
+      "condition": "Company is a competitor bank (from competitor_blocklist)",
+      "action": "BLOCK",
+      "severity": "CRITICAL",
+      "multiplier": 0,
+      "can_override": false,
+      "reason": "Banks cannot sell employee banking services to other banks"
+    },
+    {
       "type": "ENTERPRISE_BRAND",
       "condition": "Company is a major UAE enterprise brand (Etihad, Emirates, ADNOC, Emaar, DP World)",
       "action": "SKIP",
@@ -277,5 +286,80 @@
     { "source": "apollo", "priority": 2, "type": "contact" },
     { "source": "clearbit", "priority": 3, "type": "company" },
     { "source": "serp", "priority": 4, "type": "signals" }
-  ]
+  ],
+
+  "competitor_blocklist": {
+    "description": "Banks that should NEVER appear as leads to salespeople from competing banks",
+    "enabled": true,
+    "banks": [
+      {
+        "name": "Emirates NBD",
+        "aliases": ["ENBD", "Emirates National Bank of Dubai"],
+        "domains": ["emiratesnbd.com", "enbd.com"]
+      },
+      {
+        "name": "First Abu Dhabi Bank",
+        "aliases": ["FAB", "NBAD", "FGB"],
+        "domains": ["bankfab.com", "fab.ae", "nbad.com"]
+      },
+      {
+        "name": "Dubai Islamic Bank",
+        "aliases": ["DIB"],
+        "domains": ["dib.ae", "alislami.ae"]
+      },
+      {
+        "name": "Mashreq Bank",
+        "aliases": ["Mashreq", "MashreqBank"],
+        "domains": ["mashreqbank.com", "mashreq.com"]
+      },
+      {
+        "name": "Abu Dhabi Commercial Bank",
+        "aliases": ["ADCB"],
+        "domains": ["adcb.com"]
+      },
+      {
+        "name": "Commercial Bank of Dubai",
+        "aliases": ["CBD"],
+        "domains": ["cbd.ae"]
+      },
+      {
+        "name": "RAK Bank",
+        "aliases": ["RAKBANK", "National Bank of Ras Al Khaimah"],
+        "domains": ["rakbank.ae"]
+      },
+      {
+        "name": "National Bank of Fujairah",
+        "aliases": ["NBF"],
+        "domains": ["nbf.ae"]
+      },
+      {
+        "name": "Sharjah Islamic Bank",
+        "aliases": ["SIB"],
+        "domains": ["sib.ae"]
+      },
+      {
+        "name": "Union National Bank",
+        "aliases": ["UNB"],
+        "domains": ["unb.com"]
+      }
+    ]
+  },
+
+  "progressive_delivery": {
+    "description": "Config for progressive lead delivery - show leads in batches, not all at once",
+    "enabled": true,
+    "initial_batch": 5,
+    "subsequent_batch": 3,
+    "require_feedback_before_next": true,
+    "max_leads_per_session": 50
+  },
+
+  "preference_learning": {
+    "description": "Config for OS preference learning system",
+    "enabled": true,
+    "signals_to_track": ["LIKE", "DISLIKE", "SAVE", "DISMISS", "SHOW_MORE", "FIND_SIMILAR"],
+    "learning_window_days": 90,
+    "min_signals_for_learning": 5,
+    "preference_factors": ["industry", "company_size", "location", "signal_type", "founding_year"]
+  }
 }

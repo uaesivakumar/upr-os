@@ -42,6 +42,74 @@ class EdgeCasesToolStandalone {
     addFormats(ajv);
     this.validateInput = ajv.compile(edgeCasesInputSchema);
     this.validateOutput = ajv.compile(edgeCasesOutputSchema);
+
+    // Competitor blocklist (loaded from pack config)
+    this.competitorBlocklist = null;
+  }
+
+  /**
+   * Load competitor blocklist from pack config
+   * @param {Object} packConfig - The pack configuration object
+   */
+  loadPackConfig(packConfig) {
+    if (packConfig && packConfig.competitor_blocklist) {
+      this.competitorBlocklist = packConfig.competitor_blocklist;
+    }
+  }
+
+  /**
+   * Detect if company is a competitor bank (from pack config blocklist)
+   * OS_AUTHORITY: OS decides if company is a competitor
+   * @private
+   */
+  _detectCompetitorBank(companyProfile) {
+    if (!this.competitorBlocklist || !this.competitorBlocklist.enabled) {
+      return { isCompetitor: false, matchedBank: null };
+    }
+
+    const companyName = (companyProfile.name || '').toLowerCase();
+    const companyDomain = (companyProfile.domain || '').toLowerCase();
+
+    for (const bank of this.competitorBlocklist.banks) {
+      // Check domain match
+      for (const domain of bank.domains || []) {
+        if (companyDomain === domain.toLowerCase() ||
+            companyDomain.endsWith('.' + domain.toLowerCase())) {
+          return {
+            isCompetitor: true,
+            matchedBank: bank.name,
+            matchType: 'domain',
+            confidence: 1.0
+          };
+        }
+      }
+
+      // Check name match (exact or alias)
+      const bankNameLower = bank.name.toLowerCase();
+      if (companyName === bankNameLower || companyName.includes(bankNameLower)) {
+        return {
+          isCompetitor: true,
+          matchedBank: bank.name,
+          matchType: 'name',
+          confidence: 0.95
+        };
+      }
+
+      // Check alias match
+      for (const alias of bank.aliases || []) {
+        const aliasLower = alias.toLowerCase();
+        if (companyName === aliasLower || companyName.includes(aliasLower)) {
+          return {
+            isCompetitor: true,
+            matchedBank: bank.name,
+            matchType: 'alias',
+            confidence: 0.9
+          };
+        }
+      }
+    }
+
+    return { isCompetitor: false, matchedBank: null };
   }
 
   /**
@@ -335,6 +403,23 @@ class EdgeCasesToolStandalone {
     // ═══════════════════════════════════════════════════════
     // PHASE 1: CRITICAL BLOCKERS (Non-Overridable)
     // ═══════════════════════════════════════════════════════
+
+    // 0. Competitor Bank Detection (from pack config)
+    // OS_AUTHORITY: OS decides based on competitor_blocklist config
+    const competitorCheck = this._detectCompetitorBank(company_profile);
+    if (competitorCheck.isCompetitor) {
+      blockers.push({
+        type: 'COMPETITOR_BANK',
+        severity: 'CRITICAL',
+        message: `Competitor bank detected: ${competitorCheck.matchedBank}. Banks cannot sell employee banking services to other banks`,
+        can_override: false,
+        metadata: {
+          matched_bank: competitorCheck.matchedBank,
+          match_type: competitorCheck.matchType,
+          confidence: competitorCheck.confidence
+        }
+      });
+    }
 
     // 1. Government/Semi-Government Detection (INTELLIGENT)
     const govCheck = this._detectGovernmentEntity(company_profile);
