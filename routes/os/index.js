@@ -52,6 +52,7 @@ import aiAdminRouter from './ai-admin.js';
 import discoveryTemplatesRouter from './discovery-templates.js';
 import discoveryPoolRouter from './discoveryPool.js';
 import replayRouter from './replay.js';  // PRD v1.2 §7: Deterministic Replay API
+import intelligenceRouter from './intelligence.js';  // S218-S223: SIVA Intelligence Enhancement
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
 import { osAuthMiddleware, osAuditMiddleware, validateOsAuthConfig } from '../../middleware/osAuth.js';
@@ -164,6 +165,11 @@ router.get('/', (req, res) => {
         path: '/api/os/replay',
         method: 'POST/GET',
         description: 'Deterministic replay API for audit, debugging, and compliance (PRD v1.2 §7)'
+      },
+      intelligence: {
+        path: '/api/os/intelligence',
+        method: 'POST/GET/DELETE',
+        description: 'SIVA Intelligence Enhancement: progressive delivery, preference learning, conversational UX (S218-S223)'
       }
     },
     profiles: OS_PROFILES,
@@ -192,7 +198,8 @@ router.get('/health', async (req, res) => {
     config: 'checking',
     targets: 'checking',
     discoveryPool: 'checking',
-    replay: 'checking'  // PRD v1.2 §7
+    replay: 'checking',  // PRD v1.2 §7
+    intelligence: 'checking'  // S218-S223
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -277,5 +284,6 @@ router.use('/ai-admin', aiAdminRouter);
 router.use('/discovery-templates', discoveryTemplatesRouter);
 router.use('/discovery-pool', discoveryPoolRouter);
 router.use('/replay', replayRouter);  // PRD v1.2 §7: Deterministic Replay
+router.use('/intelligence', aiInputValidation, salesContextValidation, intelligenceRouter);  // S218-S223: SIVA Intelligence Enhancement
 
 export default router;
