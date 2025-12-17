@@ -705,13 +705,14 @@ router.post('/', envelopeMiddleware(), async (req, res) => {
     const {
       maxResults = 50,
       minQuality = 0,
-      profile = OS_PROFILES.DEFAULT
+      profile = OS_PROFILES.DEFAULT,
+      speed = 'balanced' // 'instant' | 'balanced' | 'thorough'
     } = options;
 
     const region = region_code || sales_context.region || filters.location || envelope.region || 'UAE';
 
     console.log(`[OS:Discovery] Request ${requestId} | Interaction: ${interactionId} | Persona: ${personaId} | Envelope: ${envelope.sha256_hash.slice(0, 12)}...`);
-    console.log(`[OS:Discovery] Mode: ${mode}, Vertical: ${vertical}, SubVertical: ${subVertical}, Region: ${region}`);
+    console.log(`[OS:Discovery] Mode: ${mode}, Speed: ${speed}, Vertical: ${vertical}, SubVertical: ${subVertical}, Region: ${region}`);
 
     // =====================================================================
     // SPRINT 77: INTELLIGENT LIVE DISCOVERY (DEFAULT)
@@ -917,43 +918,97 @@ router.post('/', envelopeMiddleware(), async (req, res) => {
     }
 
     // =====================================================================
-    // APPLY SIVA SCORING TO ALL COMPANIES (both live and cached)
+    // APPLY SIVA SCORING BASED ON SPEED MODE
+    // - 'instant': Skip scoring, return raw results fast
+    // - 'balanced': Score top 5 only (DEFAULT - fast with intelligence)
+    // - 'thorough': Score all 20 companies (full analysis)
     // PRD v1.2 §2: Pass envelope for tool gating (Law 2)
     // =====================================================================
-    const companiesToScore = companies.slice(0, 20);
-    console.log(`[OS:Discovery] Scoring ${companiesToScore.length} companies with SIVA tools (persona: ${personaId})...`);
 
-    const scoringStartTime = Date.now();
-    const scoredCompanies = await Promise.all(
-      companiesToScore.map(async (company) => {
-        // PRD v1.2: Pass envelope for tool access validation
-        const sivaScores = await scoreCompanyWithSIVA(company, envelope);
-        return {
+    let scoredCompanies = [];
+    let unscoredCompanies = [];
+
+    if (speed === 'instant') {
+      // INSTANT: No scoring, use raw signal scores, return immediately
+      console.log(`[OS:Discovery] INSTANT mode - skipping SIVA scoring for fast response`);
+
+      // Apply basic heuristic scoring based on signals
+      scoredCompanies = companies.slice(0, 20).map(company => ({
+        ...company,
+        sivaScores: {
+          quality: 50,
+          timing: company.hiringLikelihoodScore >= 4 ? 75 : 50,
+          productFit: 50,
+          overall: Math.round(company.hiringLikelihoodScore * 15 + (company.signalCount || 1) * 5),
+          tier: company.hiringLikelihoodScore >= 4 ? 'HOT' : company.hiringLikelihoodScore >= 3 ? 'WARM' : 'COOL',
+          qualityTier: 'B',
+          urgency: company.hiringLikelihoodScore >= 4 ? 'High' : 'Medium',
+          recommendedProducts: ['Payroll Banking'],
+          reasoning: ['Quick assessment based on signal strength']
+        }
+      }));
+      unscoredCompanies = companies.slice(20);
+
+    } else {
+      // BALANCED or THOROUGH: Use SIVA scoring
+      const scoreLimit = speed === 'thorough' ? 20 : 5; // Balance scores top 5, thorough scores 20
+      const companiesToScore = companies.slice(0, scoreLimit);
+
+      console.log(`[OS:Discovery] ${speed.toUpperCase()} mode - scoring ${companiesToScore.length} companies with SIVA tools (persona: ${personaId})...`);
+
+      const scoringStartTime = Date.now();
+      scoredCompanies = await Promise.all(
+        companiesToScore.map(async (company) => {
+          // PRD v1.2: Pass envelope for tool access validation
+          const sivaScores = await scoreCompanyWithSIVA(company, envelope);
+          return {
+            ...company,
+            sivaScores: {
+              quality: sivaScores.quality,
+              timing: sivaScores.timing,
+              productFit: sivaScores.productFit,
+              overall: sivaScores.overall,
+              tier: sivaScores.tier,
+              qualityTier: sivaScores.qualityTier,
+              urgency: sivaScores.urgency,
+              recommendedProducts: sivaScores.recommendedProducts,
+              reasoning: sivaScores.reasoning
+            }
+          };
+        })
+      );
+
+      const scoringTimeMs = Date.now() - scoringStartTime;
+      console.log(`[OS:Discovery] SIVA scoring completed in ${scoringTimeMs}ms`);
+
+      // For 'balanced' mode, add unscored companies with heuristic scores
+      const remainingCompanies = companies.slice(scoreLimit, 20);
+      if (speed === 'balanced' && remainingCompanies.length > 0) {
+        const heuristicScored = remainingCompanies.map(company => ({
           ...company,
           sivaScores: {
-            quality: sivaScores.quality,
-            timing: sivaScores.timing,
-            productFit: sivaScores.productFit,
-            overall: sivaScores.overall,
-            tier: sivaScores.tier,
-            qualityTier: sivaScores.qualityTier,
-            urgency: sivaScores.urgency,
-            recommendedProducts: sivaScores.recommendedProducts,
-            reasoning: sivaScores.reasoning
+            quality: 50,
+            timing: company.hiringLikelihoodScore >= 4 ? 70 : 50,
+            productFit: 50,
+            overall: Math.round(company.hiringLikelihoodScore * 12 + (company.signalCount || 1) * 5),
+            tier: company.hiringLikelihoodScore >= 4 ? 'WARM' : 'COOL',
+            qualityTier: 'C',
+            urgency: 'Medium',
+            recommendedProducts: ['Payroll Banking'],
+            reasoning: ['Pending full analysis']
           }
-        };
-      })
-    );
+        }));
+        scoredCompanies = [...scoredCompanies, ...heuristicScored];
+      }
+
+      unscoredCompanies = companies.slice(20);
+    }
 
     // Re-sort by SIVA overall score
     scoredCompanies.sort((a, b) => (b.sivaScores?.overall || 0) - (a.sivaScores?.overall || 0));
 
     // Merge scored companies back
-    const unscoredCompanies = companies.slice(20);
     companies = [...scoredCompanies, ...unscoredCompanies];
-
-    const scoringTimeMs = Date.now() - scoringStartTime;
-    console.log(`[OS:Discovery] SIVA scoring completed in ${scoringTimeMs}ms`);
 
     const executionTimeMs = Date.now() - startTime;
 
