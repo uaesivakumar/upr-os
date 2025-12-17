@@ -1,5 +1,5 @@
 /**
- * UPR OS - Intelligence Engine (S143-S146)
+ * UPR OS - Intelligence Engine (S143-S146, PRD v1.2)
  *
  * Main entry point for the OS module.
  *
@@ -21,6 +21,11 @@
  * - Typed error envelopes (OSResponse)
  * - Correlation IDs
  * - Structured error logging
+ *
+ * PRD v1.2 §2: Sealed Context Envelope
+ * - Every SIVA invocation requires sealed envelope
+ * - Envelope validation before SIVA calls
+ * - Envelope hash stored in audit logs
  */
 
 // Tools
@@ -39,9 +44,49 @@ export { signalPipeline } from "./pipeline/signalPipeline";
 export * from "./middleware";
 export { apiHardening } from "./middleware/apiHardening";
 
+// Sealed Context Envelope (PRD v1.2 §2)
+export * from "./envelope";
+export {
+  createEnvelope,
+  createEnvelopeFromRequest,
+  validateEnvelope,
+  envelopeMiddleware,
+  toolGateMiddleware,
+  requireEnvelope,
+  CANONICAL_PERSONAS,
+  ENVELOPE_VERSION,
+} from "./envelope";
+
+// Evidence System (PRD v1.2 §5)
+export * from "./evidence";
+export {
+  EVIDENCE_TYPES,
+  TRANSFORM_OPS,
+  FRESHNESS_TTL,
+  QUALITY_LEVELS,
+  createEvidence,
+  createTransformedEvidence,
+  createSIVAEvidence,
+  validateEvidence,
+  isUsableForSIVA,
+} from "./evidence";
+
+// Escalation Contract (PRD v1.2 §6)
+export * from "./escalation";
+export {
+  RISK_THRESHOLDS,
+  ESCALATION_ACTIONS,
+  RISK_CATEGORIES,
+  assessRisk,
+  applyEscalation,
+  escalationMiddleware,
+  preflightCheck,
+} from "./escalation";
+
 // Version info
 export const OS_VERSION = {
-  version: "1.0.0",
+  version: "1.2.0",
+  prd_version: "1.2 FINAL",
   sprints: ["S143", "S144", "S145", "S146"],
-  updated: "2025-12-09",
+  updated: "2025-12-17",
 };

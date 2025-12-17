@@ -90,10 +90,9 @@ class CompanyQualityTool extends AgentProtocol {
       }
     }
 
-    // PHASE 3: Log decision (async, non-blocking)
-    this._logDecision(decisionId, input, inlineResult, ruleResult, comparison).catch(err => {
-      console.error('Decision logging error:', err);
-    });
+    // PRD v1.2 Law 3: "SIVA never mutates the world"
+    // Decision logging is handled by OS layer via agentDecisionLogger
+    // See: os/persistence/agentDecisionLogger.js
 
     // PHASE 4: Return inline result (production)
     inlineResult._meta.decision_id = decisionId;
@@ -370,45 +369,8 @@ class CompanyQualityTool extends AgentProtocol {
     };
   }
 
-  /**
-   * Log decision to database for analysis
-   * Sprint 22: Decision logging
-   * @private
-   */
-  async _logDecision(decisionId, input, inlineResult, ruleResult, comparison) {
-    // Import db module
-    const db = require('../db');
-
-    try {
-      await db.query(`
-        INSERT INTO agent_core.agent_decisions (
-          decision_id,
-          tool_name,
-          rule_name,
-          rule_version,
-          input_data,
-          inline_output,
-          rule_output,
-          comparison,
-          execution_time_ms,
-          created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
-      `, [
-        decisionId,
-        'evaluate_company_quality',
-        'evaluate_company_quality',
-        ruleResult?.version || 'v1.0_inline',
-        input,
-        inlineResult,
-        ruleResult?.result || null,
-        comparison,
-        inlineResult._meta.latency_ms
-      ]);
-    } catch (error) {
-      // Don't throw - logging is non-critical
-      console.error('Failed to log decision:', error.message);
-    }
-  }
+  // NOTE: _logDecision method REMOVED per PRD v1.2 Law 3
+  // "SIVA never mutates the world" - OS layer handles persistence
 }
 
 module.exports = CompanyQualityTool;

@@ -119,11 +119,9 @@ class ContactTierToolStandalone {
         }
       }
 
-      // PHASE 4: Shadow mode decision logging (Sprint 24 + Sprint 28 A/B tracking)
-      this._logDecision(decisionId, input, inlineResult, ruleResult, comparison, distribution).catch(err => {
-        // Silent failure - don't block production
-        console.error('[ContactTier Shadow Mode] Logging failed:', err.message);
-      });
+      // PRD v1.2 Law 3: "SIVA never mutates the world"
+      // Decision logging is handled by OS layer via agentDecisionLogger
+      // See: os/persistence/agentDecisionLogger.js
 
       // PHASE 5: Return inline result (production path unchanged)
       inlineResult._meta.decision_id = decisionId;
@@ -559,43 +557,8 @@ class ContactTierToolStandalone {
     };
   }
 
-  async _logDecision(decisionId, input, inlineResult, ruleResult, comparison, distribution) {
-    // Import db module (use utils/db.js for CommonJS compatibility)
-    const db = require('../../utils/db');
-
-    try {
-      // Log to agent_core.agent_decisions (Sprint 22 schema + Sprint 28 A/B tracking)
-      await db.query(`
-        INSERT INTO agent_core.agent_decisions (
-          decision_id,
-          tool_name,
-          rule_name,
-          rule_version,
-          input_data,
-          output_data,
-          confidence_score,
-          latency_ms
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      `, [
-        decisionId,
-        'ContactTierTool',
-        'select_contact_tier',
-        ruleResult?._meta?.version || distribution?.version || 'inline_only',  // Sprint 28: A/B test version
-        input,  // input_data
-        {
-          inline: inlineResult,
-          rule: ruleResult || null,
-          comparison: comparison,
-          ab_test: distribution || null  // Sprint 28: Track A/B test group
-        },  // output_data (contains both inline and rule results)
-        inlineResult.confidence || null,
-        inlineResult._meta.latency_ms || 0
-      ]);
-    } catch (error) {
-      // Don't throw - logging is non-critical
-      console.error('[ContactTier] Failed to log decision:', error.message);
-    }
-  }
+  // NOTE: _logDecision method REMOVED per PRD v1.2 Law 3
+  // "SIVA never mutates the world" - OS layer handles persistence
 }
 
 module.exports = ContactTierToolStandalone;

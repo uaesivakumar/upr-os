@@ -2,11 +2,14 @@
  * UPR OS Scoring Endpoint
  * Sprint 64: Unified OS API Layer
  * VS2: AI-Powered QTLE Explanations
+ * PRD v1.2 §2: Sealed Context Envelope
  *
  * POST /api/os/score
  *
  * Unified scoring endpoint combining Q-Score, T-Score, L-Score, E-Score
  * Now with optional AI-powered explanations via SIVA.
+ *
+ * CRITICAL: SIVA calls require sealed context envelope per PRD v1.2
  *
  * Authorization Code: VS1-VS9-APPROVED-20251213
  */
@@ -32,6 +35,8 @@ import {
   generateAICompositeExplanation,
   generateAllExplanations
 } from '../../services/siva/aiExplanationService.js';
+// PRD v1.2 §2: Sealed Context Envelope
+import { envelopeMiddleware, toolGateMiddleware } from '../../os/envelope/index.js';
 
 const router = express.Router();
 
@@ -40,12 +45,22 @@ const router = express.Router();
  *
  * Unified scoring endpoint for the OS layer
  *
+ * PRD v1.2 COMPLIANCE:
+ * - Sealed context envelope required for SIVA calls
+ * - Envelope validated before tool execution
+ * - Tool access gated by persona
+ *
  * Request Body:
  * {
  *   "entity_type": "company",
  *   "entity_id": "uuid",
  *   "entity_data": { ... },          // OR provide data directly
  *   "score_types": ["q_score", "t_score", "l_score", "composite"],
+ *   "sales_context": {               // Required for envelope
+ *     "vertical": "banking",
+ *     "sub_vertical": "employee_banking",
+ *     "region": "UAE"
+ *   },
  *   "options": {
  *     "include_breakdown": true,
  *     "include_explanation": true,
@@ -55,7 +70,8 @@ const router = express.Router();
  *
  * Response: OSResponse with all requested scores
  */
-router.post('/', async (req, res) => {
+// Apply envelope middleware for SIVA tool access
+router.post('/', envelopeMiddleware(), async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 

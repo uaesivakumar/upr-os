@@ -111,10 +111,9 @@ class CompanyQualityToolStandalone {
         }
       }
 
-      // PHASE 4: Log decision (async, non-blocking)
-      this._logDecision(decisionId, input, inlineResult, ruleResult, comparison, distribution).catch(err => {
-        console.error('Decision logging error:', err);
-      });
+      // PRD v1.2 Law 3: "SIVA never mutates the world"
+      // Decision logging is handled by OS layer via agentDecisionLogger
+      // See: os/persistence/agentDecisionLogger.js
 
       // PHASE 5: Return inline result (production)
       inlineResult._meta.decision_id = decisionId;
@@ -534,49 +533,8 @@ class CompanyQualityToolStandalone {
     };
   }
 
-  /**
-   * Log decision to database for analysis
-   * Sprint 22: Decision logging
-   * Sprint 27: A/B test tracking
-   * @private
-   */
-  async _logDecision(decisionId, input, inlineResult, ruleResult, comparison, distribution) {
-    // Import db module (use utils/db.js for CommonJS compatibility)
-    const db = require('../../utils/db');
-
-    try {
-      // Log to agent_core.agent_decisions (Sprint 22 schema)
-      await db.query(`
-        INSERT INTO agent_core.agent_decisions (
-          decision_id,
-          tool_name,
-          rule_name,
-          rule_version,
-          input_data,
-          output_data,
-          confidence_score,
-          latency_ms
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      `, [
-        decisionId,
-        'CompanyQualityTool',
-        'evaluate_company_quality',
-        ruleResult?.version || distribution?.version || 'v2.0',
-        input,  // input_data
-        {
-          inline: inlineResult,
-          rule: ruleResult?.result || null,
-          comparison: comparison,
-          ab_test: distribution || null  // Sprint 27: Track A/B test group
-        },  // output_data (contains both inline and rule results)
-        inlineResult.confidence || null,
-        inlineResult._meta.latency_ms || 0
-      ]);
-    } catch (error) {
-      // Don't throw - logging is non-critical
-      console.error('Failed to log decision:', error.message);
-    }
-  }
+  // NOTE: _logDecision method REMOVED per PRD v1.2 Law 3
+  // "SIVA never mutates the world" - OS layer handles persistence
 }
 
 module.exports = CompanyQualityToolStandalone;

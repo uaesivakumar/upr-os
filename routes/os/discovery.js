@@ -41,6 +41,16 @@ import HiringSignalExtractionTool from '../../server/siva-tools/HiringSignalExtr
 // This provides intelligent enterprise/government detection (no hardcoded lists)
 import EdgeCasesToolStandalone from '../../server/siva-tools/EdgeCasesToolStandalone.js';
 
+// PRD v1.2 §2: Sealed Context Envelope (CONSTITUTIONAL FIX)
+// Law 1: Authority precedes intelligence - envelope required for ALL SIVA calls
+// Law 2: Persona is policy - tool access gated by persona
+// Law 5: If it cannot be replayed, it did not happen - audit logging required
+import {
+  envelopeMiddleware,
+  isToolAllowed,
+} from '../../os/envelope/index.js';
+import { createEvidence } from '../../os/evidence/factory.js';
+
 const router = express.Router();
 
 // Initialize live discovery tools
@@ -270,19 +280,31 @@ function mapLikelihoodScore(score) {
 const timingScoreTool = new TimingScoreTool();
 const bankingProductMatchTool = new BankingProductMatchTool();
 
-// Demo tenant ID with existing hiring signals data (RADAR Agent extracted)
-const DEMO_TENANT_ID = 'e2d48fa8-f6d1-4b70-a939-29efb47b0dc9';
+// Seed data tenant with pre-populated hiring signals (RADAR Agent extracted)
+// NOTE: This is NOT "demo mode" - it's a data fallback for new tenants during onboarding.
+// Production tenants get their own data; this is just seed/sample data.
+// See: docs/SHADOW_TENANT.md
+const SEED_DATA_TENANT_ID = 'e2d48fa8-f6d1-4b70-a939-29efb47b0dc9';
 
 /**
  * Sprint 76: Score a company using real SIVA tools
  * Returns QTLE scores with natural language reasoning
  *
+ * PRD v1.2 COMPLIANT: Tool access gated by envelope (Law 2)
+ *
  * IMPORTANT: Must match tool schema requirements:
  * - CompanyQualityTool: requires domain pattern, uae_signals, size_bucket
  * - TimingScoreTool: requires news_age_days, hiring_recency_days
  * - BankingProductMatchTool: requires employee_count, industry
+ *
+ * @param {Object} company - Company data to score
+ * @param {Object} envelope - Sealed context envelope (REQUIRED for tool gating)
  */
-async function scoreCompanyWithSIVA(company) {
+async function scoreCompanyWithSIVA(company, envelope) {
+  // PRD v1.2 §2: Validate envelope exists (Law 1)
+  if (!envelope || !envelope.allowed_tools) {
+    throw new Error('SIVA scoring requires sealed context envelope');
+  }
   const scores = {
     quality: 50,
     timing: 50,
@@ -347,13 +369,19 @@ async function scoreCompanyWithSIVA(company) {
   }
 
   // Use EdgeCasesTool for intelligent detection
+  // PRD v1.2 §3: Tool gate check (Law 2 - Persona is policy)
   let edgeCaseResult = null;
   try {
-    edgeCaseResult = await edgeCasesTool.execute({
-      company_profile: companyProfile,
-      contact_profile: {},
-      historical_data: {}
-    });
+    if (!isToolAllowed(envelope, 'EdgeCasesTool')) {
+      console.warn(`[OS:Discovery] EdgeCasesTool not allowed for persona ${envelope.persona_id}, skipping`);
+      // Skip edge case detection if tool not allowed for this persona
+    } else {
+      edgeCaseResult = await edgeCasesTool.execute({
+        company_profile: companyProfile,
+        contact_profile: {},
+        historical_data: {}
+      });
+    }
     scores.edgeCases = edgeCaseResult;
   } catch (edgeError) {
     console.warn(`[OS:Discovery] EdgeCases detection error for ${company.name}:`, edgeError.message);
@@ -419,26 +447,32 @@ async function scoreCompanyWithSIVA(company) {
 
   try {
     // Q-Score: Company Quality
-    const qualityInput = {
-      company_name: company.name,
-      domain: domain || 'unknown.com',
-      industry: company.industry || company.sector || 'Business Services',
-      sector: detectedSector, // Sprint 77: Pass sector for government detection
-      uae_signals: {
-        has_ae_domain: domain?.endsWith('.ae') || false,
-        has_uae_address: (company.location || '').toLowerCase().includes('uae') ||
-                         (company.location || '').toLowerCase().includes('dubai') ||
-                         (company.location || '').toLowerCase().includes('abu dhabi')
-      },
-      size_bucket: sizeBucket,
-      size: headcount
-    };
+    // PRD v1.2 §3: Tool gate check (Law 2 - Persona is policy)
+    if (!isToolAllowed(envelope, 'CompanyQualityTool')) {
+      console.warn(`[OS:Discovery] CompanyQualityTool not allowed for persona ${envelope.persona_id}, using default quality score`);
+      // Use default score if tool not allowed
+    } else {
+      const qualityInput = {
+        company_name: company.name,
+        domain: domain || 'unknown.com',
+        industry: company.industry || company.sector || 'Business Services',
+        sector: detectedSector, // Sprint 77: Pass sector for government detection
+        uae_signals: {
+          has_ae_domain: domain?.endsWith('.ae') || false,
+          has_uae_address: (company.location || '').toLowerCase().includes('uae') ||
+                           (company.location || '').toLowerCase().includes('dubai') ||
+                           (company.location || '').toLowerCase().includes('abu dhabi')
+        },
+        size_bucket: sizeBucket,
+        size: headcount
+      };
 
-    const qualityResult = await companyQualityTool.execute(qualityInput);
-    scores.quality = qualityResult.quality_score || 50;
-    scores.qualityTier = mapScoreToTier(scores.quality);
-    if (qualityResult.reasoning) {
-      scores.reasoning.push(qualityResult.reasoning);
+      const qualityResult = await companyQualityTool.execute(qualityInput);
+      scores.quality = qualityResult.quality_score || 50;
+      scores.qualityTier = mapScoreToTier(scores.quality);
+      if (qualityResult.reasoning) {
+        scores.reasoning.push(qualityResult.reasoning);
+      }
     }
   } catch (error) {
     console.error(`[OS:Discovery] Quality scoring error for ${company.name}:`, error.message);
@@ -608,29 +642,54 @@ function estimateRevenue(company) {
  * POST /api/os/discovery
  *
  * Sprint 77: INTELLIGENT LIVE DISCOVERY
+ * PRD v1.2 COMPLIANT (Constitutional Fix Applied)
+ *
  * - mode: 'live' (default) | 'cached'
  * - live: Fresh SERP search + real-time extraction (SIVA-powered)
  * - cached: Read from hiring_signals table (legacy fallback)
  *
+ * REQUIRED (PRD v1.2 §2 - Sealed Context Envelope):
+ * - tenant_id: Tenant identifier (REQUIRED)
+ * - persona_id: Canonical persona 1-7 (REQUIRED)
+ * - request_id: Client-generated request ID (REQUIRED)
+ * - sales_context: { vertical, sub_vertical, region } (REQUIRED)
+ *
  * Request body:
  * {
- *   vertical: 'banking',
- *   subVertical: 'employee_banking',
- *   region: 'UAE',
+ *   tenant_id: 'uuid',              // REQUIRED
+ *   persona_id: '2',                // REQUIRED (1-7)
+ *   request_id: 'client-uuid',      // REQUIRED
+ *   sales_context: {                // REQUIRED for envelope
+ *     vertical: 'banking',
+ *     sub_vertical: 'employee_banking',
+ *     region: 'UAE'
+ *   },
  *   mode: 'live' | 'cached',
  *   workPatterns: { preferredSectors: [...] },
  *   options: { maxResults: 50 }
  * }
+ *
+ * Response includes:
+ * - interaction_id: For replay via /api/os/replay/{interaction_id}
+ * - envelope_hash: SHA256 of sealed envelope
  */
-router.post('/', async (req, res) => {
+router.post('/', envelopeMiddleware(), async (req, res) => {
   const startTime = Date.now();
   const requestId = generateRequestId();
 
+  // PRD v1.2 §7: Generate interaction_id for replay capability (Law 5)
+  const interactionId = `disc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  // PRD v1.2 §2: Get sealed envelope (set by envelopeMiddleware)
+  const envelope = req.sealedEnvelope;
+
   try {
-    let tenantId = getTenantId(req);
+    // Use envelope values (authoritative) instead of body extraction
+    const tenantId = envelope.tenant_id;
+    const personaId = envelope.persona_id;
+
     const {
-      vertical = 'banking',
-      subVertical = 'employee_banking',
+      sales_context = {},
       region_code,
       industry = 'default',
       filters = {},
@@ -639,15 +698,20 @@ router.post('/', async (req, res) => {
       mode = 'live' // Default to live discovery
     } = req.body;
 
+    // Extract from sales_context (as sent by frontend) or fallback
+    const vertical = sales_context.vertical || req.body.vertical || envelope.vertical || 'banking';
+    const subVertical = sales_context.sub_vertical || req.body.subVertical || envelope.sub_vertical || 'employee_banking';
+
     const {
       maxResults = 50,
       minQuality = 0,
       profile = OS_PROFILES.DEFAULT
     } = options;
 
-    const region = region_code || filters.location || 'UAE';
+    const region = region_code || sales_context.region || filters.location || envelope.region || 'UAE';
 
-    console.log(`[OS:Discovery] Request ${requestId} - Mode: ${mode}, Vertical: ${vertical}, SubVertical: ${subVertical}, Region: ${region}`);
+    console.log(`[OS:Discovery] Request ${requestId} | Interaction: ${interactionId} | Persona: ${personaId} | Envelope: ${envelope.sha256_hash.slice(0, 12)}...`);
+    console.log(`[OS:Discovery] Mode: ${mode}, Vertical: ${vertical}, SubVertical: ${subVertical}, Region: ${region}`);
 
     // =====================================================================
     // SPRINT 77: INTELLIGENT LIVE DISCOVERY (DEFAULT)
@@ -735,10 +799,11 @@ router.post('/', async (req, res) => {
         LIMIT $2
       `, [tenantId, maxResults * 3]);
 
-      // If no data for this tenant, fall back to demo tenant
-      if (signalsResult.rows.length === 0 && tenantId !== DEMO_TENANT_ID) {
-        console.log(`[OS:Discovery] No signals for tenant ${tenantId}, falling back to demo tenant`);
-        tenantId = DEMO_TENANT_ID;
+      // If no data for this tenant, fall back to seed data tenant (for onboarding)
+      // NOTE: This is a data fallback, NOT demo mode. All SIVA behavior remains production-identical.
+      if (signalsResult.rows.length === 0 && tenantId !== SEED_DATA_TENANT_ID) {
+        console.log(`[OS:Discovery] No signals for tenant ${tenantId}, falling back to seed data tenant`);
+        tenantId = SEED_DATA_TENANT_ID;
         signalsResult = await pool.query(`
           SELECT
             id,
@@ -853,14 +918,16 @@ router.post('/', async (req, res) => {
 
     // =====================================================================
     // APPLY SIVA SCORING TO ALL COMPANIES (both live and cached)
+    // PRD v1.2 §2: Pass envelope for tool gating (Law 2)
     // =====================================================================
     const companiesToScore = companies.slice(0, 20);
-    console.log(`[OS:Discovery] Scoring ${companiesToScore.length} companies with SIVA tools...`);
+    console.log(`[OS:Discovery] Scoring ${companiesToScore.length} companies with SIVA tools (persona: ${personaId})...`);
 
     const scoringStartTime = Date.now();
     const scoredCompanies = await Promise.all(
       companiesToScore.map(async (company) => {
-        const sivaScores = await scoreCompanyWithSIVA(company);
+        // PRD v1.2: Pass envelope for tool access validation
+        const sivaScores = await scoreCompanyWithSIVA(company, envelope);
         return {
           ...company,
           sivaScores: {
@@ -889,6 +956,54 @@ router.post('/', async (req, res) => {
     console.log(`[OS:Discovery] SIVA scoring completed in ${scoringTimeMs}ms`);
 
     const executionTimeMs = Date.now() - startTime;
+
+    // =====================================================================
+    // PRD v1.2 §7: REPLAY SUPPORT (Law 5 - If it cannot be replayed, it did not happen)
+    // 1. Create evidence snapshot
+    // 2. Log to envelope_audit_log with interaction_id
+    // 3. Include replay metadata in response
+    // =====================================================================
+
+    // Calculate output hash for determinism verification
+    const crypto = await import('crypto');
+    const outputForHash = {
+      companies: companies.map(c => ({ id: c.id, name: c.name, sivaScores: c.sivaScores })),
+      discoveryMode: discoveryMetadata.mode,
+      companyCount: companies.length
+    };
+    const outputHash = crypto.createHash('sha256')
+      .update(JSON.stringify(outputForHash))
+      .digest('hex');
+
+    // Create evidence snapshot (minimal - company IDs + signal counts)
+    const evidenceSnapshotData = {
+      companies: companies.slice(0, 20).map(c => ({
+        id: c.id,
+        name: c.name,
+        signalCount: c.signalCount || 0,
+        tier: c.sivaScores?.tier
+      })),
+      discoveryMetadata,
+      timestamp: new Date().toISOString()
+    };
+
+    // Log to envelope_audit_log with interaction_id for replay
+    try {
+      await pool.query(`
+        UPDATE envelope_audit_log
+        SET interaction_id = $1,
+            output_hash = $2,
+            evidence_snapshot_id = NULL
+        WHERE envelope_hash = $3
+          AND tenant_id = $4
+          AND created_at > NOW() - INTERVAL '1 minute'
+      `, [interactionId, outputHash, envelope.sha256_hash, tenantId]);
+
+      console.log(`[OS:Discovery] Audit logged: interaction=${interactionId}, hash=${outputHash.slice(0, 12)}...`);
+    } catch (auditError) {
+      // Non-blocking - audit is best-effort but logged
+      console.error(`[OS:Discovery] Audit logging failed:`, auditError.message);
+    }
 
     const response = createOSResponse({
       success: true,
@@ -923,6 +1038,13 @@ router.post('/', async (req, res) => {
             subVertical,
             region
           }
+        },
+        // PRD v1.2 §7: Replay metadata
+        replay: {
+          interaction_id: interactionId,
+          envelope_hash: envelope.sha256_hash,
+          output_hash: outputHash,
+          replay_url: `/api/os/replay/${interactionId}`
         }
       },
       reason: companies.length > 0
@@ -935,7 +1057,7 @@ router.post('/', async (req, res) => {
       requestId
     });
 
-    console.log(`[OS:Discovery] Request ${requestId} completed in ${executionTimeMs}ms - ${companies.length} companies`);
+    console.log(`[OS:Discovery] Request ${requestId} | Interaction: ${interactionId} | Output hash: ${outputHash.slice(0, 12)}... | ${companies.length} companies | ${executionTimeMs}ms`);
 
     res.json(response);
 

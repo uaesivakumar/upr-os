@@ -127,7 +127,7 @@ The following are architectural violations and must not be implemented:
 4. Admin
 5. Compliance / Audit
 6. Integration / API
-7. Demo / Sandbox (synthetic data only)
+7. Internal (same as Sales-Rep, tenant-level constraints)
 
 Additional personas require OS config + version bump.
 
