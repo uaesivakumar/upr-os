@@ -68,6 +68,7 @@ COPY --from=builder /app/server ./server
 COPY --from=builder /app/middleware ./middleware
 COPY --from=builder /app/jobs ./jobs
 COPY --from=builder /app/db ./db
+COPY --from=builder /app/os ./os
 
 # Copy optional directories (created empty in builder if they don't exist)
 COPY --from=builder /app/ml ./ml
