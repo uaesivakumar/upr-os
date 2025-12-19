@@ -532,11 +532,93 @@ export async function replayInteraction(interaction_id) {
   };
 }
 
+/**
+ * GET ROUTING DECISIONS
+ *
+ * Fetch routing decisions from v_routing_decision_audit view.
+ * Used by Super Admin Model Radar for visibility into routing behavior.
+ *
+ * @param {Object} params
+ * @param {string} params.capability_key - Filter by capability
+ * @param {string} params.persona_id - Filter by persona
+ * @param {boolean} params.deviations_only - Only show decisions with replay issues
+ * @param {number} params.limit - Max results (default 50)
+ * @param {number} params.offset - Pagination offset
+ *
+ * @returns {Object} List of routing decisions
+ */
+export async function getRoutingDecisions({ capability_key, persona_id, deviations_only, limit = 50, offset = 0 }) {
+  try {
+    const conditions = [];
+    const params = [];
+    let paramIndex = 1;
+
+    if (capability_key) {
+      conditions.push(`capability_key = $${paramIndex++}`);
+      params.push(capability_key);
+    }
+
+    if (persona_id) {
+      conditions.push(`persona_id = $${paramIndex++}`);
+      params.push(persona_id);
+    }
+
+    if (deviations_only) {
+      conditions.push(`replay_status != 'REPLAYABLE'`);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    params.push(limit);
+    params.push(offset);
+
+    const result = await pool.query(
+      `SELECT
+         id,
+         interaction_id,
+         capability_key,
+         persona_id,
+         persona_key,
+         model_id,
+         model_slug,
+         model_active,
+         model_eligible,
+         routing_score,
+         routing_reason,
+         envelope_hash,
+         channel,
+         created_at,
+         replay_status
+       FROM v_routing_decision_audit
+       ${whereClause}
+       ORDER BY created_at DESC
+       LIMIT $${paramIndex++} OFFSET $${paramIndex}`,
+      params
+    );
+
+    return {
+      success: true,
+      data: result.rows,
+      total: result.rows.length,
+      limit,
+      offset,
+    };
+  } catch (error) {
+    console.error('[model-router] Get routing decisions error:', error);
+    return {
+      success: false,
+      error: 'FETCH_ERROR',
+      message: error.message,
+    };
+  }
+}
+
 export default {
   selectModel,
   invokeModel,
   resolveModelForReplay,
   replayInteraction,
+  getRoutingDecisions,
   // Export for testing only
   _internal: {
     calculateRoutingScore,

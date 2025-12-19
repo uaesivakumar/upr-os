@@ -192,6 +192,11 @@ router.get('/', (req, res) => {
         path: '/api/os/authorize-capability',
         method: 'POST/GET',
         description: 'S229: Pre-SIVA capability authorization guard. SIVA must not run on denial.'
+      },
+      routingDecisions: {
+        path: '/api/os/routing-decisions',
+        method: 'GET',
+        description: 'S232: Routing decision viewer for Super Admin Model Radar. Read-only visibility into routing behavior.'
       }
     },
     profiles: OS_PROFILES,
@@ -224,7 +229,8 @@ router.get('/health', async (req, res) => {
     intelligence: 'checking',  // S218-S223
     capabilities: 'checking',  // S228
     controlplane: 'checking',  // OS Control Plane
-    authorizeCapability: 'checking'  // S229: Capability Authorization
+    authorizeCapability: 'checking',  // S229: Capability Authorization
+    routingDecisions: 'checking'  // S232: Model Radar
   };
 
   // All services are stateless, so if the router is responding, they're healthy
