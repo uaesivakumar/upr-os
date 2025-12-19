@@ -53,6 +53,8 @@ import discoveryTemplatesRouter from './discovery-templates.js';
 import discoveryPoolRouter from './discoveryPool.js';
 import replayRouter from './replay.js';  // PRD v1.2 §7: Deterministic Replay API
 import intelligenceRouter from './intelligence.js';  // S218-S223: SIVA Intelligence Enhancement
+import controlplaneRouter from './controlplane/index.js';  // OS Control Plane: resolve-config, envelope
+import capabilitiesRouter from './capabilities.js';  // S228: Capability Registry Core
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
 import { osAuthMiddleware, osAuditMiddleware, validateOsAuthConfig } from '../../middleware/osAuth.js';
@@ -170,6 +172,21 @@ router.get('/', (req, res) => {
         path: '/api/os/intelligence',
         method: 'POST/GET/DELETE',
         description: 'SIVA Intelligence Enhancement: progressive delivery, preference learning, conversational UX (S218-S223)'
+      },
+      capabilities: {
+        path: '/api/os/capabilities',
+        method: 'GET/POST/PATCH',
+        description: 'Capability Registry: model-agnostic capability definitions, model-capability mappings, eligibility (S228)'
+      },
+      resolveConfig: {
+        path: '/api/os/resolve-config',
+        method: 'GET',
+        description: 'Resolve workspace configuration from OS control plane tables'
+      },
+      envelope: {
+        path: '/api/os/envelope',
+        method: 'POST',
+        description: 'Generate sealed SIVA context envelope with sha256 hash'
       }
     },
     profiles: OS_PROFILES,
@@ -199,7 +216,9 @@ router.get('/health', async (req, res) => {
     targets: 'checking',
     discoveryPool: 'checking',
     replay: 'checking',  // PRD v1.2 §7
-    intelligence: 'checking'  // S218-S223
+    intelligence: 'checking',  // S218-S223
+    capabilities: 'checking',  // S228
+    controlplane: 'checking'  // OS Control Plane
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -285,5 +304,9 @@ router.use('/discovery-templates', discoveryTemplatesRouter);
 router.use('/discovery-pool', discoveryPoolRouter);
 router.use('/replay', replayRouter);  // PRD v1.2 §7: Deterministic Replay
 router.use('/intelligence', aiInputValidation, salesContextValidation, intelligenceRouter);  // S218-S223: SIVA Intelligence Enhancement
+router.use('/capabilities', capabilitiesRouter);  // S228: Capability Registry Core
+
+// OS Control Plane: Authoritative configuration endpoints
+router.use('/', controlplaneRouter);  // Mounts /resolve-config and /envelope
 
 export default router;
