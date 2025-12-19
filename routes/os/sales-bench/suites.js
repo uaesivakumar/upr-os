@@ -36,19 +36,30 @@ router.get('/', async (req, res) => {
         s.suite_key,
         s.name,
         s.description,
-        v.slug AS vertical,
+        v.key AS vertical,
         sv.key AS sub_vertical,
-        s.region_code,
+        s.region_code AS region,
         s.stage,
+        COALESCE(ss.status, 'DRAFT') AS status,
         s.scenario_count,
         s.is_frozen,
         s.frozen_at,
-        ss.status,
         ss.system_validated_at,
         ss.human_validated_at,
         ss.ga_approved_at,
         ss.spearman_rho,
-        s.created_at
+        s.created_at,
+        (
+          SELECT json_build_object(
+            'golden_pass_rate', r.golden_pass_rate / 100.0,
+            'kill_containment_rate', r.kill_containment_rate / 100.0,
+            'cohens_d', r.cohens_d
+          )
+          FROM sales_bench_runs r
+          WHERE r.suite_id = s.id AND r.status = 'COMPLETED'
+          ORDER BY r.created_at DESC
+          LIMIT 1
+        ) AS last_run_result
       FROM sales_bench_suites s
       LEFT JOIN os_verticals v ON v.id = s.vertical_id
       LEFT JOIN os_sub_verticals sv ON sv.id = s.sub_vertical_id
@@ -60,7 +71,7 @@ router.get('/', async (req, res) => {
     let paramIndex = 1;
 
     if (vertical) {
-      query += ` AND v.slug = $${paramIndex++}`;
+      query += ` AND v.key = $${paramIndex++}`;
       params.push(vertical);
     }
 
@@ -89,7 +100,8 @@ router.get('/', async (req, res) => {
 
     res.json({
       success: true,
-      data: result.rows,
+      suites: result.rows,
+      data: result.rows,  // Also keep data for backwards compat
       count: result.rows.length,
       filters: { vertical, sub_vertical, region, status, frozen_only },
     });
@@ -114,9 +126,9 @@ router.get('/:key', async (req, res) => {
     const result = await pool.query(`
       SELECT
         s.*,
-        v.slug AS vertical,
+        v.key AS vertical,
         sv.key AS sub_vertical,
-        ss.status,
+        COALESCE(ss.status, 'DRAFT') AS status,
         ss.system_validated_at,
         ss.system_metrics,
         ss.human_validated_at,
