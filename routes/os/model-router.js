@@ -139,11 +139,11 @@ export async function selectModel({ capability_key, persona_id, envelope_hash, c
     };
   }
 
-  if (!channel || !['wa', 'saas', 'api'].includes(channel)) {
+  if (!channel || !['wa', 'saas', 'api', 'replay'].includes(channel)) {
     return {
       success: false,
       error: 'INVALID_INPUT',
-      message: 'channel must be one of: wa, saas, api',
+      message: 'channel must be one of: wa, saas, api, replay',
     };
   }
 
@@ -446,6 +446,15 @@ export async function resolveModelForReplay(interaction_id) {
  * Full replay of a previous interaction.
  * Rehydrates envelope, re-runs authorization, resolves model.
  *
+ * SEMANTIC DEFINITIONS:
+ * - replay_possible = "a replay output was produced" (exact or with alternate model)
+ * - replay_deviation = "model differed from original"
+ *
+ * Cases:
+ * 1. Original model still valid → replay_possible=true, replay_deviation=false
+ * 2. Original invalid, alternate found → replay_possible=true, replay_deviation=true
+ * 3. No eligible model at all → replay_possible=false (success=false)
+ *
  * @param {string} interaction_id - The interaction to replay
  * @returns {Object} Full replay result with deviation tracking
  */
@@ -459,21 +468,51 @@ export async function replayInteraction(interaction_id) {
 
   // Step 2: Check for deviation
   if (replayResolution.replay_deviation) {
-    // Model is no longer valid - return deviation info
-    // Caller must decide whether to re-route or abort
-    return {
-      success: true,
-      replay_possible: false,
-      replay_deviation: true,
-      deviation_reason: replayResolution.deviation_reason,
-      deviation_details: replayResolution.deviation_details,
-      original_model_id: replayResolution.original_model_id,
-      original_model_slug: replayResolution.original_model_slug,
+    // Original model is no longer valid - try to find alternate
+    // Re-route using the same capability_key and persona_id from original decision
+    const rerouteResult = await selectModel({
       capability_key: replayResolution.capability_key,
-      routing_score: replayResolution.routing_score,
+      persona_id: replayResolution.persona_id,
       envelope_hash: replayResolution.envelope_hash,
-      original_created_at: replayResolution.original_created_at,
-    };
+      channel: 'replay',
+      // Don't persist re-route (no interaction_id)
+    });
+
+    if (rerouteResult.success) {
+      // Alternate model found - replay IS possible, but with deviation
+      return {
+        success: true,
+        replay_possible: true,
+        replay_deviation: true,
+        deviation_reason: replayResolution.deviation_reason,
+        deviation_details: replayResolution.deviation_details,
+        original_model_id: replayResolution.original_model_id,
+        original_model_slug: replayResolution.original_model_slug,
+        replay_model_id: rerouteResult.model_id,
+        replay_model_slug: rerouteResult.model_slug,
+        replay_routing_score: rerouteResult.routing_score,
+        capability_key: replayResolution.capability_key,
+        original_routing_score: replayResolution.routing_score,
+        envelope_hash: replayResolution.envelope_hash,
+        original_created_at: replayResolution.original_created_at,
+      };
+    } else {
+      // No eligible model at all - replay NOT possible
+      return {
+        success: false,
+        replay_possible: false,
+        replay_deviation: true,
+        deviation_reason: replayResolution.deviation_reason,
+        deviation_details: replayResolution.deviation_details,
+        reroute_failure: rerouteResult.error,
+        original_model_id: replayResolution.original_model_id,
+        original_model_slug: replayResolution.original_model_slug,
+        capability_key: replayResolution.capability_key,
+        envelope_hash: replayResolution.envelope_hash,
+        original_created_at: replayResolution.original_created_at,
+        message: 'Replay not possible: original model unavailable and no eligible replacement',
+      };
+    }
   }
 
   // Step 3: No deviation - replay is exact
