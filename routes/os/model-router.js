@@ -1,6 +1,7 @@
 /**
  * MODEL ROUTER - THE MOAT
  * Sprint 230: Capability-Driven Model Selection
+ * Sprint 231: Replay Safety Integration
  *
  * This module is the SINGLE AUTHORITY for model selection.
  *
@@ -8,9 +9,13 @@
  * - Same inputs → same model EVERY TIME (deterministic)
  * - SIVA never sees model_id, provider, or version
  * - No admin preferences at runtime
- * - No side effects, no DB writes
  * - No fallback "best effort" routing
  * - No silent downgrades
+ *
+ * S231 REPLAY INVARIANTS:
+ * - Every successful routing writes to os_routing_decisions (append-only)
+ * - Replay is exact or flagged, never hidden
+ * - No overwrites, no updates
  *
  * Routing ≠ permission. Permission is done in authorize_capability (S229).
  * This module is called AFTER authorization passes.
@@ -112,10 +117,11 @@ function deterministicSort(a, b) {
  * @param {string} params.persona_id - UUID of the persona
  * @param {string} params.envelope_hash - Hash of the envelope (for tracing)
  * @param {string} params.channel - Channel: 'wa' | 'saas' | 'api'
+ * @param {string} params.interaction_id - (S231) Unique interaction ID for replay
  *
  * @returns {Object} Result with either model selection or failure
  */
-export async function selectModel({ capability_key, persona_id, envelope_hash, channel }) {
+export async function selectModel({ capability_key, persona_id, envelope_hash, channel, interaction_id }) {
   // Validate inputs
   if (!capability_key) {
     return {
@@ -260,7 +266,42 @@ export async function selectModel({ capability_key, persona_id, envelope_hash, c
     const selectedModel = scoredModels[0];
 
     // ========================================
-    // RESULT: Return selection (no DB write)
+    // S231: Persist routing decision (append-only)
+    // ========================================
+    if (interaction_id) {
+      try {
+        await pool.query(
+          `INSERT INTO os_routing_decisions
+           (interaction_id, capability_key, persona_id, model_id, routing_score,
+            routing_reason, cost_budget, latency_budget_ms, channel, envelope_hash,
+            alternatives_considered)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           ON CONFLICT (interaction_id) DO NOTHING`,  // Append-only: never overwrite
+          [
+            interaction_id,
+            capability_key,
+            persona_id,
+            selectedModel.id,
+            selectedModel.routing_score,
+            `Selected by capability routing: ${capability_key}`,
+            maxCostPerCall,
+            maxLatencyMs,
+            channel,
+            envelope_hash,
+            JSON.stringify(scoredModels.slice(1, 4).map(m => ({
+              model_id: m.id,
+              routing_score: m.routing_score,
+            }))),
+          ]
+        );
+      } catch (persistError) {
+        // Log but don't fail routing - append-only semantics
+        console.error('[model-router] Failed to persist routing decision:', persistError.message);
+      }
+    }
+
+    // ========================================
+    // RESULT: Return selection
     // ========================================
     return {
       success: true,
@@ -270,6 +311,7 @@ export async function selectModel({ capability_key, persona_id, envelope_hash, c
       routing_score: selectedModel.routing_score,
       cost_estimate: parseFloat(selectedModel.cost_per_1k),
       latency_class: selectedModel.latency_class,
+      interaction_id,  // S231: Return for replay reference
       // Metadata (for logging/debugging, not for SIVA)
       _meta: {
         capability_key,
@@ -347,9 +389,115 @@ export async function invokeModel({ capability_key, persona_id, envelope_hash, c
   };
 }
 
+/**
+ * S231: RESOLVE MODEL FOR REPLAY
+ *
+ * Resolves the model for a replay of a previous interaction.
+ *
+ * Behavior:
+ * 1. Load original routing decision
+ * 2. Check if original model is still active, eligible, supports capability
+ * 3. If yes → reuse same model
+ * 4. If no → flag deviation (NO silent substitution)
+ *
+ * @param {string} interaction_id - The interaction to replay
+ * @returns {Object} Replay resolution with deviation flag if applicable
+ */
+export async function resolveModelForReplay(interaction_id) {
+  if (!interaction_id) {
+    return {
+      success: false,
+      error: 'INVALID_INPUT',
+      message: 'interaction_id is required',
+    };
+  }
+
+  try {
+    // Call the database function
+    const result = await pool.query(
+      'SELECT resolve_model_for_replay($1) as replay_result',
+      [interaction_id]
+    );
+
+    const replayResult = result.rows[0]?.replay_result;
+
+    if (!replayResult) {
+      return {
+        success: false,
+        error: 'REPLAY_FAILED',
+        message: 'Failed to resolve replay',
+      };
+    }
+
+    return replayResult;
+  } catch (error) {
+    console.error('[model-router] Replay resolution error:', error);
+    return {
+      success: false,
+      error: 'REPLAY_ERROR',
+      message: error.message,
+    };
+  }
+}
+
+/**
+ * S231: REPLAY INTERACTION
+ *
+ * Full replay of a previous interaction.
+ * Rehydrates envelope, re-runs authorization, resolves model.
+ *
+ * @param {string} interaction_id - The interaction to replay
+ * @returns {Object} Full replay result with deviation tracking
+ */
+export async function replayInteraction(interaction_id) {
+  // Step 1: Resolve model for replay
+  const replayResolution = await resolveModelForReplay(interaction_id);
+
+  if (!replayResolution.success) {
+    return replayResolution;
+  }
+
+  // Step 2: Check for deviation
+  if (replayResolution.replay_deviation) {
+    // Model is no longer valid - return deviation info
+    // Caller must decide whether to re-route or abort
+    return {
+      success: true,
+      replay_possible: false,
+      replay_deviation: true,
+      deviation_reason: replayResolution.deviation_reason,
+      deviation_details: replayResolution.deviation_details,
+      original_model_id: replayResolution.original_model_id,
+      original_model_slug: replayResolution.original_model_slug,
+      capability_key: replayResolution.capability_key,
+      routing_score: replayResolution.routing_score,
+      envelope_hash: replayResolution.envelope_hash,
+      original_created_at: replayResolution.original_created_at,
+    };
+  }
+
+  // Step 3: No deviation - replay is exact
+  return {
+    success: true,
+    replay_possible: true,
+    replay_deviation: false,
+    original_model_id: replayResolution.original_model_id,
+    replay_model_id: replayResolution.replay_model_id,
+    original_model_slug: replayResolution.original_model_slug,
+    replay_model_slug: replayResolution.replay_model_slug,
+    capability_key: replayResolution.capability_key,
+    routing_score: replayResolution.routing_score,
+    routing_reason: replayResolution.routing_reason,
+    envelope_hash: replayResolution.envelope_hash,
+    original_created_at: replayResolution.original_created_at,
+  };
+}
+
 export default {
   selectModel,
   invokeModel,
+  resolveModelForReplay,
+  replayInteraction,
   // Export for testing only
   _internal: {
     calculateRoutingScore,
