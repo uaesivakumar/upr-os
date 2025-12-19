@@ -187,6 +187,11 @@ router.get('/', (req, res) => {
         path: '/api/os/envelope',
         method: 'POST',
         description: 'Generate sealed SIVA context envelope with sha256 hash'
+      },
+      authorizeCapability: {
+        path: '/api/os/authorize-capability',
+        method: 'POST/GET',
+        description: 'S229: Pre-SIVA capability authorization guard. SIVA must not run on denial.'
       }
     },
     profiles: OS_PROFILES,
@@ -218,7 +223,8 @@ router.get('/health', async (req, res) => {
     replay: 'checking',  // PRD v1.2 §7
     intelligence: 'checking',  // S218-S223
     capabilities: 'checking',  // S228
-    controlplane: 'checking'  // OS Control Plane
+    controlplane: 'checking',  // OS Control Plane
+    authorizeCapability: 'checking'  // S229: Capability Authorization
   };
 
   // All services are stateless, so if the router is responding, they're healthy
