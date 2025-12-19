@@ -1,0 +1,583 @@
+{
+  "scope": {
+    "vertical": "banking",
+    "sub_vertical": "employee_banking",
+    "region": "UAE",
+    "validation_id": "silent_validation_1766143574496",
+    "created_at": "2025-12-19T11:26:14.496Z",
+    "frozen": true
+  },
+  "scenario_count": 70,
+  "golden_count": 35,
+  "kill_count": 35,
+  "personas": {
+    "skeptical_hr": 7,
+    "busy_payroll": 7,
+    "compliance": 7,
+    "price_sensitive": 7,
+    "influencer": 7
+  },
+  "scenarios": [
+    {
+      "id": "EB-UAE-001",
+      "name": "Skeptical HR Director - Large Corp Payroll Migration",
+      "persona": "Risk-averse HR Director with existing competitor relationship, needs board approval",
+      "golden": {
+        "scenario_id": "98b970d5-81d8-4bd3-a5c9-8b7524490edd",
+        "hash": "8236eefb20d1569f4e26f698412c5cd9f872d2940ec6d9c7607346c7cd9bba0b",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "93b70068-f63e-4f9e-8f41-20f5c096e97f",
+        "hash": "be5a65933491bb339ccfd2b34896648091df0a84d56d02f946deb51c9ebf9ace",
+        "expected_outcome": "FAIL",
+        "trigger": "price_objection"
+      }
+    },
+    {
+      "id": "EB-UAE-002",
+      "name": "Skeptical HR Manager - SME First Bank Account",
+      "persona": "New to banking, price sensitive, confused by WPS requirements",
+      "golden": {
+        "scenario_id": "3d880546-1ad2-4a28-af8a-998e7f18b4e3",
+        "hash": "1938d693a47a4283bf47d59ea1d999b0d2d0c7317444ce027fbdec9d8d6937ae",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "2dd30bd6-7d72-43cd-9f78-9e23167aaa02",
+        "hash": "ef682c27aec94cf980c00e505cb084e20438181f68baf9ddc63b97d35725024a",
+        "expected_outcome": "FAIL",
+        "trigger": "compliance_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-003",
+      "name": "Skeptical CFO - Cost Reduction Focus",
+      "persona": "Numbers-driven CFO, suspicious of bank fees, short attention span",
+      "golden": {
+        "scenario_id": "d874c9b6-451e-4cec-a014-92611960b1b3",
+        "hash": "6e53a1e8f8fc912378e731242e65afe885ddc51ace28e57a84e0bc1bc7cc9662",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "7a730a55-9995-4dae-95c7-c0b65b2974be",
+        "hash": "5683c41d6a311cb2177f0ebb1401747ed770a4f9e632a9a5db2411ce8a87a31d",
+        "expected_outcome": "FAIL",
+        "trigger": "roi_failure"
+      }
+    },
+    {
+      "id": "EB-UAE-004",
+      "name": "Skeptical Operations Head - Integration Concerns",
+      "persona": "Technical stakeholder with IT veto power, worried about disruption",
+      "golden": {
+        "scenario_id": "c2119c3d-1f89-4851-ae62-0074c1975d06",
+        "hash": "d2ed3b4890f6f5893c15c36d8963d521536a9c0042c4c154b77aa909d58eef4e",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "6cf5b475-29f6-49f8-874f-e0ac1fb9da68",
+        "hash": "77ae22770830dfc57eb9556ac6c22dde36b78a61a533c2c9411d76167de04b77",
+        "expected_outcome": "BLOCK",
+        "trigger": "technical_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-005",
+      "name": "Skeptical CEO - Personal Banking Bundle",
+      "persona": "Busy CEO/Owner, wants personal benefits, distrusts banks",
+      "golden": {
+        "scenario_id": "f3076bd4-a58e-4830-ab4d-0417af47d2fb",
+        "hash": "525b56ff3ea899460ee77c0ffd47e6ead846408ea05a4a7890f9f6a704d4db16",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "faf04d8e-1981-4365-9db4-d17a5f25b004",
+        "hash": "ebc9dc4a4d832d5ed012cd491a2773753d4239399e6a920fb8894ed89ac0f89c",
+        "expected_outcome": "FAIL",
+        "trigger": "aggressive_pitch"
+      }
+    },
+    {
+      "id": "EB-UAE-006",
+      "name": "Skeptical Finance Manager - Audit Concerns",
+      "persona": "Detail-oriented, compliance-focused, risk-averse",
+      "golden": {
+        "scenario_id": "95f3864b-3878-405e-8684-02240a09b675",
+        "hash": "df649322877690c42ba9469e6603130e46ee404bd29090d1363037c477e371a5",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "024b125b-f0ec-4329-8447-5cce652d4589",
+        "hash": "f72be7241d3a023455ca50253a711e12761e170252d6c3ce7ff70931249fa93d",
+        "expected_outcome": "BLOCK",
+        "trigger": "audit_documentation_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-007",
+      "name": "Skeptical HR - Bad Past Experience",
+      "persona": "Burned by previous bank, defensive, needs reassurance",
+      "golden": {
+        "scenario_id": "6c71be16-32ff-49eb-bc48-fb1424143dc6",
+        "hash": "7493e98df35d6e97d7b3f40113609ad8b103e5db9034481899c8d0bc02571547",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "21fb2809-46fb-4781-b011-46d85c25f177",
+        "hash": "ccaa3be5c43dfffc37242cc2a7708ca12a6ed71a717e4d70f47822c90f36c681",
+        "expected_outcome": "FAIL",
+        "trigger": "dismissive_attitude"
+      }
+    },
+    {
+      "id": "EB-UAE-008",
+      "name": "Busy Payroll Manager - Multi-Branch Setup",
+      "persona": "Time-poor, practical, hates complexity",
+      "golden": {
+        "scenario_id": "eb8d8f76-7a3b-4174-b64f-098ddbded512",
+        "hash": "f81db22d1dcbe872b386fd7614d2949a96b60a6c579c55ec2caacbfb22eb49d1",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "11d95253-78a6-46ad-b3ba-f406ef4927d1",
+        "hash": "027ca3f537bd56476afa4e993c388ac0a2a001fced05ca54b917a7ff3329e7d4",
+        "expected_outcome": "FAIL",
+        "trigger": "long_winded_pitch"
+      }
+    },
+    {
+      "id": "EB-UAE-009",
+      "name": "Busy Payroll Manager - Month-End Pressure",
+      "persona": "Under deadline, irritable, needs immediate help",
+      "golden": {
+        "scenario_id": "1d47e16f-7abd-4d14-965c-5b0a7432247c",
+        "hash": "42328c9cda9f12eb9cf71213cc2ea90c208d91f289c392f1032961c41e596c92",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "f7f37097-0e2a-4510-aa93-bc81bb699640",
+        "hash": "106ad6204b75accb83bdd88f88449f24a291673b46f32541b66fbb75fde15ed7",
+        "expected_outcome": "FAIL",
+        "trigger": "sales_during_crisis"
+      }
+    },
+    {
+      "id": "EB-UAE-010",
+      "name": "Busy Payroll Manager - Free Zone Company",
+      "persona": "Free zone experienced, knows regulations, value-focused",
+      "golden": {
+        "scenario_id": "ee1934d0-5529-4f5f-883d-69027be8379f",
+        "hash": "abfb13dd3d4ae212707d7339a4302d70242b9ee135665386dc65b3ead0b54181",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "dfd5477c-a009-4380-b3ad-2e0bfb2b31cf",
+        "hash": "55a75c5f15646c87b7a1419ad0c3072ab95ec82e0c8d65499b94be3283ca82bb",
+        "expected_outcome": "FAIL",
+        "trigger": "freezone_ignorance"
+      }
+    },
+    {
+      "id": "EB-UAE-011",
+      "name": "Busy Payroll Manager - Construction Company",
+      "persona": "Blue-collar workforce, cash advance needs, high turnover",
+      "golden": {
+        "scenario_id": "e0bfb318-2704-4942-b2da-aa299961b864",
+        "hash": "2df7c160f7afc5f07065c6dd871c624762d9c8ccc47c67e5a5103b133c3aa56b",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "8312bf1f-1b5c-43d3-a1db-20074094f808",
+        "hash": "efc8fe9592c4c281f422bbcd4fc7422f6f6bb8b9e7445f3bda4e3cef424d1095",
+        "expected_outcome": "FAIL",
+        "trigger": "volume_pricing_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-012",
+      "name": "Busy Payroll Manager - Hospitality Chain",
+      "persona": "Multi-location, tip distribution needs, seasonal variations",
+      "golden": {
+        "scenario_id": "954a19d6-8235-43c0-9127-baf16b94c1cd",
+        "hash": "0016f901adc4493842a9511459869912993098920d8dc1979e5193dd9c2aa950",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "5c2ef249-a83a-4dc6-8144-848b0d2cedef",
+        "hash": "b06532beada8ec6190d0677a27144443e8bc7aee17de9827d55bcddb26d0f288",
+        "expected_outcome": "FAIL",
+        "trigger": "hospitality_ignorance"
+      }
+    },
+    {
+      "id": "EB-UAE-013",
+      "name": "Busy Payroll Manager - Healthcare Facility",
+      "persona": "Compliance strict, shift differential needs, benefits integration",
+      "golden": {
+        "scenario_id": "def7dbe1-0275-4dec-8a60-8267a8cb6c0f",
+        "hash": "1d5ac773f652e849e5d94ef88316a16c189cf2ea93b4857ba118f12225aabef8",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "85f8868f-e08f-4e00-980e-351c20807c9e",
+        "hash": "ed070673b7d194e33a895e5eaa2626cfe1dd3975d42ae7ccaba5edacf8b96406",
+        "expected_outcome": "BLOCK",
+        "trigger": "dha_compliance_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-014",
+      "name": "Busy Payroll Manager - Retail Chain",
+      "persona": "High turnover, commission calculations, multiple pay frequencies",
+      "golden": {
+        "scenario_id": "8d2ac820-172a-4d6f-b4e9-98b1a99b6514",
+        "hash": "9dd0972543f95ab0e7dcc8e89991f577c31fd33e1a14a7dc97df82a88f7b5f04",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "1147df00-a57a-4306-bb73-6ad495ad7eca",
+        "hash": "10d295c18a68cdd46f361b85e68836bb91483c948dbd27696df7654333a3dea7",
+        "expected_outcome": "FAIL",
+        "trigger": "switching_cost_rejection"
+      }
+    },
+    {
+      "id": "EB-UAE-015",
+      "name": "Compliance Officer - WPS Audit Prep",
+      "persona": "Regulatory expert, documentation obsessed, zero tolerance for gaps",
+      "golden": {
+        "scenario_id": "5341030f-6511-4f40-a9f4-c87330b59de8",
+        "hash": "68198b9e5bbb2bcc7c0f2fd17ef8114cf1b98df32f84da701df2ce73e417dc45",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "9606ddf3-d111-463d-8882-53a6b659b892",
+        "hash": "3ac364ac88cc665cf59d17c693948f92128e674d3bc1985a92718a52ce1100cd",
+        "expected_outcome": "BLOCK",
+        "trigger": "wps_documentation_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-016",
+      "name": "Legal Counsel - Contract Review",
+      "persona": "Contract-focused, liability concerned, slow decision maker",
+      "golden": {
+        "scenario_id": "e71c1673-88a4-4d44-85ed-7401ef26da5d",
+        "hash": "1ebe91fa0dee6f403508cb6be185dee6d46a207c7ee12624e38fb339af9662c6",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "68711eb7-1346-48e8-b1cf-b74a01cb9484",
+        "hash": "fca4bd4edc0990c752c2477d5ed88b4cedef36620227c5f74227fabf66077395",
+        "expected_outcome": "FAIL",
+        "trigger": "pressure_for_quick_decision"
+      }
+    },
+    {
+      "id": "EB-UAE-017",
+      "name": "Compliance Manager - Data Privacy Concerns",
+      "persona": "GDPR aware, data localization concerns, security focused",
+      "golden": {
+        "scenario_id": "a8d57fb0-b8b8-4969-8307-51ab2e81ada6",
+        "hash": "09e6188d892961486ebb16b710077961d28f05a57b428e9d34e68326c40f5767",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "7cdd3a36-2326-4d90-8c1b-dc288a2d6256",
+        "hash": "3c973fa82fb44c6fb031ed534daf50141030a86ea676b77ba606bcdc2280e225",
+        "expected_outcome": "BLOCK",
+        "trigger": "data_protection_unclear"
+      }
+    },
+    {
+      "id": "EB-UAE-018",
+      "name": "Risk Manager - Business Continuity",
+      "persona": "Disaster recovery focused, redundancy requirements, SLA obsessed",
+      "golden": {
+        "scenario_id": "54a3c9d5-e8ee-41dc-9c8f-a0f28bdcd038",
+        "hash": "e7cbff24c2d927454f4885f4498fadadbb47a6986a4d8adc486dc6448d294346",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "e14ca968-dd2c-48d5-b662-176fdc28c03f",
+        "hash": "c97296115fd8f69f68b24c4f7835b14bbff9fe22a5dd217a9dae53f670941b54",
+        "expected_outcome": "FAIL",
+        "trigger": "vague_dr_answers"
+      }
+    },
+    {
+      "id": "EB-UAE-019",
+      "name": "Internal Auditor - Process Review",
+      "persona": "Process-oriented, control-focused, evidence-based",
+      "golden": {
+        "scenario_id": "667f8e0c-026c-4091-b703-d91afbd0d86b",
+        "hash": "500d8eea9e4a3449e1bfe8a9fbae491acfee85efbe53c22806442720467f9638",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "64777e7d-4683-4c3c-8178-0bc2c15b8fb9",
+        "hash": "417dbc286869ffaff38c2bd29ac849d2e1c068bbcb414a30bd0b1c272c6cec16",
+        "expected_outcome": "BLOCK",
+        "trigger": "control_documentation_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-020",
+      "name": "Government Relations - Ministry Requirements",
+      "persona": "Regulatory liaison, ministry relationships, documentation expert",
+      "golden": {
+        "scenario_id": "360cb590-31d1-4f2e-9554-408e8c1acdf2",
+        "hash": "7e9cdf71e633ee961e31c38939a020a3dade58e9a78cc0d372b520bacf6a12d6",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "58f1c926-d04b-4e42-8aef-a9a81fa06c1d",
+        "hash": "07348aff8c2a54a1ae7e54a3a6dc1bf5244c86c1789af24ffefe8340de6a6a6b",
+        "expected_outcome": "BLOCK",
+        "trigger": "emiratization_gap"
+      }
+    },
+    {
+      "id": "EB-UAE-021",
+      "name": "External Auditor Prep - Big 4 Audit",
+      "persona": "Big 4 relationship, materiality focused, time pressured",
+      "golden": {
+        "scenario_id": "0d8bd1d8-c613-4271-9b0e-4dedc0e6c961",
+        "hash": "c6b7454b8cb2067c8b2d005ea3dbde12c17209164740d7e70f5377ae81a6b095",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "4d05f575-e198-4575-b631-48109791ca5f",
+        "hash": "e3bfda4ab7846ae5446b5eec90674ce682dfcf6c18a0a6f532c13f4f1b60d2a9",
+        "expected_outcome": "FAIL",
+        "trigger": "no_big4_experience"
+      }
+    },
+    {
+      "id": "EB-UAE-022",
+      "name": "Cost-Conscious Startup - Series A",
+      "persona": "Burn rate conscious, scaling rapidly, wants flexibility",
+      "golden": {
+        "scenario_id": "e96cd1bd-be36-44e0-be33-d1d6e5385ffe",
+        "hash": "05963feca955f3d97a9a00bc5d0779b4d8b5b908075ef93086c91588c92d2180",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "ed9d6846-75e4-468c-aaf0-daa30355a5b4",
+        "hash": "30ddf731373b9fd6b56a3f44bbfad8b5fd10c8f8c8fdf60b4c0432dc3dd45d40",
+        "expected_outcome": "FAIL",
+        "trigger": "rigid_pricing"
+      }
+    },
+    {
+      "id": "EB-UAE-023",
+      "name": "Family Business - Fee Negotiation",
+      "persona": "Long-term oriented, relationship focused, price negotiator",
+      "golden": {
+        "scenario_id": "3d8b9c41-9ed1-4832-a09e-6edc8d4bc6e9",
+        "hash": "744f33fcad18c55e32d3a963b0300ce51414d8f11e63aa648f424401a8c1bbb0",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "3cad05fe-b487-454e-aa6b-a821de88f94f",
+        "hash": "0ece5b5b72d48c8000ea9bd5d92f1ce93fb760b20d5863326ace65acc42c24d3",
+        "expected_outcome": "FAIL",
+        "trigger": "criticize_current_bank"
+      }
+    },
+    {
+      "id": "EB-UAE-024",
+      "name": "Procurement Manager - RFP Process",
+      "persona": "Process-driven, three quotes minimum, committee decision",
+      "golden": {
+        "scenario_id": "95b7b82a-0fc1-4770-84d9-d05abd826c50",
+        "hash": "52d38b2a940f7ad41e2fd9cbd772227b21b9af27dcc50512addc49c82cfc1160",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "1351b2bc-6156-4830-b5ad-32c3b8691d50",
+        "hash": "52264d4b90593a0c23cab30d01d06f53ac895583bc25e3823efdf97a05b99a5b",
+        "expected_outcome": "FAIL",
+        "trigger": "bypass_procurement"
+      }
+    },
+    {
+      "id": "EB-UAE-025",
+      "name": "Budget Owner - Annual Planning",
+      "persona": "Budget cycle focused, ROI required, board presentation needed",
+      "golden": {
+        "scenario_id": "a9b872b3-7a24-4af7-a83a-85383f6e375b",
+        "hash": "f540436584099a46286e483be890218d42f554905d99ea3a35fd9f3713704125",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "84d922ea-5792-48b2-abaf-d4ad425ba6ca",
+        "hash": "1709d04db5a2522d0ff2e8a18b6a276c8017ea1ba3f13691fe833e01b724d009",
+        "expected_outcome": "FAIL",
+        "trigger": "no_roi_justification"
+      }
+    },
+    {
+      "id": "EB-UAE-026",
+      "name": "Cash-Strapped SME - Survival Mode",
+      "persona": "Cash flow issues, basic needs only, skeptical of banks",
+      "golden": {
+        "scenario_id": "a3b86c15-e6cd-4698-8d83-b3e0a8883598",
+        "hash": "fce4ef76c458c86104c99d0488b725657d71eb041536f3f624ddea725ad4fc33",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "b86c00ad-8d9b-4427-b8a5-597b0d6ea583",
+        "hash": "18a6805c9144ca5e8c430237c1af53898597da6544e5381ad3996f78f9a3a619",
+        "expected_outcome": "FAIL",
+        "trigger": "premium_positioning"
+      }
+    },
+    {
+      "id": "EB-UAE-027",
+      "name": "Multinational Subsidiary - Global Mandate",
+      "persona": "Global bank relationship, limited local authority, HQ compliance",
+      "golden": {
+        "scenario_id": "a9798255-d4c4-42c7-b910-54aa27b9568f",
+        "hash": "aa3666cf0957a4708aafd802eebc35818dc1e9df0bd03946536c642b50b8c916",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "bc6cd194-f540-40cc-b0f1-117a5539bd9c",
+        "hash": "0a18fdb2d87d999c25d21240672b0541bd72c4946c63fbae7af01998522d654c",
+        "expected_outcome": "FAIL",
+        "trigger": "attack_global_bank"
+      }
+    },
+    {
+      "id": "EB-UAE-028",
+      "name": "Negotiator - Playing Banks Against Each Other",
+      "persona": "Using competition, no loyalty, price-only focus",
+      "golden": {
+        "scenario_id": "94084e10-7a17-4e3c-a5aa-214eca8a888b",
+        "hash": "03a83caa9b9fa9a2af94821b4bb55ec56f90c572cbf63c005956fca0872703d8",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "1668f3ac-6bfb-464d-a1ac-693e3a37f651",
+        "hash": "c6d94cfdb677982d0352d84263d0f86297fe6228994288043cf04d26c38acfc8",
+        "expected_outcome": "FAIL",
+        "trigger": "race_to_bottom"
+      }
+    },
+    {
+      "id": "EB-UAE-029",
+      "name": "IT Director - System Integration Gatekeeper",
+      "persona": "Technical veto power, security focused, integration expert",
+      "golden": {
+        "scenario_id": "027a51aa-5166-4863-a6ba-130225c66cf0",
+        "hash": "7bee0ec7d70debaa55ed0265a4bebbf27ff8764e7a18ef426a4c7c26089d0f6b",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "9314c4ec-acae-4182-b57d-fdd634ec173f",
+        "hash": "06f02aae5d2c49bf4011b23f4fb4e38fb3602096e84cc07a598540f170922310",
+        "expected_outcome": "BLOCK",
+        "trigger": "technical_incompetence"
+      }
+    },
+    {
+      "id": "EB-UAE-030",
+      "name": "Employee Council Rep - Staff Satisfaction",
+      "persona": "Staff advocate, service focused, complaint collector",
+      "golden": {
+        "scenario_id": "fe6e7d2e-5e51-4e0c-9158-db601983cc59",
+        "hash": "07affebb346d1871ff5fa3df59b2cee2e789fb47b31f2498dd5a3d4f2120978b",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "fb06949f-948f-4492-994d-fea236b7b0a1",
+        "hash": "d91df441d754fd1698652e927dcc013630a0a78958d96230d4471d4816b51cdb",
+        "expected_outcome": "FAIL",
+        "trigger": "ignore_employee_experience"
+      }
+    },
+    {
+      "id": "EB-UAE-031",
+      "name": "Board Member - Strategic Initiative",
+      "persona": "Strategic focus, limited operational interest, network connected",
+      "golden": {
+        "scenario_id": "5be9fe7e-48a7-4fd9-9931-816b2464a84a",
+        "hash": "1ed2946750a25b505e01c30a27b83a37d327be97fd4caabb0c195631528e4d1b",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "a3fbc4a5-4b4a-4855-b70d-451647ad9ae4",
+        "hash": "5a63ae7059f9eb77023b025cc2648e842d5c1aa6a000809fa2d5cfca58f13c48",
+        "expected_outcome": "FAIL",
+        "trigger": "too_tactical"
+      }
+    },
+    {
+      "id": "EB-UAE-032",
+      "name": "External Consultant - Bank Selection Project",
+      "persona": "Objective evaluator, framework user, client-focused",
+      "golden": {
+        "scenario_id": "b1dd4a2c-aa61-48e1-900b-1f59a2130bd2",
+        "hash": "87f4893703863335094938b966a7fad4a41b8ba85bc747f42c2f17583714b5c3",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "b7c45f46-e77c-47ef-bfff-18145fe399a8",
+        "hash": "795dea6b572fb9357c4847369db5bee7cf2e7cdc12f1fc355fb25e529c8f2dfb",
+        "expected_outcome": "FAIL",
+        "trigger": "incomplete_information"
+      }
+    },
+    {
+      "id": "EB-UAE-033",
+      "name": "Accountant - Daily Operations",
+      "persona": "Operational user, efficiency focused, training needs",
+      "golden": {
+        "scenario_id": "388c18c2-80e2-4931-bedc-9f6b79d6fd71",
+        "hash": "8ffc8301bf06765a32f15eb5ddcb0487f5d189aac016903dd8bcb371b854016f",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "1b1ec6ee-6d61-44a0-83e8-f270bd51ae6b",
+        "hash": "cbc99fbc822385be888cd8a49dd792c46f3e46aef1de5bbc3316ab605b4d351d",
+        "expected_outcome": "FAIL",
+        "trigger": "complex_no_training"
+      }
+    },
+    {
+      "id": "EB-UAE-034",
+      "name": "New HR Director - Making Their Mark",
+      "persona": "Change agent, proving value, quick wins needed",
+      "golden": {
+        "scenario_id": "a229599c-6aae-458c-a5cf-1938722dfb25",
+        "hash": "36e2d161528ddb8b76f4ca81d9651d1a9ebab8cef4a95d76e0caa046990ea96c",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "0286d043-d8b6-462a-8e4e-1d6153547329",
+        "hash": "7be036f2fffee0191fcbec6c301478006a2c9d21876ec985450ca8a958e6aabc",
+        "expected_outcome": "FAIL",
+        "trigger": "long_implementation"
+      }
+    },
+    {
+      "id": "EB-UAE-035",
+      "name": "Retiring Manager - Handover Situation",
+      "persona": "Legacy focused, knowledge transfer, risk-averse on changes",
+      "golden": {
+        "scenario_id": "5fd34503-6dc2-44d8-aff3-6a31453e2827",
+        "hash": "35eba2038c3dad0376b5710dfd7327768be13e763141f9cefbbc13fa9294f7fe",
+        "expected_outcome": "PASS"
+      },
+      "kill": {
+        "scenario_id": "bb239d80-33b6-411e-a9a9-7e75dc36ad4b",
+        "hash": "232a6eaa21ce690af5e268c92eda046cec7c8a0cbfba3fb7488ed3ed3b2db01f",
+        "expected_outcome": "FAIL",
+        "trigger": "dismiss_legacy"
+      }
+    }
+  ],
+  "frozen_at": "2025-12-19T11:26:14.499Z"
+}

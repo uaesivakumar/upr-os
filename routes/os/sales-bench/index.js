@@ -22,6 +22,8 @@ import mandatoryRouter from './mandatory.js';
 import crsRouter from './crs.js';
 import executionRouter from './execution.js';
 import calibrationRouter from './calibration.js';
+import suitesRouter from './suites.js';
+import governanceRouter from './governance.js';
 import { SALES_BENCH_META, PRD_V13_COMPLIANCE } from '../../../os/sales-bench/index.js';
 
 const router = express.Router();
@@ -42,6 +44,19 @@ router.get('/', (req, res) => {
     clarifications: SALES_BENCH_META.clarifications,
     compliance: PRD_V13_COMPLIANCE,
     endpoints: {
+      suites: {
+        path: '/api/os/sales-bench/suites',
+        methods: ['GET', 'POST', 'PATCH'],
+        description: 'Suite governance - registry, status, validation, audit',
+        status: 'ACTIVE',
+      },
+      governance: {
+        path: '/api/os/sales-bench/governance',
+        methods: ['GET', 'POST'],
+        description: 'Governance commands - Super Admin triggers, OS executes',
+        status: 'ACTIVE',
+        commands: ['run-system-validation', 'start-human-calibration', 'approve-for-ga', 'deprecate-suite'],
+      },
       scenarios: {
         path: '/api/os/sales-bench/scenarios',
         methods: ['GET', 'POST', 'DELETE'],
@@ -87,6 +102,8 @@ router.get('/', (req, res) => {
  */
 router.get('/health', async (req, res) => {
   const components = {
+    suites: 'healthy',     // Governance: Suite registry
+    governance: 'healthy', // Governance: Commands
     scenarios: 'healthy',
     runs: 'healthy',
     buyerBots: 'healthy',  // S243
@@ -105,6 +122,8 @@ router.get('/health', async (req, res) => {
 });
 
 // Mount sub-routers
+router.use('/suites', suitesRouter);  // Governance: Suite registry, status, validation, audit
+router.use('/governance', governanceRouter);  // Governance commands: Super Admin triggers
 router.use('/scenarios', scenariosRouter);
 router.use('/runs', runsRouter);
 router.use('/buyer-bots', buyerBotsRouter);  // S243: Buyer Bot Framework

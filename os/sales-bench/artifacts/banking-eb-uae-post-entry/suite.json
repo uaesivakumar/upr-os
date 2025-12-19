@@ -1,0 +1,17 @@
+{
+  "suite_key": "banking-eb-uae-post-entry",
+  "name": "Banking/EB/UAE - Payroll Solutioning (Post-Entry)",
+  "description": "Employee Banking scenarios for UAE market. Post-entry sales conversations with existing leads.",
+  "vertical": "banking",
+  "sub_vertical": "employee_banking",
+  "region_code": "UAE",
+  "stage": "POST_ENTRY",
+  "scenario_manifest_hash": "2f38551fc8f9157074c599a1d7cdda5bec855ef1a2f0107c93cc3623fa1f5124",
+  "scenario_count": 70,
+  "is_frozen": true,
+  "frozen_at": "2025-12-19T12:51:32.122Z",
+  "frozen_by": "archive-script",
+  "created_at": "2025-12-19T11:26:14.496Z",
+  "last_run_id": "run_1766148692118",
+  "last_run_at": "2025-12-19T12:51:32.122Z"
+}

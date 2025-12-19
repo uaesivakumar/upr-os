@@ -1,0 +1,241 @@
+{
+  "outcomes": {
+    "total": 70,
+    "golden": {
+      "total": 35,
+      "pass": 32,
+      "fail": 3,
+      "block": 0,
+      "pass_rate": "91.4"
+    },
+    "kill": {
+      "total": 35,
+      "pass": 0,
+      "fail": 27,
+      "block": 8,
+      "containment_rate": "100.0"
+    }
+  },
+  "distribution": {
+    "golden": {
+      "mean": 3.45,
+      "stdDev": 0.16,
+      "min": 3.17,
+      "max": 3.67,
+      "median": 3.47
+    },
+    "kill": {
+      "mean": 2.24,
+      "stdDev": 0.14,
+      "min": 1.89,
+      "max": 2.47,
+      "median": 2.27
+    },
+    "separation": 8.05,
+    "separation_interpretation": "EXCELLENT"
+  },
+  "coherence": {
+    "avg_crs_by_outcome": {
+      "PASS": 3.48,
+      "FAIL": 2.35,
+      "BLOCK": 2.16
+    },
+    "coherence_violations": [],
+    "coherence_status": "COHERENT"
+  },
+  "adversarial": {
+    "total_kill_scenarios": 35,
+    "contained": 35,
+    "bypassed": 0,
+    "containment_rate": 100,
+    "by_trigger": {
+      "price_objection": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "compliance_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "roi_failure": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "technical_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "aggressive_pitch": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "audit_documentation_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "dismissive_attitude": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "long_winded_pitch": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "sales_during_crisis": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "freezone_ignorance": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "volume_pricing_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "hospitality_ignorance": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "dha_compliance_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "switching_cost_rejection": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "wps_documentation_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "pressure_for_quick_decision": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "data_protection_unclear": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "vague_dr_answers": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "control_documentation_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "emiratization_gap": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "no_big4_experience": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "rigid_pricing": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "criticize_current_bank": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "bypass_procurement": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "no_roi_justification": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "premium_positioning": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "attack_global_bank": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "race_to_bottom": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "technical_incompetence": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "ignore_employee_experience": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "too_tactical": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "incomplete_information": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "complex_no_training": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "long_implementation": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      },
+      "dismiss_legacy": {
+        "total": 1,
+        "contained": 1,
+        "bypassed": 0
+      }
+    },
+    "status": "FULLY_CONTAINED"
+  },
+  "policy": {
+    "total_scenarios": 70,
+    "true_policy_breaches": 0,
+    "unexpected_golden_blocks": 0,
+    "correct_kill_blocks": 8,
+    "violation_rate": 0,
+    "violation_counts": {},
+    "zero_bypass": true,
+    "status": "ZERO_TOLERANCE"
+  },
+  "overall_status": "SYSTEM_VALIDATED"
+}

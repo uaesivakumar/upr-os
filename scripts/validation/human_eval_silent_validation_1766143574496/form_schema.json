@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CRS Human Evaluation Form",
+  "description": "Silent Validation Phase 2 - Human CRS Scoring",
+  "type": "object",
+  "properties": {
+    "evaluator_id": {
+      "type": "string",
+      "enum": [
+        "EVAL_1",
+        "EVAL_2",
+        "EVAL_3",
+        "EVAL_4",
+        "EVAL_5"
+      ],
+      "description": "Your assigned evaluator ID"
+    },
+    "evaluator_name": {
+      "type": "string",
+      "description": "Your full name (confidential)"
+    },
+    "evaluator_role": {
+      "type": "string",
+      "description": "Your job title"
+    },
+    "years_experience": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Years in UAE Employee Banking sales"
+    },
+    "session_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario_id": {
+            "type": "string"
+          },
+          "path_type": {
+            "type": "string",
+            "enum": [
+              "GOLDEN",
+              "KILL"
+            ]
+          },
+          "crs_scores": {
+            "type": "object",
+            "properties": {
+              "qualification": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Identifies BANT (Budget, Authority, Need, Timeline)"
+              },
+              "needs_discovery": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Uncovers pain points and requirements"
+              },
+              "value_articulation": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Connects solution to customer needs"
+              },
+              "objection_handling": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Addresses concerns professionally"
+              },
+              "process_adherence": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Follows sales methodology"
+              },
+              "compliance": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Maintains regulatory compliance"
+              },
+              "relationship_building": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Builds rapport and trust"
+              },
+              "next_step_secured": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Advances deal to next stage"
+              }
+            },
+            "required": [
+              "qualification",
+              "needs_discovery",
+              "value_articulation",
+              "objection_handling",
+              "process_adherence",
+              "compliance",
+              "relationship_building",
+              "next_step_secured"
+            ]
+          },
+          "would_pursue": {
+            "type": "string",
+            "enum": [
+              "YES",
+              "NO",
+              "MAYBE"
+            ]
+          },
+          "confidence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          }
+        },
+        "required": [
+          "scenario_id",
+          "path_type",
+          "crs_scores"
+        ]
+      },
+      "minItems": 70,
+      "maxItems": 70
+    }
+  },
+  "required": [
+    "evaluator_id",
+    "scenarios"
+  ]
+}

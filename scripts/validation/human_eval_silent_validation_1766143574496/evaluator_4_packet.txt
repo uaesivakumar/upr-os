@@ -1,0 +1,2992 @@
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    SILENT VALIDATION - EVALUATOR PROTOCOL                     ║
+║                     Employee Banking (UAE) - CRS Calibration                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+CONFIDENTIAL - INTERNAL USE ONLY
+
+PURPOSE
+-------
+You are helping calibrate our AI sales assistant (SIVA) by providing your
+expert judgment on sales scenarios. Your input will ensure SIVA gives advice
+that matches what experienced sales professionals would recommend.
+
+YOUR ROLE
+---------
+- You are evaluating SCENARIOS, not actual sales calls
+- For each scenario, imagine you are the salesperson
+- Score how well each CRS dimension applies to this situation
+
+INSTRUCTIONS
+------------
+1. Read each scenario carefully
+2. For each of the 8 dimensions, assign a score from 1-5
+3. Use your gut feeling - there are no "right" answers
+4. Do not discuss with other evaluators until all are complete
+5. Complete ALL scenarios in one sitting if possible
+
+SCORING SCALE
+-------------
+1 = Very Poor - Would lose the deal immediately
+2 = Poor - Unlikely to advance the deal
+3 = Average - May or may not advance
+4 = Good - Likely to advance the deal
+5 = Excellent - Would definitely advance
+
+CRS DIMENSIONS
+--------------
+1. QUALIFICATION (15%): Does this scenario allow proper BANT discovery?
+2. NEEDS DISCOVERY (15%): Can pain points be effectively uncovered?
+3. VALUE ARTICULATION (15%): Can solution value be clearly communicated?
+4. OBJECTION HANDLING (15%): Are objections addressable professionally?
+5. PROCESS ADHERENCE (10%): Does this follow good sales methodology?
+6. COMPLIANCE (10%): Are regulatory requirements handleable?
+7. RELATIONSHIP BUILDING (10%): Can rapport and trust be established?
+8. NEXT STEP SECURED (10%): Can the deal be advanced to next stage?
+
+IMPORTANT REMINDERS
+-------------------
+⚠️  Score based on YOUR sales experience, not theory
+⚠️  Golden paths should generally score higher than Kill paths
+⚠️  Kill paths with BLOCK triggers should score very low on compliance
+⚠️  Trust your instincts - you've closed these deals before
+
+
+════════════════════════════════════════════════════════════════════════════════
+                           EVALUATOR 4 - SCORING SHEET
+════════════════════════════════════════════════════════════════════════════════
+
+Evaluator ID: EVAL_4
+Session Date: _______________
+Start Time: _______________
+End Time: _______________
+
+BEFORE YOU BEGIN:
+□ I understand my scores are confidential
+□ I will not discuss scenarios with other evaluators
+□ I will complete all scenarios in this session
+□ I am a senior RM or sales manager with UAE payroll deal experience
+
+Signature: ________________________________
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 1: EB-UAE-031 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Board Member - Strategic Initiative
+Persona: Strategic focus, limited operational interest, network connected
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 2: EB-UAE-031 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Board Member - Strategic Initiative
+Persona: Strategic focus, limited operational interest, network connected
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: too_tactical
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 3: EB-UAE-029 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: IT Director - System Integration Gatekeeper
+Persona: Technical veto power, security focused, integration expert
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 4: EB-UAE-029 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: IT Director - System Integration Gatekeeper
+Persona: Technical veto power, security focused, integration expert
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: technical_incompetence
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 5: EB-UAE-015 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Compliance Officer - WPS Audit Prep
+Persona: Regulatory expert, documentation obsessed, zero tolerance for gaps
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 6: EB-UAE-015 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Compliance Officer - WPS Audit Prep
+Persona: Regulatory expert, documentation obsessed, zero tolerance for gaps
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: wps_documentation_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 7: EB-UAE-005 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical CEO - Personal Banking Bundle
+Persona: Busy CEO/Owner, wants personal benefits, distrusts banks
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 8: EB-UAE-005 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical CEO - Personal Banking Bundle
+Persona: Busy CEO/Owner, wants personal benefits, distrusts banks
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: aggressive_pitch
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 9: EB-UAE-025 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Budget Owner - Annual Planning
+Persona: Budget cycle focused, ROI required, board presentation needed
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 10: EB-UAE-025 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Budget Owner - Annual Planning
+Persona: Budget cycle focused, ROI required, board presentation needed
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: no_roi_justification
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 11: EB-UAE-008 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Multi-Branch Setup
+Persona: Time-poor, practical, hates complexity
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 12: EB-UAE-008 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Multi-Branch Setup
+Persona: Time-poor, practical, hates complexity
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: long_winded_pitch
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 13: EB-UAE-019 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Internal Auditor - Process Review
+Persona: Process-oriented, control-focused, evidence-based
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 14: EB-UAE-019 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Internal Auditor - Process Review
+Persona: Process-oriented, control-focused, evidence-based
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: control_documentation_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 15: EB-UAE-024 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Procurement Manager - RFP Process
+Persona: Process-driven, three quotes minimum, committee decision
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 16: EB-UAE-024 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Procurement Manager - RFP Process
+Persona: Process-driven, three quotes minimum, committee decision
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: bypass_procurement
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 17: EB-UAE-004 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical Operations Head - Integration Concerns
+Persona: Technical stakeholder with IT veto power, worried about disruption
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 18: EB-UAE-004 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical Operations Head - Integration Concerns
+Persona: Technical stakeholder with IT veto power, worried about disruption
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: technical_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 19: EB-UAE-026 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Cash-Strapped SME - Survival Mode
+Persona: Cash flow issues, basic needs only, skeptical of banks
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 20: EB-UAE-026 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Cash-Strapped SME - Survival Mode
+Persona: Cash flow issues, basic needs only, skeptical of banks
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: premium_positioning
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 21: EB-UAE-033 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Accountant - Daily Operations
+Persona: Operational user, efficiency focused, training needs
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 22: EB-UAE-033 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Accountant - Daily Operations
+Persona: Operational user, efficiency focused, training needs
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: complex_no_training
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 23: EB-UAE-016 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Legal Counsel - Contract Review
+Persona: Contract-focused, liability concerned, slow decision maker
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 24: EB-UAE-016 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Legal Counsel - Contract Review
+Persona: Contract-focused, liability concerned, slow decision maker
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: pressure_for_quick_decision
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 25: EB-UAE-035 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Retiring Manager - Handover Situation
+Persona: Legacy focused, knowledge transfer, risk-averse on changes
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 26: EB-UAE-035 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Retiring Manager - Handover Situation
+Persona: Legacy focused, knowledge transfer, risk-averse on changes
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: dismiss_legacy
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 27: EB-UAE-018 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Risk Manager - Business Continuity
+Persona: Disaster recovery focused, redundancy requirements, SLA obsessed
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 28: EB-UAE-018 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Risk Manager - Business Continuity
+Persona: Disaster recovery focused, redundancy requirements, SLA obsessed
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: vague_dr_answers
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 29: EB-UAE-003 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical CFO - Cost Reduction Focus
+Persona: Numbers-driven CFO, suspicious of bank fees, short attention span
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 30: EB-UAE-003 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical CFO - Cost Reduction Focus
+Persona: Numbers-driven CFO, suspicious of bank fees, short attention span
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: roi_failure
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 31: EB-UAE-020 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Government Relations - Ministry Requirements
+Persona: Regulatory liaison, ministry relationships, documentation expert
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 32: EB-UAE-020 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Government Relations - Ministry Requirements
+Persona: Regulatory liaison, ministry relationships, documentation expert
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: emiratization_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 33: EB-UAE-023 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Family Business - Fee Negotiation
+Persona: Long-term oriented, relationship focused, price negotiator
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 34: EB-UAE-023 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Family Business - Fee Negotiation
+Persona: Long-term oriented, relationship focused, price negotiator
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: criticize_current_bank
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 35: EB-UAE-022 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Cost-Conscious Startup - Series A
+Persona: Burn rate conscious, scaling rapidly, wants flexibility
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 36: EB-UAE-022 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Cost-Conscious Startup - Series A
+Persona: Burn rate conscious, scaling rapidly, wants flexibility
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: rigid_pricing
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 37: EB-UAE-034 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: New HR Director - Making Their Mark
+Persona: Change agent, proving value, quick wins needed
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 38: EB-UAE-034 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: New HR Director - Making Their Mark
+Persona: Change agent, proving value, quick wins needed
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: long_implementation
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 39: EB-UAE-032 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: External Consultant - Bank Selection Project
+Persona: Objective evaluator, framework user, client-focused
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 40: EB-UAE-032 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: External Consultant - Bank Selection Project
+Persona: Objective evaluator, framework user, client-focused
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: incomplete_information
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 41: EB-UAE-007 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical HR - Bad Past Experience
+Persona: Burned by previous bank, defensive, needs reassurance
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 42: EB-UAE-007 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical HR - Bad Past Experience
+Persona: Burned by previous bank, defensive, needs reassurance
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: dismissive_attitude
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 43: EB-UAE-028 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Negotiator - Playing Banks Against Each Other
+Persona: Using competition, no loyalty, price-only focus
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 44: EB-UAE-028 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Negotiator - Playing Banks Against Each Other
+Persona: Using competition, no loyalty, price-only focus
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: race_to_bottom
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 45: EB-UAE-012 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Hospitality Chain
+Persona: Multi-location, tip distribution needs, seasonal variations
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 46: EB-UAE-012 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Hospitality Chain
+Persona: Multi-location, tip distribution needs, seasonal variations
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: hospitality_ignorance
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 47: EB-UAE-027 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Multinational Subsidiary - Global Mandate
+Persona: Global bank relationship, limited local authority, HQ compliance
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 48: EB-UAE-027 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Multinational Subsidiary - Global Mandate
+Persona: Global bank relationship, limited local authority, HQ compliance
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: attack_global_bank
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 49: EB-UAE-006 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical Finance Manager - Audit Concerns
+Persona: Detail-oriented, compliance-focused, risk-averse
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 50: EB-UAE-006 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical Finance Manager - Audit Concerns
+Persona: Detail-oriented, compliance-focused, risk-averse
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: audit_documentation_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 51: EB-UAE-021 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: External Auditor Prep - Big 4 Audit
+Persona: Big 4 relationship, materiality focused, time pressured
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 52: EB-UAE-021 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: External Auditor Prep - Big 4 Audit
+Persona: Big 4 relationship, materiality focused, time pressured
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: no_big4_experience
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 53: EB-UAE-017 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Compliance Manager - Data Privacy Concerns
+Persona: GDPR aware, data localization concerns, security focused
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 54: EB-UAE-017 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Compliance Manager - Data Privacy Concerns
+Persona: GDPR aware, data localization concerns, security focused
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: data_protection_unclear
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 55: EB-UAE-030 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Employee Council Rep - Staff Satisfaction
+Persona: Staff advocate, service focused, complaint collector
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 56: EB-UAE-030 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Employee Council Rep - Staff Satisfaction
+Persona: Staff advocate, service focused, complaint collector
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: ignore_employee_experience
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 57: EB-UAE-013 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Healthcare Facility
+Persona: Compliance strict, shift differential needs, benefits integration
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 58: EB-UAE-013 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Healthcare Facility
+Persona: Compliance strict, shift differential needs, benefits integration
+Path Type: KILL
+Expected Outcome: BLOCK
+Kill Trigger: dha_compliance_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 59: EB-UAE-009 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Month-End Pressure
+Persona: Under deadline, irritable, needs immediate help
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 60: EB-UAE-009 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Month-End Pressure
+Persona: Under deadline, irritable, needs immediate help
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: sales_during_crisis
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 61: EB-UAE-010 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Free Zone Company
+Persona: Free zone experienced, knows regulations, value-focused
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 62: EB-UAE-010 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Free Zone Company
+Persona: Free zone experienced, knows regulations, value-focused
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: freezone_ignorance
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 63: EB-UAE-001 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical HR Director - Large Corp Payroll Migration
+Persona: Risk-averse HR Director with existing competitor relationship, needs board approval
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 64: EB-UAE-001 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical HR Director - Large Corp Payroll Migration
+Persona: Risk-averse HR Director with existing competitor relationship, needs board approval
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: price_objection
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 65: EB-UAE-002 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical HR Manager - SME First Bank Account
+Persona: New to banking, price sensitive, confused by WPS requirements
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 66: EB-UAE-002 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Skeptical HR Manager - SME First Bank Account
+Persona: New to banking, price sensitive, confused by WPS requirements
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: compliance_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 67: EB-UAE-011 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Construction Company
+Persona: Blue-collar workforce, cash advance needs, high turnover
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 68: EB-UAE-011 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Construction Company
+Persona: Blue-collar workforce, cash advance needs, high turnover
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: volume_pricing_gap
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 69: EB-UAE-014 (GOLDEN PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Retail Chain
+Persona: High turnover, commission calculations, multiple pay frequencies
+Path Type: GOLDEN
+Expected Outcome: PASS
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+────────────────────────────────────────────────────────────────────────────────
+SCENARIO 70: EB-UAE-014 (KILL PATH)
+────────────────────────────────────────────────────────────────────────────────
+
+Name: Busy Payroll Manager - Retail Chain
+Persona: High turnover, commission calculations, multiple pay frequencies
+Path Type: KILL
+Expected Outcome: FAIL
+Kill Trigger: switching_cost_rejection
+
+SCORES (Circle one per dimension):
+
+1. QUALIFICATION       [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (BANT discovery)
+
+2. NEEDS DISCOVERY     [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Pain points)
+
+3. VALUE ARTICULATION  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Solution value)
+
+4. OBJECTION HANDLING  [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Address concerns)
+
+5. PROCESS ADHERENCE   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Methodology)
+
+6. COMPLIANCE          [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Regulatory)
+
+7. RELATIONSHIP        [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Rapport/Trust)
+
+8. NEXT STEP SECURED   [1]  [2]  [3]  [4]  [5]    Notes: _______________
+   (Deal advancement)
+
+OVERALL ASSESSMENT:
+Would you pursue this deal? [ ] YES  [ ] NO  [ ] MAYBE
+
+Confidence in your scores (1-5): [___]
+
+
+════════════════════════════════════════════════════════════════════════════════
+                              END OF EVALUATION
+════════════════════════════════════════════════════════════════════════════════
+
+Total Scenarios Evaluated: 70
+Time Completed: _______________
+
+EVALUATOR FEEDBACK (Optional):
+Were any scenarios confusing? ________________________________________________
+Any scenarios that don't reflect real UAE EB situations? _____________________
+Additional comments: _________________________________________________________
+_____________________________________________________________________________
+
+Thank you for your expertise!

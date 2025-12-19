@@ -1,0 +1,121 @@
+{
+  "validation_id": "silent_validation_1766143574496",
+  "created_at": "2025-12-19T11:31:12.903Z",
+  "scenario_count": 70,
+  "evaluators": [
+    {
+      "id": "EVAL_1",
+      "name": "",
+      "role": "",
+      "years_experience": null,
+      "packet_distributed": null,
+      "packet_returned": null
+    },
+    {
+      "id": "EVAL_2",
+      "name": "",
+      "role": "",
+      "years_experience": null,
+      "packet_distributed": null,
+      "packet_returned": null
+    },
+    {
+      "id": "EVAL_3",
+      "name": "",
+      "role": "",
+      "years_experience": null,
+      "packet_distributed": null,
+      "packet_returned": null
+    },
+    {
+      "id": "EVAL_4",
+      "name": "",
+      "role": "",
+      "years_experience": null,
+      "packet_distributed": null,
+      "packet_returned": null
+    },
+    {
+      "id": "EVAL_5",
+      "name": "",
+      "role": "",
+      "years_experience": null,
+      "packet_distributed": null,
+      "packet_returned": null
+    }
+  ],
+  "crs_dimensions": [
+    {
+      "key": "qualification",
+      "name": "Qualification",
+      "weight": 0.15,
+      "description": "Identifies BANT (Budget, Authority, Need, Timeline)"
+    },
+    {
+      "key": "needs_discovery",
+      "name": "Needs Discovery",
+      "weight": 0.15,
+      "description": "Uncovers pain points and requirements"
+    },
+    {
+      "key": "value_articulation",
+      "name": "Value Articulation",
+      "weight": 0.15,
+      "description": "Connects solution to customer needs"
+    },
+    {
+      "key": "objection_handling",
+      "name": "Objection Handling",
+      "weight": 0.15,
+      "description": "Addresses concerns professionally"
+    },
+    {
+      "key": "process_adherence",
+      "name": "Process Adherence",
+      "weight": 0.1,
+      "description": "Follows sales methodology"
+    },
+    {
+      "key": "compliance",
+      "name": "Compliance",
+      "weight": 0.1,
+      "description": "Maintains regulatory compliance"
+    },
+    {
+      "key": "relationship_building",
+      "name": "Relationship Building",
+      "weight": 0.1,
+      "description": "Builds rapport and trust"
+    },
+    {
+      "key": "next_step_secured",
+      "name": "Next Step Secured",
+      "weight": 0.1,
+      "description": "Advances deal to next stage"
+    }
+  ],
+  "score_scale": {
+    "1": "Very Poor - Would lose the deal immediately",
+    "2": "Poor - Unlikely to advance",
+    "3": "Average - May or may not advance",
+    "4": "Good - Likely to advance",
+    "5": "Excellent - Would definitely advance"
+  },
+  "instructions": {
+    "minimum_evaluators": 3,
+    "maximum_evaluators": 5,
+    "evaluator_requirements": [
+      "Senior Relationship Manager OR Sales Manager",
+      "UAE Employee Banking experience",
+      "Actually closes payroll deals",
+      "NOT data scientists",
+      "NOT product people",
+      "NOT juniors"
+    ],
+    "blind_evaluation": true,
+    "discussion_prohibited_until": "all_complete"
+  },
+  "status": "PENDING",
+  "scores_collected": 0,
+  "inter_rater_reliability": null
+}

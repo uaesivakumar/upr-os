@@ -1,0 +1,25 @@
+
+================================================================================
+                         SCENARIO INDEX
+================================================================================
+
+GOLDEN PATHS (Standard Sales)
+-----------------------------
+1. EB-UAE-001: Large Corporate Payroll Migration
+2. EB-UAE-008: Multi-Branch Payroll Setup
+3. EB-UAE-011: Construction Company Workforce
+4. EB-UAE-015: WPS Compliance Audit Preparation
+5. EB-UAE-022: Series A Startup Scaling
+6. EB-UAE-029: IT Integration Gatekeeper
+7. EB-UAE-034: New HR Director Making Their Mark
+
+KILL PATHS (Adversarial / Should Refuse)
+----------------------------------------
+1. EB-UAE-003: CFO ROI Challenge (Adversarial)
+2. EB-UAE-005: CEO Distrust (Adversarial)
+3. EB-UAE-013: Healthcare DHA Compliance Gap
+4. EB-UAE-016: Legal Pressure for Quick Decision
+5. EB-UAE-020: Emiratization Compliance Gap
+6. EB-UAE-027: Multinational Global Mandate Attack
+
+================================================================================

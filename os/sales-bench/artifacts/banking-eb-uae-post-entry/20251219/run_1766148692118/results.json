@@ -1,0 +1,1502 @@
+[
+  {
+    "success": true,
+    "scenario_id": "98b970d5-81d8-4bd3-a5c9-8b7524490edd",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.4,
+      "needs_discovery": 4.1,
+      "value_articulation": 2.8,
+      "objection_handling": 3.5,
+      "process_adherence": 4.2,
+      "compliance": 2.9,
+      "relationship_building": 3.6,
+      "next_step_secured": 4.3
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "93b70068-f63e-4f9e-8f41-20f5c096e97f",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 3.2,
+      "needs_discovery": 1.9,
+      "value_articulation": 2.6,
+      "objection_handling": 1.3,
+      "process_adherence": 2,
+      "compliance": 2.7,
+      "relationship_building": 1.4,
+      "next_step_secured": 2.1
+    },
+    "weighted_crs": 2.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "price_objection"
+  },
+  {
+    "success": true,
+    "scenario_id": "3d880546-1ad2-4a28-af8a-998e7f18b4e3",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.5,
+      "needs_discovery": 4.2,
+      "value_articulation": 2.9,
+      "objection_handling": 3.6,
+      "process_adherence": 4.3,
+      "compliance": 3,
+      "relationship_building": 3.7,
+      "next_step_secured": 4.4
+    },
+    "weighted_crs": 3.67,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "2dd30bd6-7d72-43cd-9f78-9e23167aaa02",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 3.2,
+      "needs_discovery": 1.9,
+      "value_articulation": 2.6,
+      "objection_handling": 1.3,
+      "process_adherence": 2,
+      "compliance": 2.7,
+      "relationship_building": 1.4,
+      "next_step_secured": 2.1
+    },
+    "weighted_crs": 2.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "compliance_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "d874c9b6-451e-4cec-a014-92611960b1b3",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 4.3,
+      "needs_discovery": 3,
+      "value_articulation": 3.7,
+      "objection_handling": 4.4,
+      "process_adherence": 3.1,
+      "compliance": 3.8,
+      "relationship_building": 2.5,
+      "next_step_secured": 3.2
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "7a730a55-9995-4dae-95c7-c0b65b2974be",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.6,
+      "needs_discovery": 1.3,
+      "value_articulation": 2,
+      "objection_handling": 2.7,
+      "process_adherence": 1.4,
+      "compliance": 2.1,
+      "relationship_building": 2.8,
+      "next_step_secured": 1.5
+    },
+    "weighted_crs": 2.07,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "roi_failure"
+  },
+  {
+    "success": true,
+    "scenario_id": "c2119c3d-1f89-4851-ae62-0074c1975d06",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 3.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 3.9,
+      "compliance": 2.6,
+      "relationship_building": 3.3,
+      "next_step_secured": 4
+    },
+    "weighted_crs": 3.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "6cf5b475-29f6-49f8-874f-e0ac1fb9da68",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 2.6,
+      "needs_discovery": 1.3,
+      "value_articulation": 2,
+      "objection_handling": 2.7,
+      "process_adherence": 1.4,
+      "compliance": 1.1,
+      "relationship_building": 2.8,
+      "next_step_secured": 1.5
+    },
+    "weighted_crs": 1.97,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "technical_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "f3076bd4-a58e-4830-ab4d-0417af47d2fb",
+    "path_type": "GOLDEN",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.5,
+      "needs_discovery": 3.2,
+      "value_articulation": 3.9,
+      "objection_handling": 2.6,
+      "process_adherence": 3.3,
+      "compliance": 4,
+      "relationship_building": 2.7,
+      "next_step_secured": 3.4
+    },
+    "weighted_crs": 3.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "faf04d8e-1981-4365-9db4-d17a5f25b004",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.5,
+      "needs_discovery": 3.2,
+      "value_articulation": 1.9,
+      "objection_handling": 2.6,
+      "process_adherence": 1.3,
+      "compliance": 2,
+      "relationship_building": 2.7,
+      "next_step_secured": 1.4
+    },
+    "weighted_crs": 2.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "aggressive_pitch"
+  },
+  {
+    "success": true,
+    "scenario_id": "95f3864b-3878-405e-8684-02240a09b675",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 4.3,
+      "needs_discovery": 3,
+      "value_articulation": 3.7,
+      "objection_handling": 4.4,
+      "process_adherence": 3.1,
+      "compliance": 3.8,
+      "relationship_building": 2.5,
+      "next_step_secured": 3.2
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "024b125b-f0ec-4329-8447-5cce652d4589",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 1.4,
+      "needs_discovery": 2.1,
+      "value_articulation": 2.8,
+      "objection_handling": 1.5,
+      "process_adherence": 2.2,
+      "compliance": 1.1,
+      "relationship_building": 1.6,
+      "next_step_secured": 2.3
+    },
+    "weighted_crs": 1.89,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "audit_documentation_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "6c71be16-32ff-49eb-bc48-fb1424143dc6",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 4.2,
+      "needs_discovery": 2.9,
+      "value_articulation": 3.6,
+      "objection_handling": 4.3,
+      "process_adherence": 3,
+      "compliance": 3.7,
+      "relationship_building": 4.4,
+      "next_step_secured": 3.1
+    },
+    "weighted_crs": 3.67,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "21fb2809-46fb-4781-b011-46d85c25f177",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.9,
+      "needs_discovery": 1.6,
+      "value_articulation": 2.3,
+      "objection_handling": 3,
+      "process_adherence": 1.7,
+      "compliance": 2.4,
+      "relationship_building": 3.1,
+      "next_step_secured": 1.8
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "dismissive_attitude"
+  },
+  {
+    "success": true,
+    "scenario_id": "eb8d8f76-7a3b-4174-b64f-098ddbded512",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3,
+      "needs_discovery": 3.7,
+      "value_articulation": 4.4,
+      "objection_handling": 3.1,
+      "process_adherence": 3.8,
+      "compliance": 2.5,
+      "relationship_building": 3.2,
+      "next_step_secured": 3.9
+    },
+    "weighted_crs": 3.47,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "11d95253-78a6-46ad-b3ba-f406ef4927d1",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.5,
+      "needs_discovery": 3.2,
+      "value_articulation": 1.9,
+      "objection_handling": 2.6,
+      "process_adherence": 1.3,
+      "compliance": 2,
+      "relationship_building": 2.7,
+      "next_step_secured": 1.4
+    },
+    "weighted_crs": 2.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "long_winded_pitch"
+  },
+  {
+    "success": true,
+    "scenario_id": "1d47e16f-7abd-4d14-965c-5b0a7432247c",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.8,
+      "needs_discovery": 3.5,
+      "value_articulation": 4.2,
+      "objection_handling": 2.9,
+      "process_adherence": 3.6,
+      "compliance": 4.3,
+      "relationship_building": 3,
+      "next_step_secured": 3.7
+    },
+    "weighted_crs": 3.47,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "f7f37097-0e2a-4510-aa93-bc81bb699640",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.7,
+      "needs_discovery": 1.4,
+      "value_articulation": 2.1,
+      "objection_handling": 2.8,
+      "process_adherence": 1.5,
+      "compliance": 2.2,
+      "relationship_building": 2.9,
+      "next_step_secured": 1.6
+    },
+    "weighted_crs": 2.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "sales_during_crisis"
+  },
+  {
+    "success": true,
+    "scenario_id": "ee1934d0-5529-4f5f-883d-69027be8379f",
+    "path_type": "GOLDEN",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.5,
+      "needs_discovery": 3.2,
+      "value_articulation": 3.9,
+      "objection_handling": 2.6,
+      "process_adherence": 3.3,
+      "compliance": 4,
+      "relationship_building": 2.7,
+      "next_step_secured": 3.4
+    },
+    "weighted_crs": 3.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "dfd5477c-a009-4380-b3ad-2e0bfb2b31cf",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 1.5,
+      "needs_discovery": 2.2,
+      "value_articulation": 2.9,
+      "objection_handling": 1.6,
+      "process_adherence": 2.3,
+      "compliance": 3,
+      "relationship_building": 1.7,
+      "next_step_secured": 2.4
+    },
+    "weighted_crs": 2.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "freezone_ignorance"
+  },
+  {
+    "success": true,
+    "scenario_id": "e0bfb318-2704-4942-b2da-aa299961b864",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 3.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 3.9,
+      "compliance": 2.6,
+      "relationship_building": 3.3,
+      "next_step_secured": 4
+    },
+    "weighted_crs": 3.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "8312bf1f-1b5c-43d3-a1db-20074094f808",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 3.2,
+      "needs_discovery": 1.9,
+      "value_articulation": 2.6,
+      "objection_handling": 1.3,
+      "process_adherence": 2,
+      "compliance": 2.7,
+      "relationship_building": 1.4,
+      "next_step_secured": 2.1
+    },
+    "weighted_crs": 2.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "volume_pricing_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "954a19d6-8235-43c0-9127-baf16b94c1cd",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.9,
+      "needs_discovery": 2.6,
+      "value_articulation": 3.3,
+      "objection_handling": 4,
+      "process_adherence": 2.7,
+      "compliance": 3.4,
+      "relationship_building": 4.1,
+      "next_step_secured": 2.8
+    },
+    "weighted_crs": 3.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "5c2ef249-a83a-4dc6-8144-848b0d2cedef",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 1.4,
+      "needs_discovery": 2.1,
+      "value_articulation": 2.8,
+      "objection_handling": 1.5,
+      "process_adherence": 2.2,
+      "compliance": 2.9,
+      "relationship_building": 1.6,
+      "next_step_secured": 2.3
+    },
+    "weighted_crs": 2.07,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "hospitality_ignorance"
+  },
+  {
+    "success": true,
+    "scenario_id": "def7dbe1-0275-4dec-8a60-8267a8cb6c0f",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.7,
+      "needs_discovery": 3.4,
+      "value_articulation": 4.1,
+      "objection_handling": 2.8,
+      "process_adherence": 3.5,
+      "compliance": 4.2,
+      "relationship_building": 2.9,
+      "next_step_secured": 3.6
+    },
+    "weighted_crs": 3.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "85f8868f-e08f-4e00-980e-351c20807c9e",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 2.2,
+      "needs_discovery": 2.9,
+      "value_articulation": 1.6,
+      "objection_handling": 2.3,
+      "process_adherence": 3,
+      "compliance": 1.4,
+      "relationship_building": 2.4,
+      "next_step_secured": 3.1
+    },
+    "weighted_crs": 2.34,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "dha_compliance_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "8d2ac820-172a-4d6f-b4e9-98b1a99b6514",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.6,
+      "needs_discovery": 4.3,
+      "value_articulation": 3,
+      "objection_handling": 3.7,
+      "process_adherence": 4.4,
+      "compliance": 3.1,
+      "relationship_building": 3.8,
+      "next_step_secured": 2.5
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "1147df00-a57a-4306-bb73-6ad495ad7eca",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.4,
+      "needs_discovery": 3.1,
+      "value_articulation": 1.8,
+      "objection_handling": 2.5,
+      "process_adherence": 3.2,
+      "compliance": 1.9,
+      "relationship_building": 2.6,
+      "next_step_secured": 1.3
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "switching_cost_rejection"
+  },
+  {
+    "success": true,
+    "scenario_id": "5341030f-6511-4f40-a9f4-c87330b59de8",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.7,
+      "needs_discovery": 4.4,
+      "value_articulation": 3.1,
+      "objection_handling": 3.8,
+      "process_adherence": 2.5,
+      "compliance": 3.2,
+      "relationship_building": 3.9,
+      "next_step_secured": 2.6
+    },
+    "weighted_crs": 3.47,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "9606ddf3-d111-463d-8882-53a6b659b892",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 1.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 1.9,
+      "compliance": 1.4,
+      "relationship_building": 1.3,
+      "next_step_secured": 2
+    },
+    "weighted_crs": 2.25,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "wps_documentation_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "e71c1673-88a4-4d44-85ed-7401ef26da5d",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.8,
+      "needs_discovery": 2.5,
+      "value_articulation": 3.2,
+      "objection_handling": 3.9,
+      "process_adherence": 2.6,
+      "compliance": 3.3,
+      "relationship_building": 4,
+      "next_step_secured": 2.7
+    },
+    "weighted_crs": 3.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "68711eb7-1346-48e8-b1cf-b74a01cb9484",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.4,
+      "needs_discovery": 3.1,
+      "value_articulation": 1.8,
+      "objection_handling": 2.5,
+      "process_adherence": 3.2,
+      "compliance": 1.9,
+      "relationship_building": 2.6,
+      "next_step_secured": 1.3
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "pressure_for_quick_decision"
+  },
+  {
+    "success": true,
+    "scenario_id": "a8d57fb0-b8b8-4969-8307-51ab2e81ada6",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.4,
+      "needs_discovery": 4.1,
+      "value_articulation": 2.8,
+      "objection_handling": 3.5,
+      "process_adherence": 4.2,
+      "compliance": 2.9,
+      "relationship_building": 3.6,
+      "next_step_secured": 4.3
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "7cdd3a36-2326-4d90-8c1b-dc288a2d6256",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 1.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 1.9,
+      "compliance": 1.4,
+      "relationship_building": 1.3,
+      "next_step_secured": 2
+    },
+    "weighted_crs": 2.25,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "data_protection_unclear"
+  },
+  {
+    "success": true,
+    "scenario_id": "54a3c9d5-e8ee-41dc-9c8f-a0f28bdcd038",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.9,
+      "needs_discovery": 2.6,
+      "value_articulation": 3.3,
+      "objection_handling": 4,
+      "process_adherence": 2.7,
+      "compliance": 3.4,
+      "relationship_building": 4.1,
+      "next_step_secured": 2.8
+    },
+    "weighted_crs": 3.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "e14ca968-dd2c-48d5-b662-176fdc28c03f",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.6,
+      "needs_discovery": 1.3,
+      "value_articulation": 2,
+      "objection_handling": 2.7,
+      "process_adherence": 1.4,
+      "compliance": 2.1,
+      "relationship_building": 2.8,
+      "next_step_secured": 1.5
+    },
+    "weighted_crs": 2.07,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "vague_dr_answers"
+  },
+  {
+    "success": true,
+    "scenario_id": "667f8e0c-026c-4091-b703-d91afbd0d86b",
+    "path_type": "GOLDEN",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.5,
+      "needs_discovery": 3.2,
+      "value_articulation": 3.9,
+      "objection_handling": 2.6,
+      "process_adherence": 3.3,
+      "compliance": 4,
+      "relationship_building": 2.7,
+      "next_step_secured": 3.4
+    },
+    "weighted_crs": 3.17,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "64777e7d-4683-4c3c-8178-0bc2c15b8fb9",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 2.1,
+      "needs_discovery": 2.8,
+      "value_articulation": 1.5,
+      "objection_handling": 2.2,
+      "process_adherence": 2.9,
+      "compliance": 1.4,
+      "relationship_building": 2.3,
+      "next_step_secured": 3
+    },
+    "weighted_crs": 2.25,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "control_documentation_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "360cb590-31d1-4f2e-9554-408e8c1acdf2",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.9,
+      "needs_discovery": 3.6,
+      "value_articulation": 4.3,
+      "objection_handling": 3,
+      "process_adherence": 3.7,
+      "compliance": 4.4,
+      "relationship_building": 3.1,
+      "next_step_secured": 3.8
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "58f1c926-d04b-4e42-8aef-a9a81fa06c1d",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 1.8,
+      "needs_discovery": 2.5,
+      "value_articulation": 3.2,
+      "objection_handling": 1.9,
+      "process_adherence": 2.6,
+      "compliance": 1.3,
+      "relationship_building": 2,
+      "next_step_secured": 2.7
+    },
+    "weighted_crs": 2.27,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "emiratization_gap"
+  },
+  {
+    "success": true,
+    "scenario_id": "0d8bd1d8-c613-4271-9b0e-4dedc0e6c961",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.8,
+      "needs_discovery": 2.5,
+      "value_articulation": 3.2,
+      "objection_handling": 3.9,
+      "process_adherence": 2.6,
+      "compliance": 3.3,
+      "relationship_building": 4,
+      "next_step_secured": 2.7
+    },
+    "weighted_crs": 3.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "4d05f575-e198-4575-b631-48109791ca5f",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 1.4,
+      "needs_discovery": 2.1,
+      "value_articulation": 2.8,
+      "objection_handling": 1.5,
+      "process_adherence": 2.2,
+      "compliance": 2.9,
+      "relationship_building": 1.6,
+      "next_step_secured": 2.3
+    },
+    "weighted_crs": 2.07,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "no_big4_experience"
+  },
+  {
+    "success": true,
+    "scenario_id": "e96cd1bd-be36-44e0-be33-d1d6e5385ffe",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.7,
+      "needs_discovery": 3.4,
+      "value_articulation": 4.1,
+      "objection_handling": 2.8,
+      "process_adherence": 3.5,
+      "compliance": 4.2,
+      "relationship_building": 2.9,
+      "next_step_secured": 3.6
+    },
+    "weighted_crs": 3.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "ed9d6846-75e4-468c-aaf0-daa30355a5b4",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 1.6,
+      "needs_discovery": 2.3,
+      "value_articulation": 3,
+      "objection_handling": 1.7,
+      "process_adherence": 2.4,
+      "compliance": 3.1,
+      "relationship_building": 1.8,
+      "next_step_secured": 2.5
+    },
+    "weighted_crs": 2.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "rigid_pricing"
+  },
+  {
+    "success": true,
+    "scenario_id": "3d8b9c41-9ed1-4832-a09e-6edc8d4bc6e9",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 4.2,
+      "needs_discovery": 2.9,
+      "value_articulation": 3.6,
+      "objection_handling": 4.3,
+      "process_adherence": 3,
+      "compliance": 3.7,
+      "relationship_building": 4.4,
+      "next_step_secured": 3.1
+    },
+    "weighted_crs": 3.67,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "3cad05fe-b487-454e-aa6b-a821de88f94f",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.3,
+      "needs_discovery": 3,
+      "value_articulation": 1.7,
+      "objection_handling": 2.4,
+      "process_adherence": 3.1,
+      "compliance": 1.8,
+      "relationship_building": 2.5,
+      "next_step_secured": 3.2
+    },
+    "weighted_crs": 2.47,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "criticize_current_bank"
+  },
+  {
+    "success": true,
+    "scenario_id": "95b7b82a-0fc1-4770-84d9-d05abd826c50",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 3.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 3.9,
+      "compliance": 2.6,
+      "relationship_building": 3.3,
+      "next_step_secured": 4
+    },
+    "weighted_crs": 3.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "1351b2bc-6156-4830-b5ad-32c3b8691d50",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 1.7,
+      "needs_discovery": 2.4,
+      "value_articulation": 3.1,
+      "objection_handling": 1.8,
+      "process_adherence": 2.5,
+      "compliance": 3.2,
+      "relationship_building": 1.9,
+      "next_step_secured": 2.6
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "bypass_procurement"
+  },
+  {
+    "success": true,
+    "scenario_id": "a9b872b3-7a24-4af7-a83a-85383f6e375b",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.6,
+      "needs_discovery": 4.3,
+      "value_articulation": 3,
+      "objection_handling": 3.7,
+      "process_adherence": 4.4,
+      "compliance": 3.1,
+      "relationship_building": 3.8,
+      "next_step_secured": 2.5
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "84d922ea-5792-48b2-abaf-d4ad425ba6ca",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 1.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 1.9,
+      "compliance": 2.6,
+      "relationship_building": 1.3,
+      "next_step_secured": 2
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "no_roi_justification"
+  },
+  {
+    "success": true,
+    "scenario_id": "a3b86c15-e6cd-4698-8d83-b3e0a8883598",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 4.1,
+      "needs_discovery": 2.8,
+      "value_articulation": 3.5,
+      "objection_handling": 4.2,
+      "process_adherence": 2.9,
+      "compliance": 3.6,
+      "relationship_building": 4.3,
+      "next_step_secured": 3
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "b86c00ad-8d9b-4427-b8a5-597b0d6ea583",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.3,
+      "needs_discovery": 3,
+      "value_articulation": 1.7,
+      "objection_handling": 2.4,
+      "process_adherence": 3.1,
+      "compliance": 1.8,
+      "relationship_building": 2.5,
+      "next_step_secured": 3.2
+    },
+    "weighted_crs": 2.47,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "premium_positioning"
+  },
+  {
+    "success": true,
+    "scenario_id": "a9798255-d4c4-42c7-b910-54aa27b9568f",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.9,
+      "needs_discovery": 3.6,
+      "value_articulation": 4.3,
+      "objection_handling": 3,
+      "process_adherence": 3.7,
+      "compliance": 4.4,
+      "relationship_building": 3.1,
+      "next_step_secured": 3.8
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "bc6cd194-f540-40cc-b0f1-117a5539bd9c",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 1.6,
+      "needs_discovery": 2.3,
+      "value_articulation": 3,
+      "objection_handling": 1.7,
+      "process_adherence": 2.4,
+      "compliance": 3.1,
+      "relationship_building": 1.8,
+      "next_step_secured": 2.5
+    },
+    "weighted_crs": 2.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "attack_global_bank"
+  },
+  {
+    "success": true,
+    "scenario_id": "94084e10-7a17-4e3c-a5aa-214eca8a888b",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.5,
+      "needs_discovery": 4.2,
+      "value_articulation": 2.9,
+      "objection_handling": 3.6,
+      "process_adherence": 4.3,
+      "compliance": 3,
+      "relationship_building": 3.7,
+      "next_step_secured": 4.4
+    },
+    "weighted_crs": 3.67,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "1668f3ac-6bfb-464d-a1ac-693e3a37f651",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.4,
+      "needs_discovery": 3.1,
+      "value_articulation": 1.8,
+      "objection_handling": 2.5,
+      "process_adherence": 3.2,
+      "compliance": 1.9,
+      "relationship_building": 2.6,
+      "next_step_secured": 1.3
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "race_to_bottom"
+  },
+  {
+    "success": true,
+    "scenario_id": "027a51aa-5166-4863-a6ba-130225c66cf0",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.9,
+      "needs_discovery": 3.6,
+      "value_articulation": 4.3,
+      "objection_handling": 3,
+      "process_adherence": 3.7,
+      "compliance": 4.4,
+      "relationship_building": 3.1,
+      "next_step_secured": 3.8
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "9314c4ec-acae-4182-b57d-fdd634ec173f",
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "crs_scores": {
+      "qualification": 1.9,
+      "needs_discovery": 2.6,
+      "value_articulation": 1.3,
+      "objection_handling": 2,
+      "process_adherence": 2.7,
+      "compliance": 1.3,
+      "relationship_building": 2.1,
+      "next_step_secured": 2.8
+    },
+    "weighted_crs": 2.06,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "technical_incompetence"
+  },
+  {
+    "success": true,
+    "scenario_id": "fe6e7d2e-5e51-4e0c-9158-db601983cc59",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.9,
+      "needs_discovery": 2.6,
+      "value_articulation": 3.3,
+      "objection_handling": 4,
+      "process_adherence": 2.7,
+      "compliance": 3.4,
+      "relationship_building": 4.1,
+      "next_step_secured": 2.8
+    },
+    "weighted_crs": 3.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "fb06949f-948f-4492-994d-fea236b7b0a1",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.6,
+      "needs_discovery": 1.3,
+      "value_articulation": 2,
+      "objection_handling": 2.7,
+      "process_adherence": 1.4,
+      "compliance": 2.1,
+      "relationship_building": 2.8,
+      "next_step_secured": 1.5
+    },
+    "weighted_crs": 2.07,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "ignore_employee_experience"
+  },
+  {
+    "success": true,
+    "scenario_id": "5be9fe7e-48a7-4fd9-9931-816b2464a84a",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3.1,
+      "needs_discovery": 3.8,
+      "value_articulation": 2.5,
+      "objection_handling": 3.2,
+      "process_adherence": 3.9,
+      "compliance": 2.6,
+      "relationship_building": 3.3,
+      "next_step_secured": 4
+    },
+    "weighted_crs": 3.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "a3fbc4a5-4b4a-4855-b70d-451647ad9ae4",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.2,
+      "needs_discovery": 2.9,
+      "value_articulation": 1.6,
+      "objection_handling": 2.3,
+      "process_adherence": 3,
+      "compliance": 1.7,
+      "relationship_building": 2.4,
+      "next_step_secured": 3.1
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "too_tactical"
+  },
+  {
+    "success": true,
+    "scenario_id": "b1dd4a2c-aa61-48e1-900b-1f59a2130bd2",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 4.2,
+      "needs_discovery": 2.9,
+      "value_articulation": 3.6,
+      "objection_handling": 4.3,
+      "process_adherence": 3,
+      "compliance": 3.7,
+      "relationship_building": 4.4,
+      "next_step_secured": 3.1
+    },
+    "weighted_crs": 3.67,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "b7c45f46-e77c-47ef-bfff-18145fe399a8",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.8,
+      "needs_discovery": 1.5,
+      "value_articulation": 2.2,
+      "objection_handling": 2.9,
+      "process_adherence": 1.6,
+      "compliance": 2.3,
+      "relationship_building": 3,
+      "next_step_secured": 1.7
+    },
+    "weighted_crs": 2.27,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "incomplete_information"
+  },
+  {
+    "success": true,
+    "scenario_id": "388c18c2-80e2-4931-bedc-9f6b79d6fd71",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.9,
+      "needs_discovery": 3.6,
+      "value_articulation": 4.3,
+      "objection_handling": 3,
+      "process_adherence": 3.7,
+      "compliance": 4.4,
+      "relationship_building": 3.1,
+      "next_step_secured": 3.8
+    },
+    "weighted_crs": 3.57,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "1b1ec6ee-6d61-44a0-83e8-f270bd51ae6b",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.9,
+      "needs_discovery": 1.6,
+      "value_articulation": 2.3,
+      "objection_handling": 3,
+      "process_adherence": 1.7,
+      "compliance": 2.4,
+      "relationship_building": 3.1,
+      "next_step_secured": 1.8
+    },
+    "weighted_crs": 2.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "complex_no_training"
+  },
+  {
+    "success": true,
+    "scenario_id": "a229599c-6aae-458c-a5cf-1938722dfb25",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 3,
+      "needs_discovery": 3.7,
+      "value_articulation": 4.4,
+      "objection_handling": 3.1,
+      "process_adherence": 3.8,
+      "compliance": 2.5,
+      "relationship_building": 3.2,
+      "next_step_secured": 3.9
+    },
+    "weighted_crs": 3.47,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "0286d043-d8b6-462a-8e4e-1d6153547329",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.3,
+      "needs_discovery": 3,
+      "value_articulation": 1.7,
+      "objection_handling": 2.4,
+      "process_adherence": 3.1,
+      "compliance": 1.8,
+      "relationship_building": 2.5,
+      "next_step_secured": 3.2
+    },
+    "weighted_crs": 2.47,
+    "policy_violations": [
+      "COMPLIANCE_THRESHOLD_BREACH"
+    ],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "long_implementation"
+  },
+  {
+    "success": true,
+    "scenario_id": "5fd34503-6dc2-44d8-aff3-6a31453e2827",
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "crs_scores": {
+      "qualification": 2.7,
+      "needs_discovery": 3.4,
+      "value_articulation": 4.1,
+      "objection_handling": 2.8,
+      "process_adherence": 3.5,
+      "compliance": 4.2,
+      "relationship_building": 2.9,
+      "next_step_secured": 3.6
+    },
+    "weighted_crs": 3.37,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": null
+  },
+  {
+    "success": true,
+    "scenario_id": "bb239d80-33b6-411e-a9a9-7e75dc36ad4b",
+    "path_type": "KILL",
+    "outcome": "FAIL",
+    "crs_scores": {
+      "qualification": 2.6,
+      "needs_discovery": 1.3,
+      "value_articulation": 2,
+      "objection_handling": 2.7,
+      "process_adherence": 1.4,
+      "compliance": 2.1,
+      "relationship_building": 2.8,
+      "next_step_secured": 1.5
+    },
+    "weighted_crs": 2.07,
+    "policy_violations": [],
+    "adversarial_contained": true,
+    "is_mock": true,
+    "buyer_bot_trigger": "dismiss_legacy"
+  }
+]

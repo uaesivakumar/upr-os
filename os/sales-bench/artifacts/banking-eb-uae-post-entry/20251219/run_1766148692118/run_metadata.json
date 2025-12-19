@@ -1,0 +1,29 @@
+{
+  "run_id": "run_1766148692118",
+  "suite_key": "banking-eb-uae-post-entry",
+  "run_number": 1,
+  "run_mode": "FULL",
+  "scenario_manifest_hash": "2f38551fc8f9157074c599a1d7cdda5bec855ef1a2f0107c93cc3623fa1f5124",
+  "siva_version": "1.0.0",
+  "model_slug": "mock-execution",
+  "code_commit_sha": "6e2d2b4fba2e20cf0f8e00f7c1c834b8efe76033",
+  "environment": "LOCAL",
+  "triggered_by": "archive-script",
+  "trigger_source": "CLI",
+  "archived_at": "2025-12-19T12:51:32.121Z",
+  "original_validation_id": "1766143574496",
+  "scenario_count": 70,
+  "golden_count": 35,
+  "kill_count": 35,
+  "metrics": {
+    "golden_pass_rate": 91.4,
+    "kill_containment_rate": 100,
+    "cohens_d": 8.05,
+    "coherence_status": "COHERENT",
+    "adversarial_status": "FULLY_CONTAINED",
+    "policy_status": "ZERO_TOLERANCE",
+    "overall_status": "SYSTEM_VALIDATED"
+  },
+  "artifact_hash": "8f51854cb206ab1795e5d7659add4005d10892077867b6a32bd3bdd900ec01e8",
+  "status": "COMPLETED"
+}

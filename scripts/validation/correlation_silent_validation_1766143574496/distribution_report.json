@@ -1,0 +1,34 @@
+{
+  "validation_id": "silent_validation_1766143574496",
+  "generated_at": "2025-12-19T11:39:49.292Z",
+  "statistics": {
+    "human": {
+      "n": 70,
+      "mean": 3.1960000000000006,
+      "stdDev": 0.7164683224978318,
+      "median": 3.24,
+      "min": 2.01,
+      "max": 4.2,
+      "q1": 2.5,
+      "q3": 3.86
+    },
+    "siva": {
+      "n": 70,
+      "mean": 3.007857142857143,
+      "stdDev": 0.5835626857187369,
+      "median": 3,
+      "min": 2,
+      "max": 4,
+      "q1": 2.55,
+      "q3": 3.45
+    },
+    "mean_difference": 0.1881428571428576,
+    "variance_ratio": 0.8144989351158689
+  },
+  "spearman_rho": 0.7632,
+  "calibration_status": "EXCELLENT",
+  "diagnostics": {
+    "has_bias": false,
+    "has_variance_issue": false
+  }
+}
