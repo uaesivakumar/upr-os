@@ -55,6 +55,7 @@ import replayRouter from './replay.js';  // PRD v1.2 §7: Deterministic Replay A
 import intelligenceRouter from './intelligence.js';  // S218-S223: SIVA Intelligence Enhancement
 import controlplaneRouter from './controlplane/index.js';  // OS Control Plane: resolve-config, envelope
 import capabilitiesRouter from './capabilities.js';  // S228: Capability Registry Core
+import salesBenchRouter from './sales-bench/index.js';  // S241-S248: Sales-Bench v1 (PRD v1.3 Appendix)
 import { OS_VERSION, OS_PROFILES, PIPELINE_MODES, SCORE_TYPES, ENTITY_TYPES } from './types.js';
 import { cacheStats, cacheStatsHandler, cacheClear } from '../../middleware/caching.js';
 import { osAuthMiddleware, osAuditMiddleware, validateOsAuthConfig } from '../../middleware/osAuth.js';
@@ -197,6 +198,11 @@ router.get('/', (req, res) => {
         path: '/api/os/routing-decisions',
         method: 'GET',
         description: 'S232: Routing decision viewer for Super Admin Model Radar. Read-only visibility into routing behavior.'
+      },
+      salesBench: {
+        path: '/api/os/sales-bench',
+        method: 'GET/POST/DELETE',
+        description: 'S241-S248: Sales-Bench v1 - SIVA behavioral evaluation (PRD v1.3 Appendix). Advisory only.'
       }
     },
     profiles: OS_PROFILES,
@@ -230,7 +236,8 @@ router.get('/health', async (req, res) => {
     capabilities: 'checking',  // S228
     controlplane: 'checking',  // OS Control Plane
     authorizeCapability: 'checking',  // S229: Capability Authorization
-    routingDecisions: 'checking'  // S232: Model Radar
+    routingDecisions: 'checking',  // S232: Model Radar
+    salesBench: 'checking',  // S241-S248: Sales-Bench v1
   };
 
   // All services are stateless, so if the router is responding, they're healthy
@@ -317,6 +324,7 @@ router.use('/discovery-pool', discoveryPoolRouter);
 router.use('/replay', replayRouter);  // PRD v1.2 §7: Deterministic Replay
 router.use('/intelligence', aiInputValidation, salesContextValidation, intelligenceRouter);  // S218-S223: SIVA Intelligence Enhancement
 router.use('/capabilities', capabilitiesRouter);  // S228: Capability Registry Core
+router.use('/sales-bench', salesBenchRouter);  // S241-S248: Sales-Bench v1 (PRD v1.3 Appendix)
 
 // OS Control Plane: Authoritative configuration endpoints
 router.use('/', controlplaneRouter);  // Mounts /resolve-config and /envelope
