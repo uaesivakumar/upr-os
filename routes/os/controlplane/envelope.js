@@ -14,7 +14,7 @@
 
 import express from 'express';
 import crypto from 'crypto';
-import pool from '../../server/db.js';
+import pool from '../../../server/db.js';
 
 const router = express.Router();
 

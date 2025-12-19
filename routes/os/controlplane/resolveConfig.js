@@ -13,7 +13,7 @@
  */
 
 import express from 'express';
-import pool from '../../server/db.js';
+import pool from '../../../server/db.js';
 
 const router = express.Router();
 

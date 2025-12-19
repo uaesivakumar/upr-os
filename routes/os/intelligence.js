@@ -1,5 +1,5 @@
 /**
- * Intelligence Router - S218-S223 SIVA Intelligence Enhancement
+ * Intelligence Router - S218-S227 SIVA Intelligence Enhancement
  *
  * OS_AUTHORITY: All endpoints are controlled by OS
  * - Session management
@@ -7,6 +7,12 @@
  * - Preference learning
  * - Interaction Ledger (PRD v1.2: NOT "conversation history")
  * - Conversational UX
+ *
+ * S224-S227 DECISION MODE:
+ * - S224: ONE primary recommendation with reasoning (directive, not descriptive)
+ * - S226: Aggressive shortlisting (Top 5 only, no 46-dump)
+ * - S227: Score explainability (Top 3 drivers, personalized)
+ * - S225: Visible learning feedback (immediate acknowledgment)
  *
  * Architecture: OS decides. SIVA reasons. SaaS renders.
  *
@@ -34,6 +40,230 @@ const conversationalService = new ConversationalService();
 
 // In-memory session store (production: Redis)
 const sessions = new Map();
+
+// =============================================================================
+// S224: DECISION MODE - Generate Primary Recommendation
+// =============================================================================
+
+/**
+ * S224: Generate primary recommendation from leads
+ * OS decides THE ONE company to focus on - directive, not descriptive
+ *
+ * Output contract:
+ * {
+ *   company: "G42",
+ *   company_id: "...",
+ *   why_now: ["Hiring velocity spike", "Payroll-scale headcount", "Tech expansion"],
+ *   confidence: 0.82,
+ *   next_action: "Find HR decision-maker",
+ *   score_drivers: [...]  // S227
+ * }
+ */
+function generatePrimaryRecommendation(leads, preferenceContext) {
+  if (!leads || leads.length === 0) {
+    return null;
+  }
+
+  // Top lead is the recommendation (already sorted by score)
+  const top = leads[0];
+  const score = top.score || top.qtle_score || 0;
+
+  // S224: Generate "why_now" reasons - directive language
+  const whyNow = [];
+
+  // Signal-based reasons
+  if (top.signals && top.signals.length > 0) {
+    const topSignal = top.signals[0];
+    if (topSignal.type === 'hiring-expansion' || topSignal.title?.toLowerCase().includes('hiring')) {
+      whyNow.push('Hiring velocity spike');
+    } else if (topSignal.type === 'office-opening' || topSignal.title?.toLowerCase().includes('expansion')) {
+      whyNow.push('Active expansion in your territory');
+    } else if (topSignal.type === 'funding-round' || topSignal.title?.toLowerCase().includes('funding')) {
+      whyNow.push('Fresh capital = budget for banking solutions');
+    } else {
+      whyNow.push(topSignal.title || 'Strong growth signal detected');
+    }
+  }
+
+  // Headcount-based reason
+  if (top.headcount) {
+    if (top.headcount >= 500) {
+      whyNow.push('Payroll-scale headcount (500+ employees)');
+    } else if (top.headcount >= 100) {
+      whyNow.push('Growing team (' + top.headcount + ' employees)');
+    }
+  }
+
+  // Preference-aligned reason (personalized)
+  if (preferenceContext && preferenceContext.preferred_industries) {
+    if (preferenceContext.preferred_industries.includes(top.industry)) {
+      whyNow.push('Matches your preferred industry pattern');
+    }
+  }
+
+  // Industry/tech reason
+  if (top.industry) {
+    if (top.industry.toLowerCase().includes('tech') || top.industry.toLowerCase().includes('technology')) {
+      whyNow.push('Tech sector = digital-first banking fit');
+    }
+  }
+
+  // Ensure at least 2 reasons
+  if (whyNow.length < 2) {
+    whyNow.push('High opportunity score (' + score + ')');
+  }
+
+  // S227: Score drivers (top 3, personalized)
+  const scoreDrivers = generateScoreDrivers(top, preferenceContext);
+
+  return {
+    company: top.name || top.company_name,
+    company_id: top.company_id || top.id,
+    industry: top.industry,
+    score: score,
+    why_now: whyNow.slice(0, 3), // Max 3 reasons
+    confidence: Math.min(0.95, score / 100),
+    next_action: 'Find HR decision-maker at ' + (top.name || 'this company'),
+    score_drivers: scoreDrivers // S227
+  };
+}
+
+// =============================================================================
+// S227: SCORE EXPLAINABILITY - Top 3 drivers, personalized
+// =============================================================================
+
+/**
+ * S227: Generate score drivers - explain WHY this score
+ * Rules:
+ * - Top 3 drivers only
+ * - At least 1 personalized driver
+ * - No math dumps, no jargon
+ */
+function generateScoreDrivers(lead, preferenceContext) {
+  const drivers = [];
+  const score = lead.score || lead.qtle_score || 0;
+
+  // Signal strength driver
+  if (lead.signals && lead.signals.length > 0) {
+    const signalCount = lead.signals.length;
+    if (signalCount >= 3) {
+      drivers.push({
+        driver: 'Multiple growth signals',
+        detail: signalCount + ' verified signals from multiple sources',
+        impact: 'high'
+      });
+    } else if (signalCount >= 1) {
+      const topSignal = lead.signals[0];
+      drivers.push({
+        driver: topSignal.title || 'Active growth signal',
+        detail: 'Source: ' + (topSignal.source || 'verified'),
+        impact: 'medium'
+      });
+    }
+  }
+
+  // Size/scale driver
+  if (lead.headcount) {
+    if (lead.headcount >= 500) {
+      drivers.push({
+        driver: 'Enterprise scale',
+        detail: lead.headcount + ' employees = significant payroll volume',
+        impact: 'high'
+      });
+    } else if (lead.headcount >= 100) {
+      drivers.push({
+        driver: 'Growth-stage company',
+        detail: lead.headcount + ' employees with expansion signals',
+        impact: 'medium'
+      });
+    }
+  }
+
+  // Personalized driver (REQUIRED - at least 1)
+  if (preferenceContext) {
+    if (preferenceContext.preferred_industries?.includes(lead.industry)) {
+      drivers.push({
+        driver: 'Matches your pattern',
+        detail: 'Similar to companies you previously engaged with',
+        impact: 'high',
+        personalized: true
+      });
+    } else if (preferenceContext.preferred_size_bucket === lead.size_bucket) {
+      drivers.push({
+        driver: 'Right company size',
+        detail: 'Matches your preferred company profile',
+        impact: 'medium',
+        personalized: true
+      });
+    }
+  }
+
+  // If no personalized driver yet, add a generic personalized one
+  if (!drivers.some(d => d.personalized)) {
+    drivers.push({
+      driver: 'Strong fit for your territory',
+      detail: 'Active in ' + (lead.location || lead.city || 'your region'),
+      impact: 'medium',
+      personalized: true
+    });
+  }
+
+  // Return top 3 only
+  return drivers.slice(0, 3);
+}
+
+// =============================================================================
+// S226: AGGRESSIVE SHORTLISTING - Top 5 only
+// =============================================================================
+
+const SHORTLIST_SIZE = 5; // Hard cap - no exceptions
+
+/**
+ * S226: Create aggressive shortlist
+ * Rules:
+ * - Default: Top 5 only
+ * - Everything else collapsed behind intent
+ * - Shortlist changes after feedback
+ */
+function createShortlist(leads, preferenceContext) {
+  if (!leads || leads.length === 0) {
+    return { shortlist: [], total_available: 0, collapsed_count: 0 };
+  }
+
+  // Apply preference boost before shortlisting
+  const boostedLeads = leads.map(lead => {
+    let boost = 0;
+    if (preferenceContext) {
+      if (preferenceContext.preferred_industries?.includes(lead.industry)) {
+        boost += 5;
+      }
+      if (preferenceContext.preferred_size_bucket === lead.size_bucket) {
+        boost += 3;
+      }
+    }
+    return {
+      ...lead,
+      score: (lead.score || lead.qtle_score || 0) + boost,
+      preference_boosted: boost > 0
+    };
+  });
+
+  // Sort by boosted score
+  boostedLeads.sort((a, b) => b.score - a.score);
+
+  // Take top 5 ONLY
+  const shortlist = boostedLeads.slice(0, SHORTLIST_SIZE);
+  const collapsedCount = Math.max(0, boostedLeads.length - SHORTLIST_SIZE);
+
+  return {
+    shortlist,
+    total_available: leads.length,
+    collapsed_count: collapsedCount,
+    message: collapsedCount > 0
+      ? `${collapsedCount} more available. Ask to see more if needed.`
+      : null
+  };
+}
 
 /**
  * POST /api/os/intelligence/session
@@ -79,12 +309,11 @@ router.post('/session', async (req, res) => {
     // Get user preference context
     const preferenceContext = preferenceLearningService.getPreferenceContext(user_id || tenant_id);
 
-    // Generate initial commentary
-    const commentaryContext = conversationalService.generateCommentaryContext(
-      initialBatch.leads,
-      { vertical, sub_vertical, region_code, filters },
-      preferenceContext
-    );
+    // S224: Generate PRIMARY RECOMMENDATION (ONE company, directive)
+    const primaryRecommendation = generatePrimaryRecommendation(initialBatch.leads, preferenceContext);
+
+    // S226: Aggressive shortlisting (Top 5 ONLY)
+    const shortlistResult = createShortlist(initialBatch.leads, preferenceContext);
 
     // Store session
     sessions.set(sessionId, {
@@ -98,19 +327,41 @@ router.post('/session', async (req, res) => {
       createdAt: new Date().toISOString()
     });
 
+    // S224: Decision Mode response - NO 46-dump, ONE recommendation + shortlist
     res.json({
       success: true,
       session_id: sessionId,
-      leads: initialBatch.leads,
-      batch_number: initialBatch.batchNumber,
-      has_more: initialBatch.hasMore,
-      remaining: initialBatch.remaining,
-      stats: initialBatch.stats,
-      commentary: generateSivaCommentary(commentaryContext, initialBatch.leads.length),
-      prompt: null, // No prompt on first batch
+
+      // S224: THE decision - directive, not descriptive
+      primary_recommendation: primaryRecommendation,
+
+      // S226: Top 5 only - aggressive shortlist
+      shortlist: shortlistResult.shortlist,
+      total_available: shortlistResult.total_available,
+      collapsed_count: shortlistResult.collapsed_count,
+      collapsed_message: shortlistResult.message,
+
+      // Legacy fields (for backward compatibility during transition)
+      leads: shortlistResult.shortlist, // Only shortlist, NOT all leads
+      batch_number: 1,
+      has_more: shortlistResult.collapsed_count > 0,
+      remaining: shortlistResult.collapsed_count,
+
+      // Stats
+      stats: {
+        shown: shortlistResult.shortlist.length,
+        total: shortlistResult.total_available,
+        collapsed: shortlistResult.collapsed_count
+      },
+
+      // No prompt on first batch
+      prompt: null,
+
       config: {
+        decision_mode: true, // S224 flag
+        shortlist_size: SHORTLIST_SIZE, // S226 cap
         progressive_delivery: packConfig?.progressive_delivery || {
-          initial_batch: 5,
+          initial_batch: SHORTLIST_SIZE,
           subsequent_batch: 3,
           require_feedback_before_next: true
         },
