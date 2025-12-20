@@ -732,6 +732,73 @@ router.post('/:key/approve', async (req, res) => {
 });
 
 /**
+ * GET /api/os/sales-bench/suites/:key/scenarios
+ * Get scenarios linked to a suite with details
+ */
+router.get('/:key/scenarios', async (req, res) => {
+  try {
+    const { key } = req.params;
+    const { limit = 100 } = req.query;
+
+    // Get suite ID first
+    const suiteResult = await pool.query(
+      `SELECT id FROM sales_bench_suites WHERE suite_key = $1`,
+      [key]
+    );
+
+    if (suiteResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'SUITE_NOT_FOUND',
+      });
+    }
+
+    const suiteId = suiteResult.rows[0].id;
+
+    // Get scenarios with details
+    const result = await pool.query(`
+      SELECT
+        s.id,
+        s.hash,
+        s.path_type,
+        s.expected_outcome,
+        s.entry_intent,
+        s.success_condition,
+        s.company_profile,
+        s.contact_profile,
+        s.signal_context,
+        s.persona_context,
+        s.source,
+        s.tags,
+        ss.sequence_order
+      FROM sales_bench.sales_scenarios s
+      JOIN sales_bench_suite_scenarios ss ON ss.scenario_id = s.id
+      WHERE ss.suite_id = $1
+      ORDER BY ss.sequence_order
+      LIMIT $2
+    `, [suiteId, parseInt(limit)]);
+
+    res.json({
+      success: true,
+      scenarios: result.rows,
+      count: result.rows.length,
+      summary: {
+        total: result.rows.length,
+        golden: result.rows.filter(r => r.path_type === 'GOLDEN').length,
+        kill: result.rows.filter(r => r.path_type === 'KILL').length,
+      },
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] Suite scenarios error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'SUITE_SCENARIOS_FAILED',
+      message: error.message,
+    });
+  }
+});
+
+/**
  * GET /api/os/sales-bench/suites/overview
  * Get overview of all suites with status (for Super Admin dashboard)
  */
