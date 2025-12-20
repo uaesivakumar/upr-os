@@ -73,8 +73,17 @@ export async function scoreScenario(scenario) {
     // Calculate weighted CRS (0-1 scale)
     const weightedCRS = calculateWeightedCRS(dimensionScores);
 
-    // Make PASS/BLOCK decision
-    const decision = makeDecision(dimensionScores, weightedCRS, scenario.path_type);
+    // Build context for meaningful reasoning
+    const reasoningContext = {
+      company,
+      signals,
+      scenarioData,
+      contact,
+      persona,
+    };
+
+    // Make PASS/BLOCK decision with persona-aware reasoning
+    const decision = makeDecision(dimensionScores, weightedCRS, scenario.path_type, reasoningContext);
 
     return {
       success: true,
@@ -86,10 +95,17 @@ export async function scoreScenario(scenario) {
       dimension_scores: dimensionScores,
       weighted_crs: weightedCRS,
 
-      // Decision
+      // Decision with EB RM reasoning
       outcome: decision.outcome,
       outcome_reason: decision.reason,
       outcome_correct: decision.outcome === scenario.expected_outcome,
+
+      // NEW: Meaningful EB RM insights
+      decision: decision.decision, // ENGAGE, WAIT, DO NOT ENGAGE
+      siva_reasoning: decision.siva_reasoning, // Full reasoning structure
+      suggested_persona: decision.suggested_persona, // How to approach
+      suggested_timing: decision.suggested_timing, // When to engage
+      revisit_trigger: decision.revisit_trigger, // For WAIT decisions
 
       // Timing
       latency_ms: Date.now() - startTime,
@@ -415,44 +431,286 @@ function calculateWeightedCRS(dimensionScores) {
 
 /**
  * Make PASS/BLOCK decision based on scores
+ * Now includes persona-aware reasoning for meaningful EB RM insights
  */
-function makeDecision(dimensionScores, weightedCRS, pathType) {
-  // Hard blocks
+function makeDecision(dimensionScores, weightedCRS, pathType, context = {}) {
+  const { company, signals, scenarioData } = context;
+
+  // Hard blocks with meaningful reasoning
   if (dimensionScores.compliance < DECISION_THRESHOLDS.COMPLIANCE_MIN) {
+    const blocker = signals?.blocker || scenarioData?.blocker || 'compliance issue';
     return {
       outcome: 'BLOCK',
-      reason: 'Compliance score below threshold - regulatory or policy concern',
+      reason: generateBlockReason(blocker, company, signals),
+      decision: 'DO NOT ENGAGE',
+      siva_reasoning: generateEBReasoning('compliance_block', context),
     };
   }
 
   if (dimensionScores.qualification < DECISION_THRESHOLDS.QUALIFICATION_MIN) {
+    const blocker = signals?.blocker || scenarioData?.blocker || 'poor qualification';
     return {
       outcome: 'BLOCK',
-      reason: 'Qualification score below threshold - lead does not match target profile',
+      reason: generateBlockReason(blocker, company, signals),
+      decision: 'DO NOT ENGAGE',
+      siva_reasoning: generateEBReasoning('qualification_block', context),
     };
   }
 
-  // CRS-based decision
+  // CRS-based decision with meaningful EB RM reasoning
   if (weightedCRS >= DECISION_THRESHOLDS.PASS_MIN_CRS) {
     return {
       outcome: 'PASS',
-      reason: `Weighted CRS ${(weightedCRS * 100).toFixed(1)}% exceeds ${DECISION_THRESHOLDS.PASS_MIN_CRS * 100}% threshold`,
+      reason: generateEngageReason(company, signals, scenarioData),
+      decision: 'ENGAGE',
+      siva_reasoning: generateEBReasoning('engage', context),
+      suggested_persona: suggestPersona(signals, company),
+      suggested_timing: suggestTiming(signals, scenarioData),
     };
   }
 
   if (weightedCRS <= DECISION_THRESHOLDS.BLOCK_MAX_CRS) {
+    const blocker = signals?.blocker || scenarioData?.blocker || 'weak opportunity';
     return {
       outcome: 'BLOCK',
-      reason: `Weighted CRS ${(weightedCRS * 100).toFixed(1)}% below ${DECISION_THRESHOLDS.BLOCK_MAX_CRS * 100}% threshold`,
+      reason: generateBlockReason(blocker, company, signals),
+      decision: 'DO NOT ENGAGE',
+      siva_reasoning: generateEBReasoning('weak_block', context),
     };
   }
 
   // Edge case: CRS between BLOCK_MAX and PASS_MIN
-  // Default to BLOCK for safety (conservative approach)
   return {
     outcome: 'BLOCK',
-    reason: `Weighted CRS ${(weightedCRS * 100).toFixed(1)}% in uncertain range - blocking conservatively`,
+    reason: generateWaitReason(company, signals),
+    decision: 'WAIT',
+    siva_reasoning: generateEBReasoning('wait', context),
+    revisit_trigger: suggestRevisitTrigger(signals),
   };
+}
+
+/**
+ * Generate meaningful ENGAGE reason like an experienced EB RM would think
+ */
+function generateEngageReason(company, signals, scenarioData) {
+  const signalType = signals?.type || signals?.signal_type || '';
+  const companyName = company?.name || 'This company';
+  const context = scenarioData?.context || '';
+
+  // Signal-specific EB reasoning
+  const signalReasons = {
+    'new-entity-setup': `${companyName} just registered in UAE - perfect timing to establish payroll relationship before first WPS cycle`,
+    'headcount-threshold': `${companyName} crossed 50+ employee threshold - now eligible for corporate payroll packages with volume pricing`,
+    'leadership-change': `New HR/Finance leadership at ${companyName} - fresh decision-maker means openness to new banking relationships`,
+    'regional-hq-setup': `${companyName} establishing regional HQ - will need centralized payroll across UAE entities`,
+    'office-expansion': `${companyName} expanding operations - additional employees means payroll scaling opportunity`,
+    'payroll-role-posted': `${companyName} hiring payroll specialist - signals payroll system review/change imminent`,
+    'contract-renewal': `${companyName}'s banking contract up for renewal - competitive bidding window open`,
+    'wps-compliance': `${companyName} needs WPS setup - immediate, non-negotiable banking requirement`,
+    'funding-round': `${companyName} raised funding - treasury needs plus likely headcount growth coming`,
+    'acquisition-integration': `${companyName} acquired local entity - payroll consolidation opportunity`,
+    'privatization': `${companyName} transitioning to private sector - needs commercial banking setup`,
+    'property-opening': `${companyName} opening new property/location - additional staff means additional payroll`,
+    'project-award': `${companyName} won major contract - will need project-specific payroll capacity`,
+    'mainland-migration': `${companyName} moving from free zone to mainland - WPS and visa payroll now required`,
+    'seasonal-hiring': `${companyName} seasonal hiring spike - temporary payroll solution opportunity`,
+    'clinic-network-expansion': `${companyName} expanding clinic network - healthcare staff payroll opportunity`,
+    'fleet-expansion': `${companyName} growing fleet/operations - driver/staff payroll scaling`,
+    'school-opening': `${companyName} opening new campus - education sector payroll opportunity`,
+    'hub-launch': `${companyName} launching UAE hub - initial payroll setup for new operation`,
+    'factory-setup': `${companyName} establishing manufacturing - industrial workforce payroll`,
+    'bank-consolidation': `${companyName} consolidating banks - RFP process likely, be part of consideration`,
+    'competitor-dissatisfaction': `${companyName} unhappy with current bank - timing to present alternative`,
+    'ipo-preparation': `${companyName} preparing for IPO - treasury optimization and payroll audit coming`,
+    'jv-formation': `${companyName} forming JV - new legal entity needs dedicated payroll`,
+  };
+
+  if (signalReasons[signalType]) {
+    return signalReasons[signalType];
+  }
+
+  // Fallback to context-based reasoning
+  if (context) {
+    return `Strong opportunity at ${companyName}: ${context.substring(0, 100)}...`;
+  }
+
+  return `${companyName} shows strong engagement signals - worth pursuing for payroll relationship`;
+}
+
+/**
+ * Generate meaningful BLOCK reason
+ */
+function generateBlockReason(blocker, company, signals) {
+  const companyName = company?.name || 'This company';
+
+  const blockerReasons = {
+    'recent_switch': `${companyName} switched banks recently - wait 18 months before approaching (relationship cooling period)`,
+    'downsizing': `${companyName} in downsizing mode - payroll opportunity shrinking, wrong timing`,
+    'contract_locked': `${companyName} has multi-year contract in place - no decision window available`,
+    'global_mandate': `${companyName}'s payroll controlled by global HQ - no local authority to engage`,
+    'compliance': `${companyName} has compliance/regulatory issues - reputational risk, do not engage`,
+    'no_payroll': `${companyName} is an investment vehicle/shell company - no actual employees to serve`,
+    'outsourced': `${companyName} uses outsourced payroll (PEO/EoR) - not a direct banking opportunity`,
+    'market_exit': `${companyName} exiting UAE market - closing operations, no future value`,
+    'sanctions': `${companyName} has sanctions/trade restriction concerns - hard compliance block`,
+    'recently_rejected': `${companyName} rejected us recently - allow 6+ month cooling period`,
+    'government': `${companyName} is government entity - requires specialized government banking unit`,
+    'competitor_relationship': `${companyName}'s key contact has personal relationship with competitor RM`,
+    'below_threshold': `${companyName} below 20 employee threshold - too small for EB product economics`,
+    'parent_payroll': `${companyName}'s payroll run by parent company - no local decision authority`,
+    'bad_debt': `${companyName} has credit/payment history issues - risk exposure too high`,
+    'no_growth': `${companyName} shows no growth trajectory - static payroll, no expansion opportunity`,
+  };
+
+  if (blockerReasons[blocker]) {
+    return blockerReasons[blocker];
+  }
+
+  return `${companyName} blocked: ${blocker}`;
+}
+
+/**
+ * Generate WAIT reason for edge cases
+ */
+function generateWaitReason(company, signals) {
+  const companyName = company?.name || 'This company';
+  return `${companyName} - signals present but not strong enough yet. Monitor for trigger events before engaging.`;
+}
+
+/**
+ * Generate full EB RM reasoning narrative
+ */
+function generateEBReasoning(decisionType, context) {
+  const { company, signals, scenarioData } = context;
+  const companyName = company?.name || 'Unknown Company';
+  const signalType = signals?.type || signals?.signal_type || 'general';
+  const employees = company?.employees || company?.employee_count || 'unknown';
+  const industry = company?.industry || 'N/A';
+
+  switch (decisionType) {
+    case 'engage':
+      return {
+        decision: 'ENGAGE',
+        confidence: 'HIGH',
+        summary: `Recommend approaching ${companyName} now based on ${signalType} signal.`,
+        analysis: [
+          `Signal: ${signals?.detail || signalType} indicates active banking need`,
+          `Company: ${employees} employees in ${industry} sector`,
+          `Timing: Current window favorable for initial outreach`,
+        ],
+        next_action: scenarioData?.expected_persona || 'Schedule discovery call with HR/Finance contact',
+      };
+
+    case 'compliance_block':
+      return {
+        decision: 'DO NOT ENGAGE',
+        confidence: 'HIGH',
+        summary: `${companyName} has compliance concerns - do not pursue.`,
+        analysis: [
+          `Blocker: ${signals?.blocker || 'Compliance/regulatory issue detected'}`,
+          `Risk: Reputational or regulatory exposure too high`,
+          `Action: Remove from active pipeline`,
+        ],
+        next_action: 'Archive and do not contact',
+      };
+
+    case 'qualification_block':
+      return {
+        decision: 'DO NOT ENGAGE',
+        confidence: 'HIGH',
+        summary: `${companyName} does not meet qualification criteria.`,
+        analysis: [
+          `Blocker: ${signals?.blocker || scenarioData?.blocker || 'Does not fit target profile'}`,
+          `Issue: Lead outside EB sweet spot (company size, decision authority, or timing)`,
+        ],
+        next_action: 'Focus resources on better-qualified leads',
+      };
+
+    case 'weak_block':
+      return {
+        decision: 'DO NOT ENGAGE',
+        confidence: 'MEDIUM',
+        summary: `${companyName} shows insufficient engagement signals.`,
+        analysis: [
+          `Signals too weak to justify pursuit effort`,
+          `Current timing does not favor outreach`,
+        ],
+        next_action: 'Add to nurture list, monitor for stronger signals',
+      };
+
+    case 'wait':
+      return {
+        decision: 'WAIT',
+        confidence: 'MEDIUM',
+        summary: `${companyName} - monitor for better timing.`,
+        analysis: [
+          `Some positive signals present but not actionable yet`,
+          `Premature outreach may burn the opportunity`,
+        ],
+        next_action: 'Set reminder to revisit in 30-60 days',
+      };
+
+    default:
+      return {
+        decision: 'REVIEW',
+        confidence: 'LOW',
+        summary: 'Manual review recommended',
+      };
+  }
+}
+
+/**
+ * Suggest approach persona based on signals
+ */
+function suggestPersona(signals, company) {
+  const signalType = signals?.type || signals?.signal_type || '';
+
+  const personaMap = {
+    'new-entity-setup': 'Trusted Advisor - guide through first-time WPS setup',
+    'headcount-threshold': 'Solution Architect - present volume pricing benefits',
+    'leadership-change': 'Relationship Builder - focus on fresh start narrative',
+    'regional-hq-setup': 'Enterprise Partner - emphasize regional capabilities',
+    'funding-round': 'Growth Partner - align with their scaling journey',
+    'wps-compliance': 'Compliance Expert - lead with regulatory expertise',
+    'contract-renewal': 'Competitive Analyst - benchmark against current provider',
+    'acquisition-integration': 'Integration Specialist - simplify M&A complexity',
+  };
+
+  return personaMap[signalType] || 'Consultative Partner - discovery-first approach';
+}
+
+/**
+ * Suggest timing for outreach
+ */
+function suggestTiming(signals, scenarioData) {
+  const signalType = signals?.type || signals?.signal_type || '';
+
+  const timingMap = {
+    'new-entity-setup': 'Immediate - before they establish first banking relationship',
+    'headcount-threshold': 'This week - capitalize on threshold momentum',
+    'leadership-change': 'After 30-60 days - let new leader settle in',
+    'wps-compliance': 'Urgent - WPS deadline drives decision',
+    'contract-renewal': '90 days before expiry - RFP timing window',
+    'funding-round': '2-4 weeks post-announcement - after celebration, before chaos',
+  };
+
+  return timingMap[signalType] || scenarioData?.expected_timing || 'Within 2 weeks of signal detection';
+}
+
+/**
+ * Suggest what trigger to monitor for revisit
+ */
+function suggestRevisitTrigger(signals) {
+  const signalType = signals?.type || signals?.signal_type || '';
+
+  // Suggest what to watch for before revisiting
+  const triggerMap = {
+    'weak': 'Watch for hiring posts, leadership changes, or funding announcements',
+    'stale': 'Wait for fresh signal - any expansion or restructuring news',
+    'general': 'Monitor for payroll-related job postings or contract expiry signals',
+  };
+
+  return triggerMap[signalType] || 'Monitor for stronger engagement signals or trigger events';
 }
 
 /**
