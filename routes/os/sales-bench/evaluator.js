@@ -41,8 +41,8 @@ router.get('/:token', async (req, res) => {
       FROM sales_bench_evaluator_invites i
       JOIN sales_bench_human_sessions s ON s.id = i.session_id
       JOIN sales_bench_suites su ON su.id = s.suite_id
-      LEFT JOIN os_verticals v ON v.key = su.vertical
-      LEFT JOIN os_sub_verticals sv ON sv.key = su.sub_vertical
+      LEFT JOIN os_verticals v ON v.id = su.vertical_id
+      LEFT JOIN os_sub_verticals sv ON sv.id = su.sub_vertical_id
       WHERE i.token = $1
     `, [token]);
 
