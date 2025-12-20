@@ -96,6 +96,12 @@ export function osAuthMiddleware(req, res, next) {
     return next();
   }
 
+  // Skip evaluator endpoints (token-based public access for human calibration)
+  // These use their own token validation via URL parameter, not x-pr-os-token
+  if (req.path.startsWith('/sales-bench/evaluator')) {
+    return next();
+  }
+
   // Check if PR_OS_TOKEN is configured
   const expectedTokenHash = getExpectedTokenHash();
   if (!expectedTokenHash) {
