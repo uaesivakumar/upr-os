@@ -708,7 +708,7 @@ router.get('/:key/runs/:runId/results', async (req, res) => {
         rr.crs_weighted,
         rr.siva_response,
         rr.latency_ms,
-        rr.created_at,
+        rr.executed_at,
         sc.company_profile,
         sc.contact_profile,
         sc.signal_context
