@@ -24,6 +24,7 @@ import executionRouter from './execution.js';
 import calibrationRouter from './calibration.js';
 import suitesRouter from './suites.js';
 import governanceRouter from './governance.js';
+import evaluatorRouter from './evaluator.js';
 import { SALES_BENCH_META, PRD_V13_COMPLIANCE } from '../../../os/sales-bench/index.js';
 
 const router = express.Router();
@@ -133,5 +134,8 @@ router.use('/execution', executionRouter);  // S247: Golden & Kill Path Executio
 
 // S248: Human Calibration Tooling
 router.use('/calibration', calibrationRouter);
+
+// Evaluator API: Token-based access for human scoring (no auth required)
+router.use('/evaluator', evaluatorRouter);
 
 export default router;

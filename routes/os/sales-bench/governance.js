@@ -14,6 +14,7 @@
  */
 
 import express from 'express';
+import { randomBytes } from 'crypto';
 import pool from '../../../server/db.js';
 
 const router = express.Router();
@@ -132,15 +133,28 @@ router.post('/commands/run-system-validation', async (req, res) => {
 });
 
 /**
+ * Generate URL-safe token for evaluator access
+ */
+function generateToken() {
+  return randomBytes(48).toString('base64url');
+}
+
+/**
  * POST /api/os/sales-bench/governance/commands/start-human-calibration
- * Start human calibration session for a suite
+ * Start human calibration session for a suite with email-based evaluator invites
  *
  * Super Admin triggers → OS executes
  * Requires: SYSTEM_VALIDATED status
+ *
+ * Flow:
+ * 1. Create session with evaluator invites
+ * 2. Generate unique tokens for each evaluator
+ * 3. Return invite URLs (Super Admin or system sends emails)
+ * 4. Evaluators access scoring page via token (no login required)
  */
 router.post('/commands/start-human-calibration', async (req, res) => {
   try {
-    const { suite_key, session_name, evaluator_count, triggered_by } = req.body;
+    const { suite_key, session_name, evaluator_count, evaluator_emails, triggered_by, deadline_days = 7 } = req.body;
 
     if (!suite_key) {
       return res.status(400).json({
@@ -150,12 +164,25 @@ router.post('/commands/start-human-calibration', async (req, res) => {
       });
     }
 
-    if (!evaluator_count || evaluator_count < 2) {
+    // Validate evaluator emails
+    const emails = evaluator_emails || [];
+    const effectiveCount = evaluator_count || emails.length;
+
+    if (effectiveCount < 2) {
       return res.status(400).json({
         success: false,
         error: 'EVALUATOR_COUNT_REQUIRED',
         command: 'start-human-calibration',
-        message: 'At least 2 evaluators required for ICC computation',
+        message: 'At least 2 evaluators required for ICC/Spearman computation',
+      });
+    }
+
+    if (emails.length > 0 && emails.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: 'INSUFFICIENT_EMAILS',
+        command: 'start-human-calibration',
+        message: 'Please provide at least 2 evaluator emails',
       });
     }
 
@@ -193,19 +220,101 @@ router.post('/commands/start-human-calibration', async (req, res) => {
     try {
       await client.query('BEGIN');
 
+      // Calculate deadline
+      const deadline = new Date();
+      deadline.setDate(deadline.getDate() + deadline_days);
+
       // Create human calibration session
       const sessionResult = await client.query(`
         INSERT INTO sales_bench_human_sessions (
-          suite_id, session_name, evaluator_count, created_by
-        ) VALUES ($1, $2, $3, $4)
+          suite_id, session_name, evaluator_count, deadline, created_by
+        ) VALUES ($1, $2, $3, $4, $5)
         RETURNING *
-      `, [suite.id, session_name || `Calibration ${new Date().toISOString().split('T')[0]}`, evaluator_count, triggered_by || 'SUPER_ADMIN']);
+      `, [
+        suite.id,
+        session_name || `Calibration ${new Date().toISOString().split('T')[0]}`,
+        effectiveCount,
+        deadline,
+        triggered_by || 'SUPER_ADMIN'
+      ]);
+
+      const session = sessionResult.rows[0];
+
+      // Get scenarios for this suite
+      const scenariosResult = await client.query(`
+        SELECT scenario_id FROM sales_bench_suite_scenarios
+        WHERE suite_id = $1
+        ORDER BY sequence_order
+      `, [suite.id]);
+
+      const scenarioIds = scenariosResult.rows.map(r => r.scenario_id);
+
+      // Create evaluator invites if emails provided
+      const invites = [];
+      const baseUrl = process.env.SAAS_BASE_URL || 'https://upr.sivakumar.ai';
+
+      for (let i = 0; i < emails.length; i++) {
+        const email = emails[i].trim().toLowerCase();
+        const evaluatorId = `EVAL_${i + 1}`;
+        const token = generateToken();
+        const expiresAt = new Date(deadline);
+        expiresAt.setDate(expiresAt.getDate() + 1); // Expires 1 day after deadline
+
+        const inviteResult = await client.query(`
+          INSERT INTO sales_bench_evaluator_invites (
+            session_id, evaluator_id, email, token, scenarios_assigned, expires_at
+          ) VALUES ($1, $2, $3, $4, $5, $6)
+          RETURNING *
+        `, [session.id, evaluatorId, email, token, scenarioIds.length, expiresAt]);
+
+        const invite = inviteResult.rows[0];
+
+        // Create scenario queue for this evaluator (shuffled order for bias reduction)
+        const shuffledScenarios = [...scenarioIds];
+        // Seeded shuffle based on evaluator index for reproducibility
+        for (let j = shuffledScenarios.length - 1; j > 0; j--) {
+          const seed = (i + 1) * 12345 + j;
+          const k = Math.floor(((seed * 9301 + 49297) % 233280) / 233280 * (j + 1));
+          [shuffledScenarios[j], shuffledScenarios[k]] = [shuffledScenarios[k], shuffledScenarios[j]];
+        }
+
+        for (let q = 0; q < shuffledScenarios.length; q++) {
+          await client.query(`
+            INSERT INTO sales_bench_evaluator_scenario_queue (
+              invite_id, scenario_id, queue_position
+            ) VALUES ($1, $2, $3)
+          `, [invite.id, shuffledScenarios[q], q + 1]);
+        }
+
+        invites.push({
+          evaluator_id: evaluatorId,
+          email: email,
+          token: token,
+          scoring_url: `${baseUrl}/evaluate/${token}`,
+          scenarios_to_score: scenarioIds.length,
+          expires_at: expiresAt.toISOString(),
+        });
+      }
+
+      // Update session with invite count
+      if (invites.length > 0) {
+        await client.query(`
+          UPDATE sales_bench_human_sessions
+          SET invites_sent = $2
+          WHERE id = $1
+        `, [session.id, invites.length]);
+      }
 
       // Audit log
       await client.query(`
-        INSERT INTO sales_bench_audit_log (suite_id, event_type, event_description, actor, actor_role)
-        VALUES ($1, 'HUMAN_CALIBRATION_STARTED', $2, $3, 'SUPER_ADMIN')
-      `, [suite.id, `Human calibration session started with ${evaluator_count} evaluators`, triggered_by || 'SUPER_ADMIN']);
+        INSERT INTO sales_bench_audit_log (suite_id, event_type, event_description, actor, actor_role, after_state)
+        VALUES ($1, 'HUMAN_CALIBRATION_STARTED', $2, $3, 'SUPER_ADMIN', $4)
+      `, [
+        suite.id,
+        `Human calibration session started with ${effectiveCount} evaluators`,
+        triggered_by || 'SUPER_ADMIN',
+        JSON.stringify({ session_id: session.id, invites: invites.length, deadline: deadline.toISOString() })
+      ]);
 
       await client.query('COMMIT');
 
@@ -213,13 +322,23 @@ router.post('/commands/start-human-calibration', async (req, res) => {
         success: true,
         command: 'start-human-calibration',
         data: {
-          session_id: sessionResult.rows[0].id,
+          session_id: session.id,
           suite_key,
-          evaluator_count,
+          evaluator_count: effectiveCount,
           status: 'IN_PROGRESS',
+          deadline: deadline.toISOString(),
+          invites: invites,
         },
-        message: 'Human calibration session started',
-        next_step: 'Use calibration API to record human scores',
+        message: `Human calibration session started. ${invites.length > 0 ? `Send the scoring URLs to evaluators.` : 'Add evaluators via API.'}`,
+        next_steps: invites.length > 0 ? [
+          'Send scoring URLs to evaluators via email',
+          'Evaluators click link and score scenarios (no login required)',
+          'Monitor progress via /api/os/sales-bench/calibration/session/:id',
+          'Correlation computed automatically when all complete',
+        ] : [
+          'Use calibration API to add evaluators',
+          'Record human scores via submit endpoint',
+        ],
       });
     } catch (error) {
       await client.query('ROLLBACK');
@@ -446,6 +565,143 @@ router.post('/commands/deprecate-suite', async (req, res) => {
       success: false,
       command: 'deprecate-suite',
       error: 'COMMAND_FAILED',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/os/sales-bench/governance/commands/create-version
+ * Create a new version of a suite
+ *
+ * Copies scenarios from source suite to new version.
+ * New version starts in DRAFT status.
+ */
+router.post('/commands/create-version', async (req, res) => {
+  try {
+    const { suite_key, version_notes, created_by } = req.body;
+
+    if (!suite_key) {
+      return res.status(400).json({
+        success: false,
+        error: 'SUITE_KEY_REQUIRED',
+        command: 'create-version',
+      });
+    }
+
+    // Get source suite
+    const suiteResult = await pool.query(`
+      SELECT id, suite_key, name, version, base_suite_key
+      FROM sales_bench_suites
+      WHERE suite_key = $1 AND is_active = true
+    `, [suite_key]);
+
+    if (suiteResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'SUITE_NOT_FOUND',
+        command: 'create-version',
+      });
+    }
+
+    const sourceSuite = suiteResult.rows[0];
+
+    // Create new version using database function
+    const newVersionResult = await pool.query(`
+      SELECT sales_bench_create_suite_version($1, $2, $3) AS new_suite_id
+    `, [sourceSuite.id, version_notes, created_by || 'SUPER_ADMIN']);
+
+    const newSuiteId = newVersionResult.rows[0].new_suite_id;
+
+    // Get new suite details
+    const newSuiteResult = await pool.query(`
+      SELECT s.*, ss.status
+      FROM sales_bench_suites s
+      LEFT JOIN sales_bench_suite_status ss ON ss.suite_id = s.id
+      WHERE s.id = $1
+    `, [newSuiteId]);
+
+    const newSuite = newSuiteResult.rows[0];
+
+    // Audit log
+    await pool.query(`
+      INSERT INTO sales_bench_audit_log (suite_id, event_type, event_description, actor, actor_role, after_state)
+      VALUES ($1, 'VERSION_CREATED', $2, $3, 'SUPER_ADMIN', $4)
+    `, [
+      newSuiteId,
+      `Created version ${newSuite.version} from ${sourceSuite.suite_key}`,
+      created_by || 'SUPER_ADMIN',
+      JSON.stringify({ source_suite_key: sourceSuite.suite_key, new_version: newSuite.version })
+    ]);
+
+    res.status(201).json({
+      success: true,
+      command: 'create-version',
+      data: {
+        new_suite_id: newSuiteId,
+        new_suite_key: newSuite.suite_key,
+        version: newSuite.version,
+        base_suite_key: newSuite.base_suite_key,
+        status: newSuite.status,
+        scenario_count: newSuite.scenario_count,
+        source_suite_key: sourceSuite.suite_key,
+      },
+      message: `Created version ${newSuite.version} of ${newSuite.base_suite_key}`,
+      next_step: 'Modify scenarios as needed, then freeze and validate',
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] create-version error:', error);
+    res.status(500).json({
+      success: false,
+      command: 'create-version',
+      error: 'COMMAND_FAILED',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * GET /api/os/sales-bench/governance/versions/:base_suite_key
+ * Get all versions of a suite
+ */
+router.get('/versions/:base_suite_key', async (req, res) => {
+  try {
+    const { base_suite_key } = req.params;
+
+    const versionsResult = await pool.query(`
+      SELECT
+        s.id,
+        s.suite_key,
+        s.name,
+        s.version,
+        s.is_latest_version,
+        s.version_notes,
+        s.version_created_at,
+        s.scenario_count,
+        s.is_frozen,
+        ss.status,
+        ss.system_validated_at,
+        ss.human_validated_at,
+        ss.ga_approved_at
+      FROM sales_bench_suites s
+      LEFT JOIN sales_bench_suite_status ss ON ss.suite_id = s.id
+      WHERE s.base_suite_key = $1 AND s.is_active = true
+      ORDER BY s.version DESC
+    `, [base_suite_key]);
+
+    res.json({
+      success: true,
+      data: {
+        base_suite_key,
+        total_versions: versionsResult.rows.length,
+        versions: versionsResult.rows,
+      },
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] get versions error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'FETCH_FAILED',
       message: error.message,
     });
   }

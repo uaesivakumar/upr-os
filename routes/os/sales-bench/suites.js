@@ -49,6 +49,10 @@ router.get('/', async (req, res) => {
         ss.ga_approved_at,
         ss.spearman_rho,
         s.created_at,
+        s.version,
+        s.base_suite_key,
+        s.is_latest_version,
+        s.version_notes,
         (
           SELECT json_build_object(
             'golden_pass_rate', r.golden_pass_rate / 100.0,
