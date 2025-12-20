@@ -661,6 +661,131 @@ router.get('/:key/audit', async (req, res) => {
 });
 
 /**
+ * GET /api/os/sales-bench/suites/:key/runs/:runId/results
+ * Get scenario-by-scenario results for a specific run
+ * Super Admin visibility: See exactly what SIVA scored
+ */
+router.get('/:key/runs/:runId/results', async (req, res) => {
+  try {
+    const { key, runId } = req.params;
+
+    // Get run to verify it belongs to this suite
+    const runResult = await pool.query(`
+      SELECT r.*, s.suite_key
+      FROM sales_bench_runs r
+      JOIN sales_bench_suites s ON s.id = r.suite_id
+      WHERE r.id = $1 AND s.suite_key = $2
+    `, [runId, key]);
+
+    if (runResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'RUN_NOT_FOUND',
+        message: 'Run not found or does not belong to this suite',
+      });
+    }
+
+    const run = runResult.rows[0];
+
+    // Get scenario results with company/contact info
+    const resultsQuery = await pool.query(`
+      SELECT
+        rr.id,
+        rr.scenario_id,
+        rr.scenario_hash,
+        rr.path_type,
+        rr.execution_order,
+        rr.outcome,
+        rr.expected_outcome,
+        rr.crs_qualification,
+        rr.crs_needs_discovery,
+        rr.crs_value_articulation,
+        rr.crs_objection_handling,
+        rr.crs_process_adherence,
+        rr.crs_compliance,
+        rr.crs_relationship_building,
+        rr.crs_next_step_secured,
+        rr.crs_weighted,
+        rr.siva_response,
+        rr.latency_ms,
+        rr.created_at,
+        sc.company_profile,
+        sc.contact_profile,
+        sc.signal_context
+      FROM sales_bench_run_results rr
+      JOIN sales_bench.sales_scenarios sc ON sc.id = rr.scenario_id
+      WHERE rr.run_id = $1
+      ORDER BY rr.execution_order
+    `, [runId]);
+
+    // Calculate aggregates
+    const results = resultsQuery.rows;
+    const correct = results.filter(r => r.outcome === r.expected_outcome).length;
+    const incorrect = results.length - correct;
+    const golden = results.filter(r => r.path_type === 'GOLDEN');
+    const kill = results.filter(r => r.path_type === 'KILL');
+
+    res.json({
+      success: true,
+      data: {
+        run: {
+          id: run.id,
+          run_number: run.run_number,
+          status: run.status,
+          started_at: run.started_at,
+          ended_at: run.ended_at,
+          duration_ms: run.duration_ms,
+          golden_pass_rate: run.golden_pass_rate,
+          kill_containment_rate: run.kill_containment_rate,
+          cohens_d: run.cohens_d,
+        },
+        summary: {
+          total_scenarios: results.length,
+          correct,
+          incorrect,
+          accuracy: results.length > 0 ? Math.round((correct / results.length) * 100) : 0,
+          golden_total: golden.length,
+          golden_passed: golden.filter(r => r.outcome === 'PASS').length,
+          kill_total: kill.length,
+          kill_blocked: kill.filter(r => r.outcome === 'BLOCK').length,
+        },
+        results: results.map(r => ({
+          scenario_id: r.scenario_id,
+          execution_order: r.execution_order,
+          path_type: r.path_type,
+          expected_outcome: r.expected_outcome,
+          outcome: r.outcome,
+          is_correct: r.outcome === r.expected_outcome,
+          crs_scores: {
+            qualification: r.crs_qualification,
+            needs_discovery: r.crs_needs_discovery,
+            value_articulation: r.crs_value_articulation,
+            objection_handling: r.crs_objection_handling,
+            process_adherence: r.crs_process_adherence,
+            compliance: r.crs_compliance,
+            relationship_building: r.crs_relationship_building,
+            next_step_secured: r.crs_next_step_secured,
+            weighted: r.crs_weighted,
+          },
+          siva_reason: r.siva_response,
+          latency_ms: r.latency_ms,
+          company: r.company_profile,
+          contact: r.contact_profile,
+          signals: r.signal_context,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] Run results error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'RUN_RESULTS_FAILED',
+      message: error.message,
+    });
+  }
+});
+
+/**
  * POST /api/os/sales-bench/suites/:key/approve
  * Approve suite for GA (after human validation)
  * Requires CALIBRATION_ADMIN role

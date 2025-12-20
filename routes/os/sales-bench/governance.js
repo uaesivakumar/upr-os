@@ -16,6 +16,7 @@
 import express from 'express';
 import { randomBytes } from 'crypto';
 import pool from '../../../server/db.js';
+import { scoreScenario, scoreBatch } from '../../../os/sales-bench/engine/siva-scorer.js';
 
 const router = express.Router();
 
@@ -23,9 +24,19 @@ const router = express.Router();
  * POST /api/os/sales-bench/governance/commands/run-system-validation
  * Trigger system validation run for a suite
  *
- * Super Admin triggers → OS executes
+ * Super Admin triggers → OS executes → SIVA scores all scenarios
+ *
+ * This is a SYNCHRONOUS operation that:
+ * 1. Creates a run record (status: RUNNING)
+ * 2. Fetches all scenarios for the suite
+ * 3. Scores each scenario using SIVA
+ * 4. Stores results in sales_bench_run_results
+ * 5. Calculates aggregate metrics
+ * 6. Updates run status to COMPLETED (or FAILED)
  */
 router.post('/commands/run-system-validation', async (req, res) => {
+  const startTime = Date.now();
+
   try {
     const { suite_key, run_mode = 'FULL', triggered_by, environment = 'PRODUCTION' } = req.body;
 
@@ -66,6 +77,39 @@ router.post('/commands/run-system-validation', async (req, res) => {
       });
     }
 
+    // Fetch all scenarios for this suite
+    const scenariosResult = await pool.query(`
+      SELECT
+        sc.id,
+        sc.path_type,
+        sc.expected_outcome,
+        sc.scenario_data,
+        sc.company_profile,
+        sc.contact_profile,
+        sc.signal_context,
+        sc.persona_context,
+        sc.hash
+      FROM sales_bench_suite_scenarios sss
+      JOIN sales_bench.sales_scenarios sc ON sc.id = sss.scenario_id
+      WHERE sss.suite_id = $1
+      ORDER BY sss.sequence_order
+    `, [suite.id]);
+
+    const scenarios = scenariosResult.rows;
+
+    if (scenarios.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'NO_SCENARIOS',
+        command: 'run-system-validation',
+        message: 'Suite has no scenarios to validate',
+      });
+    }
+
+    // Count scenario types
+    const goldenCount = scenarios.filter(s => s.path_type === 'GOLDEN').length;
+    const killCount = scenarios.filter(s => s.path_type === 'KILL').length;
+
     // Get next run number
     const nextRunResult = await pool.query(
       `SELECT COALESCE(MAX(run_number), 0) + 1 AS next_run FROM sales_bench_runs WHERE suite_id = $1`,
@@ -74,10 +118,12 @@ router.post('/commands/run-system-validation', async (req, res) => {
     const runNumber = nextRunResult.rows[0].next_run;
 
     const client = await pool.connect();
+    let runId;
+
     try {
       await client.query('BEGIN');
 
-      // Create run record
+      // Create run record (status: RUNNING)
       const runResult = await client.query(`
         INSERT INTO sales_bench_runs (
           suite_id, suite_key, run_number, run_mode,
@@ -86,40 +132,174 @@ router.post('/commands/run-system-validation', async (req, res) => {
           scenario_count, golden_count, kill_count,
           status
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'SUPER_ADMIN', $10, $11, $12, 'RUNNING')
-        RETURNING *
+        RETURNING id
       `, [
         suite.id, suite_key, runNumber, run_mode,
-        suite.scenario_manifest_hash, '1.0.0', 'unknown',
+        suite.scenario_manifest_hash || 'computed-at-runtime', '1.0.0', process.env.GIT_COMMIT || 'unknown',
         environment, triggered_by || 'SUPER_ADMIN',
-        suite.scenario_count, Math.floor(suite.scenario_count / 2), Math.floor(suite.scenario_count / 2),
+        scenarios.length, goldenCount, killCount,
       ]);
 
-      // Audit log
+      runId = runResult.rows[0].id;
+
+      // Audit log - run started
       await client.query(`
         INSERT INTO sales_bench_audit_log (suite_id, run_id, event_type, event_description, actor, actor_role)
         VALUES ($1, $2, 'RUN_STARTED', $3, $4, 'SUPER_ADMIN')
-      `, [suite.id, runResult.rows[0].id, `System validation run #${runNumber} started (${run_mode})`, triggered_by || 'SUPER_ADMIN']);
+      `, [suite.id, runId, `System validation run #${runNumber} started (${run_mode}) - ${scenarios.length} scenarios`, triggered_by || 'SUPER_ADMIN']);
 
       await client.query('COMMIT');
-
-      res.status(201).json({
-        success: true,
-        command: 'run-system-validation',
-        data: {
-          run_id: runResult.rows[0].id,
-          run_number: runNumber,
-          suite_key,
-          run_mode,
-          status: 'RUNNING',
-        },
-        message: `System validation run #${runNumber} started`,
-        next_step: 'Poll /api/os/sales-bench/suites/${suite_key}/history for run status',
-      });
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
     } finally {
       client.release();
+    }
+
+    // --- SIVA SCORING (outside transaction for responsiveness) ---
+    console.log(`[SALES_BENCH] Run #${runNumber}: Scoring ${scenarios.length} scenarios...`);
+
+    const batchResult = await scoreBatch(scenarios);
+    const { results, metrics } = batchResult;
+
+    console.log(`[SALES_BENCH] Run #${runNumber}: Scoring complete. Golden Pass: ${metrics.golden_pass_rate}%, Kill Containment: ${metrics.kill_containment_rate}%`);
+
+    // Store individual results and update run
+    const client2 = await pool.connect();
+    try {
+      await client2.query('BEGIN');
+
+      // Insert individual scenario results
+      for (let i = 0; i < results.length; i++) {
+        const r = results[i];
+        const scenario = scenarios[i];
+
+        await client2.query(`
+          INSERT INTO sales_bench_run_results (
+            run_id, scenario_id, scenario_hash, path_type, execution_order,
+            outcome, expected_outcome,
+            crs_qualification, crs_needs_discovery, crs_value_articulation,
+            crs_objection_handling, crs_process_adherence, crs_compliance,
+            crs_relationship_building, crs_next_step_secured, crs_weighted,
+            siva_response, latency_ms
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        `, [
+          runId, r.scenario_id, scenario.hash, r.path_type, i + 1,
+          r.outcome || 'ERROR', r.expected_outcome,
+          r.dimension_scores?.qualification || null,
+          r.dimension_scores?.needs_discovery || null,
+          r.dimension_scores?.value_articulation || null,
+          r.dimension_scores?.objection_handling || null,
+          r.dimension_scores?.process_adherence || null,
+          r.dimension_scores?.compliance || null,
+          r.dimension_scores?.relationship_building || null,
+          r.dimension_scores?.next_step_secured || null,
+          r.weighted_crs || null,
+          r.outcome_reason || r.error || null,
+          r.latency_ms || 0,
+        ]);
+      }
+
+      // Update run with results
+      const durationMs = Date.now() - startTime;
+      await client2.query(`
+        UPDATE sales_bench_runs SET
+          status = 'COMPLETED',
+          ended_at = NOW(),
+          duration_ms = $2,
+          pass_count = $3,
+          fail_count = 0,
+          block_count = $4,
+          error_count = $5,
+          golden_pass_rate = $6,
+          kill_containment_rate = $7,
+          cohens_d = $8,
+          metrics = $9
+        WHERE id = $1
+      `, [
+        runId, durationMs,
+        metrics.pass_count, metrics.block_count, metrics.error_count,
+        metrics.golden_pass_rate, metrics.kill_containment_rate, metrics.cohens_d,
+        JSON.stringify(metrics),
+      ]);
+
+      // Update suite status if validation passes
+      const validationPassed = metrics.golden_pass_rate >= 90 && metrics.kill_containment_rate >= 95;
+
+      if (validationPassed) {
+        await client2.query(`
+          UPDATE sales_bench_suite_status SET
+            status = 'SYSTEM_VALIDATED',
+            system_validated_at = NOW(),
+            system_validation_run_id = $2,
+            system_metrics = $3
+          WHERE suite_id = $1
+        `, [suite.id, runId, JSON.stringify(metrics)]);
+
+        // Audit log - system validated
+        await client2.query(`
+          INSERT INTO sales_bench_audit_log (suite_id, run_id, event_type, event_description, actor, actor_role, after_state)
+          VALUES ($1, $2, 'SYSTEM_VALIDATION_PASSED', $3, 'SYSTEM', 'OS', $4)
+        `, [
+          suite.id, runId,
+          `System validation PASSED: Golden ${metrics.golden_pass_rate}%, Kill ${metrics.kill_containment_rate}%, Cohen's d ${metrics.cohens_d}`,
+          JSON.stringify({ status: 'SYSTEM_VALIDATED', metrics }),
+        ]);
+      } else {
+        // Audit log - validation result
+        await client2.query(`
+          INSERT INTO sales_bench_audit_log (suite_id, run_id, event_type, event_description, actor, actor_role, after_state)
+          VALUES ($1, $2, 'RUN_COMPLETED', $3, 'SYSTEM', 'OS', $4)
+        `, [
+          suite.id, runId,
+          `Run #${runNumber} completed: Golden ${metrics.golden_pass_rate}%, Kill ${metrics.kill_containment_rate}%, Cohen's d ${metrics.cohens_d}`,
+          JSON.stringify({ metrics }),
+        ]);
+      }
+
+      await client2.query('COMMIT');
+
+      res.status(201).json({
+        success: true,
+        command: 'run-system-validation',
+        data: {
+          id: runId,
+          run_id: runId,
+          run_number: runNumber,
+          suite_key,
+          run_mode,
+          status: 'COMPLETED',
+          scenario_count: scenarios.length,
+          golden_count: goldenCount,
+          kill_count: killCount,
+          pass_count: metrics.pass_count,
+          block_count: metrics.block_count,
+          error_count: metrics.error_count,
+          golden_pass_rate: metrics.golden_pass_rate,
+          kill_containment_rate: metrics.kill_containment_rate,
+          cohens_d: metrics.cohens_d,
+          duration_ms: durationMs,
+          validation_passed: validationPassed,
+        },
+        message: validationPassed
+          ? `System validation PASSED! Golden: ${metrics.golden_pass_rate}%, Kill: ${metrics.kill_containment_rate}%`
+          : `Run #${runNumber} completed. Golden: ${metrics.golden_pass_rate}%, Kill: ${metrics.kill_containment_rate}%`,
+        next_step: validationPassed
+          ? 'Suite is now SYSTEM_VALIDATED. Proceed to human calibration.'
+          : 'Review results and tune scenarios or SIVA logic.',
+      });
+    } catch (error) {
+      await client2.query('ROLLBACK');
+
+      // Mark run as FAILED
+      await pool.query(`
+        UPDATE sales_bench_runs SET status = 'FAILED', error_message = $2, ended_at = NOW()
+        WHERE id = $1
+      `, [runId, error.message]);
+
+      throw error;
+    } finally {
+      client2.release();
     }
   } catch (error) {
     console.error('[SALES_BENCH] run-system-validation error:', error);
