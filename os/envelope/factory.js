@@ -37,24 +37,48 @@ export function createEnvelope(params) {
     overrides = {},
   } = params;
 
-  // Validate canonical persona
+  // Validate canonical persona OR accept UUID persona with overrides
   const validPersonaIds = Object.values(CANONICAL_PERSONAS);
-  if (!validPersonaIds.includes(persona_id)) {
-    throw new Error(`Invalid persona_id: ${persona_id}. Must be one of: ${validPersonaIds.join(', ')}`);
+  const isCanonicalPersona = validPersonaIds.includes(persona_id);
+  const isUuidPersona = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(persona_id);
+
+  if (!isCanonicalPersona && !isUuidPersona) {
+    throw new Error(`Invalid persona_id: ${persona_id}. Must be canonical (1-7) or valid UUID.`);
   }
 
-  // Get persona capabilities
-  const capabilities = PERSONA_CAPABILITIES[persona_id];
-  if (!capabilities) {
-    throw new Error(`No capabilities defined for persona_id: ${persona_id}`);
+  // Get persona capabilities - use overrides for UUID personas
+  let capabilities;
+  if (isCanonicalPersona) {
+    capabilities = PERSONA_CAPABILITIES[persona_id];
+    if (!capabilities) {
+      throw new Error(`No capabilities defined for persona_id: ${persona_id}`);
+    }
+  } else {
+    // UUID persona - must have allowed_tools in overrides
+    if (!overrides.allowed_tools || overrides.allowed_tools.length === 0) {
+      throw new Error(`UUID persona ${persona_id} requires overrides.allowed_tools`);
+    }
+    // Use default capabilities for UUID personas
+    capabilities = {
+      allowed_intents: ['discovery', 'scoring', 'ranking', 'qualification'],
+      forbidden_outputs: ['pii', 'competitors_internal'],
+      max_tokens: 4000,
+      max_cost_usd: 0.50,
+      model_tier: 'standard',
+      memory_days: 30,
+      stateless: false,
+    };
   }
+
+  // For UUID personas, use defaults for helper functions
+  const effectivePersonaId = isCanonicalPersona ? persona_id : '2'; // Default to RM persona for UUID
 
   // Build envelope without hash
   const envelope = {
     envelope_version: ENVELOPE_VERSION,
     tenant_id,
     user_id,
-    persona_id,
+    persona_id,  // Keep original UUID or canonical ID
     vertical,
     sub_vertical,
     region,
@@ -62,20 +86,20 @@ export function createEnvelope(params) {
     // Persona-bound capabilities
     allowed_intents: overrides.allowed_intents || capabilities.allowed_intents,
     forbidden_outputs: overrides.forbidden_outputs || capabilities.forbidden_outputs,
-    allowed_tools: overrides.allowed_tools || getAllowedToolsForPersona(persona_id),
+    allowed_tools: overrides.allowed_tools || getAllowedToolsForPersona(effectivePersonaId),
 
     // Scopes
     evidence_scope: {
-      show_raw_evidence: persona_id !== '1', // Not for customer-facing
-      show_provenance: ['2', '3', '5'].includes(persona_id), // Sales, Supervisor, Compliance
+      show_raw_evidence: !isCanonicalPersona || persona_id !== '1',
+      show_provenance: !isCanonicalPersona || ['2', '3', '5'].includes(persona_id),
       max_evidence_age_days: capabilities.memory_days || 30,
-      allowed_sources: getEvidenceSourcesForPersona(persona_id),
+      allowed_sources: getEvidenceSourcesForPersona(effectivePersonaId),
     },
 
     memory_scope: {
       max_days: capabilities.memory_days,
       stateless: capabilities.stateless,
-      summarized_only: persona_id === '1', // Customer-facing gets summarized only
+      summarized_only: isCanonicalPersona && persona_id === '1',
     },
 
     // Budgets
@@ -86,8 +110,8 @@ export function createEnvelope(params) {
     },
 
     latency_budget: {
-      p95_ms: getLatencyBudgetForPersona(persona_id).p95_ms,
-      timeout_ms: getLatencyBudgetForPersona(persona_id).timeout_ms,
+      p95_ms: getLatencyBudgetForPersona(effectivePersonaId).p95_ms,
+      timeout_ms: getLatencyBudgetForPersona(effectivePersonaId).timeout_ms,
     },
 
     // Rules
