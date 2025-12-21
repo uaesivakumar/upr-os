@@ -999,4 +999,392 @@ router.get('/dashboard/overview', async (req, res) => {
   }
 });
 
+// ============================================================================
+// PHASE 1: TRUST LAYER - TRACE ENDPOINTS
+// ============================================================================
+
+/**
+ * GET /api/os/sales-bench/suites/:key/runs/:runId/results/:resultId/trace
+ * Get complete trace/provenance data for a single scenario result
+ *
+ * Returns the full audit trail:
+ * - interaction_id (unique identifier for replay)
+ * - envelope_sha256 (request hash for integrity)
+ * - persona_id, persona_version, policy_version (authority chain)
+ * - tools_allowed, tools_used (tool execution trace)
+ * - policy_gates_hit (policy enforcement trace)
+ * - evidence_used (data provenance)
+ * - signature (tamper detection HMAC)
+ * - replay_url (link to replay this exact interaction)
+ */
+router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
+  try {
+    const { key: suiteKey, runId, resultId } = req.params;
+
+    // Validate suite exists
+    const suiteCheck = await pool.query(
+      'SELECT id FROM sales_bench_suites WHERE suite_key = $1 AND is_active = true',
+      [suiteKey]
+    );
+
+    if (suiteCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'SUITE_NOT_FOUND',
+        suite_key: suiteKey,
+      });
+    }
+
+    // Get complete trace data for this result
+    const result = await pool.query(`
+      SELECT
+        rr.id,
+        rr.scenario_id,
+        rr.run_id,
+        r.suite_key,
+        r.run_number,
+        rr.execution_order,
+        rr.path_type,
+        rr.outcome,
+        rr.expected_outcome,
+        CASE WHEN rr.outcome = rr.expected_outcome THEN true ELSE false END AS outcome_correct,
+        -- Envelope provenance
+        rr.interaction_id,
+        rr.envelope_sha256,
+        rr.envelope_version,
+        -- Authority chain
+        rr.persona_id,
+        p.key AS persona_key,
+        p.name AS persona_name,
+        rr.persona_version,
+        rr.policy_version,
+        -- Model routing
+        rr.model_slug,
+        rr.model_provider,
+        rr.routing_decision,
+        -- Tool trace
+        rr.tools_allowed,
+        rr.tools_used,
+        -- Policy trace
+        rr.policy_gates_hit,
+        -- Evidence trace
+        rr.evidence_used,
+        -- Performance
+        rr.latency_ms,
+        rr.tokens_in,
+        rr.tokens_out,
+        rr.cost_estimate,
+        rr.cost_actual,
+        rr.cache_hit,
+        -- Risk
+        rr.risk_score,
+        rr.escalation_triggered,
+        -- Replay
+        rr.replay_of_interaction_id,
+        rr.replay_status,
+        rr.replay_deviation_reason,
+        -- Integrity
+        rr.signature,
+        -- Timestamps
+        rr.executed_at,
+        -- Scenario context
+        sc.company_profile,
+        sc.contact_profile,
+        sc.signal_context,
+        sc.persona_context
+      FROM sales_bench_run_results rr
+      JOIN sales_bench_runs r ON r.id = rr.run_id
+      JOIN sales_bench.sales_scenarios sc ON sc.id = rr.scenario_id
+      LEFT JOIN os_personas p ON p.id = rr.persona_id
+      WHERE rr.id = $1 AND r.id = $2 AND r.suite_key = $3
+    `, [resultId, runId, suiteKey]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'RESULT_NOT_FOUND',
+        result_id: resultId,
+        run_id: runId,
+        suite_key: suiteKey,
+      });
+    }
+
+    const row = result.rows[0];
+
+    // Build structured trace response
+    const trace = {
+      // Identity
+      interaction_id: row.interaction_id,
+      result_id: row.id,
+      scenario_id: row.scenario_id,
+      run_id: row.run_id,
+      suite_key: row.suite_key,
+      run_number: row.run_number,
+      execution_order: row.execution_order,
+
+      // Decision
+      decision: {
+        path_type: row.path_type,
+        outcome: row.outcome,
+        expected_outcome: row.expected_outcome,
+        outcome_correct: row.outcome_correct,
+      },
+
+      // Envelope provenance
+      envelope: {
+        sha256: row.envelope_sha256,
+        version: row.envelope_version,
+      },
+
+      // Authority chain
+      authority: {
+        persona_id: row.persona_id,
+        persona_key: row.persona_key,
+        persona_name: row.persona_name,
+        persona_version: row.persona_version,
+        policy_version: row.policy_version,
+      },
+
+      // Model routing
+      routing: {
+        model_slug: row.model_slug,
+        model_provider: row.model_provider,
+        decision: row.routing_decision,
+      },
+
+      // Tool execution trace
+      tools: {
+        allowed: row.tools_allowed || [],
+        used: row.tools_used || [],
+        call_count: Array.isArray(row.tools_used) ? row.tools_used.length : 0,
+      },
+
+      // Policy gates trace
+      policy_gates: {
+        gates_hit: row.policy_gates_hit || [],
+        gates_count: Array.isArray(row.policy_gates_hit) ? row.policy_gates_hit.length : 0,
+      },
+
+      // Evidence provenance
+      evidence: {
+        sources: row.evidence_used || [],
+        source_count: Array.isArray(row.evidence_used) ? row.evidence_used.length : 0,
+      },
+
+      // Performance metrics
+      performance: {
+        latency_ms: row.latency_ms,
+        tokens_in: row.tokens_in,
+        tokens_out: row.tokens_out,
+        cost_estimate: parseFloat(row.cost_estimate) || 0,
+        cost_actual: parseFloat(row.cost_actual) || null,
+        cache_hit: row.cache_hit || false,
+      },
+
+      // Risk assessment
+      risk: {
+        score: parseFloat(row.risk_score) || 0,
+        escalation_triggered: row.escalation_triggered || false,
+      },
+
+      // Replay information
+      replay: {
+        is_replay: !!row.replay_of_interaction_id,
+        original_interaction_id: row.replay_of_interaction_id,
+        status: row.replay_status,
+        deviation_reason: row.replay_deviation_reason,
+        replay_url: `/api/os/sales-bench/replay/${row.interaction_id}`,
+      },
+
+      // Integrity verification
+      integrity: {
+        signature: row.signature,
+        verification_url: `/api/os/sales-bench/verify/${row.interaction_id}`,
+      },
+
+      // Timestamps
+      timestamps: {
+        executed_at: row.executed_at,
+      },
+
+      // Scenario context (for replay)
+      context: {
+        company_profile: row.company_profile,
+        contact_profile: row.contact_profile,
+        signal_context: row.signal_context,
+        persona_context: row.persona_context,
+      },
+    };
+
+    res.json({
+      success: true,
+      data: trace,
+      _meta: {
+        guardrails: {
+          immutability: 'All trace fields are append-only. Cannot be updated after insert.',
+          replay_semantics: 'EXACT=identical output, EQUIVALENT=same routing, DEVIATED=different outcome',
+        },
+      },
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] Trace endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'TRACE_FETCH_FAILED',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/os/sales-bench/replay/:interactionId
+ * Replay a specific interaction to verify determinism
+ *
+ * Replay Semantics:
+ * - EXACT: Same model, same routing, same outcome
+ * - EQUIVALENT: Same routing decision, possibly different model (due to availability)
+ * - DEVIATED: Different routing or outcome (triggers investigation)
+ *
+ * Note: "Deterministic Replay ≠ Same Tokens"
+ * We verify the ROUTING and POLICY decisions are identical,
+ * not that the output text is bit-for-bit identical.
+ */
+router.post('/replay/:interactionId', async (req, res) => {
+  try {
+    const { interactionId } = req.params;
+
+    // Get original interaction
+    const originalResult = await pool.query(`
+      SELECT
+        rr.*,
+        sc.company_profile,
+        sc.contact_profile,
+        sc.signal_context,
+        sc.persona_context,
+        r.suite_key,
+        r.run_number
+      FROM sales_bench_run_results rr
+      JOIN sales_bench_runs r ON r.id = rr.run_id
+      JOIN sales_bench.sales_scenarios sc ON sc.id = rr.scenario_id
+      WHERE rr.interaction_id = $1
+    `, [interactionId]);
+
+    if (originalResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'INTERACTION_NOT_FOUND',
+        interaction_id: interactionId,
+      });
+    }
+
+    const original = originalResult.rows[0];
+
+    // For now, return replay analysis without re-executing
+    // Full replay would re-run through SIVA scorer
+    const replayAnalysis = {
+      interaction_id: interactionId,
+      original: {
+        run_id: original.run_id,
+        scenario_id: original.scenario_id,
+        outcome: original.outcome,
+        model_slug: original.model_slug,
+        routing_decision: original.routing_decision,
+        envelope_sha256: original.envelope_sha256,
+        executed_at: original.executed_at,
+      },
+      replay_status: 'PENDING',
+      replay_message: 'Full replay execution requires SIVA re-scoring (not implemented in Phase 1)',
+      replay_url: `/api/os/sales-bench/suites/${original.suite_key}/runs/${original.run_id}/results/${original.id}/trace`,
+    };
+
+    res.json({
+      success: true,
+      data: replayAnalysis,
+      _meta: {
+        phase: 'Phase 1 - Trust Layer',
+        note: 'Full replay with deviation detection coming in Phase 2',
+      },
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] Replay endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'REPLAY_FAILED',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * GET /api/os/sales-bench/verify/:interactionId
+ * Verify signature integrity of an interaction
+ *
+ * Checks HMAC signature to detect tampering.
+ * Returns: VALID | INVALID | SIGNATURE_MISSING
+ */
+router.get('/verify/:interactionId', async (req, res) => {
+  try {
+    const { interactionId } = req.params;
+    const { createHmac } = await import('crypto');
+
+    // Get interaction
+    const result = await pool.query(`
+      SELECT
+        interaction_id,
+        envelope_sha256,
+        outcome,
+        signature
+      FROM sales_bench_run_results
+      WHERE interaction_id = $1
+    `, [interactionId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'INTERACTION_NOT_FOUND',
+        interaction_id: interactionId,
+      });
+    }
+
+    const row = result.rows[0];
+
+    if (!row.signature) {
+      return res.json({
+        success: true,
+        data: {
+          interaction_id: interactionId,
+          verification_status: 'SIGNATURE_MISSING',
+          message: 'No signature stored for this interaction (pre-trace-layer result)',
+        },
+      });
+    }
+
+    // Recompute signature
+    const secret = process.env.TRACE_SIGNING_SECRET || 'sales-bench-trace-secret-v1';
+    const data = `${row.interaction_id}:${row.envelope_sha256}:${row.outcome}`;
+    const expectedSignature = createHmac('sha256', secret).update(data).digest('hex');
+
+    const isValid = row.signature === expectedSignature;
+
+    res.json({
+      success: true,
+      data: {
+        interaction_id: interactionId,
+        verification_status: isValid ? 'VALID' : 'INVALID',
+        message: isValid
+          ? 'Signature verified. No tampering detected.'
+          : 'SIGNATURE MISMATCH. Possible tampering or data corruption.',
+        signature_present: true,
+      },
+    });
+  } catch (error) {
+    console.error('[SALES_BENCH] Verify endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'VERIFICATION_FAILED',
+      message: error.message,
+    });
+  }
+});
+
 export default router;
