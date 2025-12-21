@@ -1,0 +1,127 @@
+{
+  "interaction_id": "a5dbe590-2429-4105-8678-1012ad243780",
+  "result_id": "3ee9bf14-272f-48cc-bcbb-9809053a5b66",
+  "scenario_id": "08ee4296-aa9c-4d79-8112-8628f57ee40e",
+  "run_id": "ed5e3ff3-e62f-4e2f-9240-f6a0c22c5b96",
+  "suite_key": "banking-eb-uae-pre-entry",
+  "run_number": 7,
+  "execution_order": 1,
+  "decision": {
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "expected_outcome": "PASS",
+    "outcome_correct": true
+  },
+  "envelope": {
+    "sha256": "cebbaa4b6edfae6c3a4c60f4a6607b79bedb1de2232b705bd01e51b4c706bd09",
+    "version": "1.0.0"
+  },
+  "authority": {
+    "persona_id": null,
+    "persona_key": null,
+    "persona_name": null,
+    "persona_version": "1.0.0",
+    "policy_version": "1.0.0"
+  },
+  "routing": {
+    "model_slug": "siva-scorer-v1",
+    "model_provider": "internal",
+    "decision": {
+      "reason": "Deterministic scoring for Sales-Bench validation",
+      "routing_score": 1,
+      "model_selected": "siva-scorer-v1",
+      "alternatives_considered": []
+    }
+  },
+  "tools": {
+    "allowed": [
+      "siva-scorer",
+      "crs-calculator",
+      "decision-engine"
+    ],
+    "used": [
+      {
+        "error": null,
+        "success": true,
+        "tool_name": "siva-scorer",
+        "input_hash": "8955b4a5f728e9b5e9ea1718306d5e8eba3f7cee3d60d1649ef3e0413da02f83",
+        "duration_ms": 1,
+        "output_hash": "b3f997ee5e314302e38797d7763c7b2df9388710abb9cfe3928e0ba71b818d3c"
+      }
+    ],
+    "call_count": 1
+  },
+  "policy_gates": {
+    "gates_hit": [
+      {
+        "reason": "CRS 0.738 >= 0.60",
+        "gate_name": "crs_pass_threshold",
+        "triggered": true,
+        "action_taken": "PASS"
+      }
+    ],
+    "gates_count": 1
+  },
+  "evidence": {
+    "sources": [
+      {
+        "source": "company_profile",
+        "fetched_at": "2025-12-21T09:45:48.810Z",
+        "ttl_seconds": null,
+        "content_hash": "2a858c5dc06428dea6d061f18f6caf5dc86e92507ce72e77148983bb79c0cd07"
+      },
+      {
+        "source": "signal_context",
+        "fetched_at": "2025-12-21T09:45:48.810Z",
+        "ttl_seconds": 86400,
+        "content_hash": "f4f575751a79ea126510a9e50f674bd79f7dbc110b93c95cf9a8f451d4fc0a01"
+      }
+    ],
+    "source_count": 2
+  },
+  "performance": {
+    "latency_ms": 1,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_estimate": 0,
+    "cost_actual": null,
+    "cache_hit": false
+  },
+  "risk": {
+    "score": 0.1,
+    "escalation_triggered": false
+  },
+  "replay": {
+    "is_replay": false,
+    "original_interaction_id": null,
+    "status": null,
+    "deviation_reason": null,
+    "replay_url": "/api/os/sales-bench/replay/a5dbe590-2429-4105-8678-1012ad243780"
+  },
+  "integrity": {
+    "signature": "a5250d3f52524cf70a0b7d927a9d65fabb8ea156f4210185583133cb4b7d02bb",
+    "verification_url": "/api/os/sales-bench/verify/a5dbe590-2429-4105-8678-1012ad243780"
+  },
+  "timestamps": {
+    "executed_at": "2025-12-21T09:45:48.807Z"
+  },
+  "context": {
+    "company_profile": {
+      "hq": "Dubai",
+      "name": "Talabat",
+      "industry": "food-delivery",
+      "employees": 3000,
+      "entity_age_months": 120
+    },
+    "contact_profile": {
+      "name": "Omar Siddiqui",
+      "title": "Integration PMO Lead"
+    },
+    "signal_context": {
+      "type": "acquisition-integration",
+      "detail": "Acquiring 3 small delivery startups, consolidating 400 employees",
+      "strength": 0.85
+    },
+    "persona_context": null
+  }
+}

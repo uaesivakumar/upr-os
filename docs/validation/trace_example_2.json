@@ -1,0 +1,127 @@
+{
+  "interaction_id": "458f4fab-a9d9-40a8-b936-41279740dd5d",
+  "result_id": "b763cc7c-10a2-4af8-a479-bcd1a4c328aa",
+  "scenario_id": "b4b927fe-de58-4b65-bac3-a6d16157e02f",
+  "run_id": "ed5e3ff3-e62f-4e2f-9240-f6a0c22c5b96",
+  "suite_key": "banking-eb-uae-pre-entry",
+  "run_number": 7,
+  "execution_order": 2,
+  "decision": {
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "expected_outcome": "PASS",
+    "outcome_correct": true
+  },
+  "envelope": {
+    "sha256": "e66915c08c2a953b976e21f9677b6ffc49e80ba62eb61e804e0506ff047e58ac",
+    "version": "1.0.0"
+  },
+  "authority": {
+    "persona_id": null,
+    "persona_key": null,
+    "persona_name": null,
+    "persona_version": "1.0.0",
+    "policy_version": "1.0.0"
+  },
+  "routing": {
+    "model_slug": "siva-scorer-v1",
+    "model_provider": "internal",
+    "decision": {
+      "reason": "Deterministic scoring for Sales-Bench validation",
+      "routing_score": 1,
+      "model_selected": "siva-scorer-v1",
+      "alternatives_considered": []
+    }
+  },
+  "tools": {
+    "allowed": [
+      "siva-scorer",
+      "crs-calculator",
+      "decision-engine"
+    ],
+    "used": [
+      {
+        "error": null,
+        "success": true,
+        "tool_name": "siva-scorer",
+        "input_hash": "98a8f010ead75d792f150c3a054ed3be07193ba4101f49ab7f832e362e230343",
+        "duration_ms": 0,
+        "output_hash": "b3f997ee5e314302e38797d7763c7b2df9388710abb9cfe3928e0ba71b818d3c"
+      }
+    ],
+    "call_count": 1
+  },
+  "policy_gates": {
+    "gates_hit": [
+      {
+        "reason": "CRS 0.738 >= 0.60",
+        "gate_name": "crs_pass_threshold",
+        "triggered": true,
+        "action_taken": "PASS"
+      }
+    ],
+    "gates_count": 1
+  },
+  "evidence": {
+    "sources": [
+      {
+        "source": "company_profile",
+        "fetched_at": "2025-12-21T09:45:48.817Z",
+        "ttl_seconds": null,
+        "content_hash": "1817ded64615c81060a3c595a137c3db77d29d0af1635d579a00ac3f82778482"
+      },
+      {
+        "source": "signal_context",
+        "fetched_at": "2025-12-21T09:45:48.817Z",
+        "ttl_seconds": 86400,
+        "content_hash": "a6118177a0fe6a29d81709f776a8cbd39f29d593f6cd78802351b9126a28fc6b"
+      }
+    ],
+    "source_count": 2
+  },
+  "performance": {
+    "latency_ms": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_estimate": 0,
+    "cost_actual": null,
+    "cache_hit": false
+  },
+  "risk": {
+    "score": 0.1,
+    "escalation_triggered": false
+  },
+  "replay": {
+    "is_replay": false,
+    "original_interaction_id": null,
+    "status": null,
+    "deviation_reason": null,
+    "replay_url": "/api/os/sales-bench/replay/458f4fab-a9d9-40a8-b936-41279740dd5d"
+  },
+  "integrity": {
+    "signature": "9c3fe7f978887795961b90aafeb527e4afb5056b397ccdc92ed7272c238eecda",
+    "verification_url": "/api/os/sales-bench/verify/458f4fab-a9d9-40a8-b936-41279740dd5d"
+  },
+  "timestamps": {
+    "executed_at": "2025-12-21T09:45:48.807Z"
+  },
+  "context": {
+    "company_profile": {
+      "hq": "Dubai",
+      "name": "DEWA Solar",
+      "industry": "renewable-energy",
+      "employees": 500,
+      "entity_age_months": 6
+    },
+    "contact_profile": {
+      "name": "Abdullah Al-Maktoum",
+      "title": "Finance Manager"
+    },
+    "signal_context": {
+      "type": "privatization",
+      "detail": "Newly corporatized subsidiary, needs commercial banking",
+      "strength": 0.88
+    },
+    "persona_context": null
+  }
+}

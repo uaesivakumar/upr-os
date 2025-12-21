@@ -1,0 +1,127 @@
+{
+  "interaction_id": "e0446610-c362-4a15-9c30-301dee38a1b2",
+  "result_id": "6df59578-d67a-4824-be29-67333876be0e",
+  "scenario_id": "d2f5010e-8a81-4e54-be69-3b19849f948c",
+  "run_id": "ed5e3ff3-e62f-4e2f-9240-f6a0c22c5b96",
+  "suite_key": "banking-eb-uae-pre-entry",
+  "run_number": 7,
+  "execution_order": 4,
+  "decision": {
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "expected_outcome": "PASS",
+    "outcome_correct": true
+  },
+  "envelope": {
+    "sha256": "c42935848567935054588a4b523c65908e664e376afb4793eb8f7679c9090415",
+    "version": "1.0.0"
+  },
+  "authority": {
+    "persona_id": null,
+    "persona_key": null,
+    "persona_name": null,
+    "persona_version": "1.0.0",
+    "policy_version": "1.0.0"
+  },
+  "routing": {
+    "model_slug": "siva-scorer-v1",
+    "model_provider": "internal",
+    "decision": {
+      "reason": "Deterministic scoring for Sales-Bench validation",
+      "routing_score": 1,
+      "model_selected": "siva-scorer-v1",
+      "alternatives_considered": []
+    }
+  },
+  "tools": {
+    "allowed": [
+      "siva-scorer",
+      "crs-calculator",
+      "decision-engine"
+    ],
+    "used": [
+      {
+        "error": null,
+        "success": true,
+        "tool_name": "siva-scorer",
+        "input_hash": "f6237a1e0939276bb6d2eb92cfa4c55201932d6d6daab362a9b5167be9911fae",
+        "duration_ms": 0,
+        "output_hash": "b3f997ee5e314302e38797d7763c7b2df9388710abb9cfe3928e0ba71b818d3c"
+      }
+    ],
+    "call_count": 1
+  },
+  "policy_gates": {
+    "gates_hit": [
+      {
+        "reason": "CRS 0.738 >= 0.60",
+        "gate_name": "crs_pass_threshold",
+        "triggered": true,
+        "action_taken": "PASS"
+      }
+    ],
+    "gates_count": 1
+  },
+  "evidence": {
+    "sources": [
+      {
+        "source": "company_profile",
+        "fetched_at": "2025-12-21T09:45:48.826Z",
+        "ttl_seconds": null,
+        "content_hash": "ebf56ad9c33fb1bc4d27606f7629fabf0104aa587a549ea710d0eee25b7a906d"
+      },
+      {
+        "source": "signal_context",
+        "fetched_at": "2025-12-21T09:45:48.826Z",
+        "ttl_seconds": 86400,
+        "content_hash": "f19d64686d1da1c1b40826c2f092b7ecce65ce7b8354cc94728a5663db7cb501"
+      }
+    ],
+    "source_count": 2
+  },
+  "performance": {
+    "latency_ms": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_estimate": 0,
+    "cost_actual": null,
+    "cache_hit": false
+  },
+  "risk": {
+    "score": 0.1,
+    "escalation_triggered": false
+  },
+  "replay": {
+    "is_replay": false,
+    "original_interaction_id": null,
+    "status": null,
+    "deviation_reason": null,
+    "replay_url": "/api/os/sales-bench/replay/e0446610-c362-4a15-9c30-301dee38a1b2"
+  },
+  "integrity": {
+    "signature": "9bb68c17b108769085f988a830c8145e2d7d2e8ca9d335009cdd547dafe98473",
+    "verification_url": "/api/os/sales-bench/verify/e0446610-c362-4a15-9c30-301dee38a1b2"
+  },
+  "timestamps": {
+    "executed_at": "2025-12-21T09:45:48.807Z"
+  },
+  "context": {
+    "company_profile": {
+      "hq": "Abu Dhabi",
+      "name": "Rotana Hotels",
+      "industry": "hospitality",
+      "employees": 8000,
+      "entity_age_months": 360
+    },
+    "contact_profile": {
+      "name": "Maria Santos",
+      "title": "Regional HR Head"
+    },
+    "signal_context": {
+      "type": "property-opening",
+      "detail": "Opening 3 new hotels in Dubai, hiring 600 staff",
+      "strength": 0.85
+    },
+    "persona_context": null
+  }
+}

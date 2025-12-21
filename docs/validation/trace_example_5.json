@@ -1,0 +1,128 @@
+{
+  "interaction_id": "742b1c00-620a-4d50-b3e0-76d14ba7aa34",
+  "result_id": "8357efef-5b05-4ed6-ab3f-d79a293f57db",
+  "scenario_id": "29c1544d-1777-4571-89fc-bccc41536b12",
+  "run_id": "ed5e3ff3-e62f-4e2f-9240-f6a0c22c5b96",
+  "suite_key": "banking-eb-uae-pre-entry",
+  "run_number": 7,
+  "execution_order": 25,
+  "decision": {
+    "path_type": "KILL",
+    "outcome": "BLOCK",
+    "expected_outcome": "BLOCK",
+    "outcome_correct": true
+  },
+  "envelope": {
+    "sha256": "c26b9757d2e63994027a11592854b9cfcf1a126e3466f4b22aa3f234065c60eb",
+    "version": "1.0.0"
+  },
+  "authority": {
+    "persona_id": null,
+    "persona_key": null,
+    "persona_name": null,
+    "persona_version": "1.0.0",
+    "policy_version": "1.0.0"
+  },
+  "routing": {
+    "model_slug": "siva-scorer-v1",
+    "model_provider": "internal",
+    "decision": {
+      "reason": "Deterministic scoring for Sales-Bench validation",
+      "routing_score": 1,
+      "model_selected": "siva-scorer-v1",
+      "alternatives_considered": []
+    }
+  },
+  "tools": {
+    "allowed": [
+      "siva-scorer",
+      "crs-calculator",
+      "decision-engine"
+    ],
+    "used": [
+      {
+        "error": null,
+        "success": true,
+        "tool_name": "siva-scorer",
+        "input_hash": "b5bcccd19b8a1fe3d59c75ebe69bf28f924bcfcc351312fe30021087953e44de",
+        "duration_ms": 0,
+        "output_hash": "1153c7fdafcf1e8fc2d17acf21c35195bd9e68f54890e2a0271a31fdf4ae7225"
+      }
+    ],
+    "call_count": 1
+  },
+  "policy_gates": {
+    "gates_hit": [
+      {
+        "reason": "Qualification score 2 < 3",
+        "gate_name": "qualification_threshold",
+        "triggered": true,
+        "action_taken": "BLOCK"
+      }
+    ],
+    "gates_count": 1
+  },
+  "evidence": {
+    "sources": [
+      {
+        "source": "company_profile",
+        "fetched_at": "2025-12-21T09:45:48.904Z",
+        "ttl_seconds": null,
+        "content_hash": "0f53f4519d0d93fedd2dd3e8c79ccca49f5a184efea3852dff3b6a6575aed232"
+      },
+      {
+        "source": "signal_context",
+        "fetched_at": "2025-12-21T09:45:48.904Z",
+        "ttl_seconds": 86400,
+        "content_hash": "838c1670fc173a2665065c562ff249be29ef268ca9d16d437411bfc9ec9c0500"
+      }
+    ],
+    "source_count": 2
+  },
+  "performance": {
+    "latency_ms": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_estimate": 0,
+    "cost_actual": null,
+    "cache_hit": false
+  },
+  "risk": {
+    "score": 0.3,
+    "escalation_triggered": false
+  },
+  "replay": {
+    "is_replay": false,
+    "original_interaction_id": null,
+    "status": null,
+    "deviation_reason": null,
+    "replay_url": "/api/os/sales-bench/replay/742b1c00-620a-4d50-b3e0-76d14ba7aa34"
+  },
+  "integrity": {
+    "signature": "9dfba5afa92d31e86698ff6f135436983b52a55fca28a1a1090edada7c274eff",
+    "verification_url": "/api/os/sales-bench/verify/742b1c00-620a-4d50-b3e0-76d14ba7aa34"
+  },
+  "timestamps": {
+    "executed_at": "2025-12-21T09:45:48.807Z"
+  },
+  "context": {
+    "company_profile": {
+      "hq": "Dubai",
+      "name": "Dubai Properties Group",
+      "industry": "real-estate",
+      "employees": 800,
+      "entity_age_months": 240
+    },
+    "contact_profile": {
+      "name": "Ahmed Hassan",
+      "title": "CFO"
+    },
+    "signal_context": {
+      "type": "recent-bank-switch",
+      "detail": "Switched all payroll to FAB 4 months ago",
+      "blocker": "recent_switch",
+      "strength": 0.1
+    },
+    "persona_context": null
+  }
+}

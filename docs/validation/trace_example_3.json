@@ -1,0 +1,127 @@
+{
+  "interaction_id": "739c5f4d-ccd4-4721-8682-dbd30a3acc97",
+  "result_id": "77ca6511-2331-4fa8-9401-5580f9ed98ef",
+  "scenario_id": "163c3668-7935-4c3f-8791-49cc5a1408f4",
+  "run_id": "ed5e3ff3-e62f-4e2f-9240-f6a0c22c5b96",
+  "suite_key": "banking-eb-uae-pre-entry",
+  "run_number": 7,
+  "execution_order": 3,
+  "decision": {
+    "path_type": "GOLDEN",
+    "outcome": "PASS",
+    "expected_outcome": "PASS",
+    "outcome_correct": true
+  },
+  "envelope": {
+    "sha256": "5fbc2b2b4c2f2b0a88063c66394a0a4361f12d3b1cea78a97e44b1ca7ab8a93a",
+    "version": "1.0.0"
+  },
+  "authority": {
+    "persona_id": null,
+    "persona_key": null,
+    "persona_name": null,
+    "persona_version": "1.0.0",
+    "policy_version": "1.0.0"
+  },
+  "routing": {
+    "model_slug": "siva-scorer-v1",
+    "model_provider": "internal",
+    "decision": {
+      "reason": "Deterministic scoring for Sales-Bench validation",
+      "routing_score": 1,
+      "model_selected": "siva-scorer-v1",
+      "alternatives_considered": []
+    }
+  },
+  "tools": {
+    "allowed": [
+      "siva-scorer",
+      "crs-calculator",
+      "decision-engine"
+    ],
+    "used": [
+      {
+        "error": null,
+        "success": true,
+        "tool_name": "siva-scorer",
+        "input_hash": "ec7433edb873811190193695481610335349aca9a1413e2c8b41ca3ea21b4bf0",
+        "duration_ms": 0,
+        "output_hash": "b3f997ee5e314302e38797d7763c7b2df9388710abb9cfe3928e0ba71b818d3c"
+      }
+    ],
+    "call_count": 1
+  },
+  "policy_gates": {
+    "gates_hit": [
+      {
+        "reason": "CRS 0.738 >= 0.60",
+        "gate_name": "crs_pass_threshold",
+        "triggered": true,
+        "action_taken": "PASS"
+      }
+    ],
+    "gates_count": 1
+  },
+  "evidence": {
+    "sources": [
+      {
+        "source": "company_profile",
+        "fetched_at": "2025-12-21T09:45:48.821Z",
+        "ttl_seconds": null,
+        "content_hash": "0806542c8975b858ed5ea31ef11cab171646309412cac6c60cffec7d880f6a56"
+      },
+      {
+        "source": "signal_context",
+        "fetched_at": "2025-12-21T09:45:48.821Z",
+        "ttl_seconds": 86400,
+        "content_hash": "a90c539dc29fe05b2bf42308005a792ac6a1c4664e90028aee805a840ea174d6"
+      }
+    ],
+    "source_count": 2
+  },
+  "performance": {
+    "latency_ms": 0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cost_estimate": 0,
+    "cost_actual": null,
+    "cache_hit": false
+  },
+  "risk": {
+    "score": 0.1,
+    "escalation_triggered": false
+  },
+  "replay": {
+    "is_replay": false,
+    "original_interaction_id": null,
+    "status": null,
+    "deviation_reason": null,
+    "replay_url": "/api/os/sales-bench/replay/739c5f4d-ccd4-4721-8682-dbd30a3acc97"
+  },
+  "integrity": {
+    "signature": "72659477df722544fcf2a817289d3cefb029a223c4cdf0effc1f62a769627c39",
+    "verification_url": "/api/os/sales-bench/verify/739c5f4d-ccd4-4721-8682-dbd30a3acc97"
+  },
+  "timestamps": {
+    "executed_at": "2025-12-21T09:45:48.807Z"
+  },
+  "context": {
+    "company_profile": {
+      "hq": "Dubai",
+      "name": "TechVentures DMCC",
+      "industry": "technology",
+      "employees": 0,
+      "entity_age_months": 1
+    },
+    "contact_profile": {
+      "name": "Raj Mehta",
+      "title": "Founder/CEO"
+    },
+    "signal_context": {
+      "type": "new-entity-setup",
+      "detail": "Just registered DMCC license, posting 15 tech roles on LinkedIn",
+      "strength": 0.9
+    },
+    "persona_context": null
+  }
+}
