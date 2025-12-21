@@ -14,9 +14,181 @@
  */
 
 import express from 'express';
-import { randomBytes } from 'crypto';
+import { randomBytes, createHash, createHmac, randomUUID } from 'crypto';
 import pool from '../../../server/db.js';
 import { scoreScenario, scoreBatch } from '../../../os/sales-bench/engine/siva-scorer.js';
+
+// ============================================================================
+// TRACE HELPERS (Phase 1: Trust Layer)
+// ============================================================================
+
+/**
+ * Compute SHA256 hash of an object (for envelope provenance)
+ */
+function computeHash(data) {
+  const json = JSON.stringify(data, Object.keys(data).sort());
+  return createHash('sha256').update(json).digest('hex');
+}
+
+/**
+ * Compute HMAC signature for tamper detection
+ * signature = HMAC-SHA256(interaction_id + envelope_sha256 + outcome)
+ */
+function computeSignature(interactionId, envelopeHash, outcome) {
+  const secret = process.env.TRACE_SIGNING_SECRET || 'sales-bench-trace-secret-v1';
+  const data = `${interactionId}:${envelopeHash}:${outcome}`;
+  return createHmac('sha256', secret).update(data).digest('hex');
+}
+
+/**
+ * Build envelope object for hashing
+ * This captures the complete request context
+ */
+function buildEnvelope(scenario, suiteKey, runNumber) {
+  return {
+    suite_key: suiteKey,
+    run_number: runNumber,
+    scenario_id: scenario.id,
+    scenario_hash: scenario.hash,
+    path_type: scenario.path_type,
+    expected_outcome: scenario.expected_outcome,
+    company_profile_hash: computeHash(scenario.company_profile || {}),
+    contact_profile_hash: computeHash(scenario.contact_profile || {}),
+    signal_context_hash: computeHash(scenario.signal_context || {}),
+    persona_context_hash: computeHash(scenario.persona_context || {}),
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Build trace metadata for a scored scenario result
+ */
+function buildTraceData(scenario, result, envelope, suiteContext) {
+  const interactionId = randomUUID();
+  const envelopeHash = computeHash(envelope);
+
+  // Determine policy gates hit based on decision logic
+  const policyGatesHit = [];
+
+  // Check compliance gate
+  if (result.dimension_scores?.compliance < 3) {
+    policyGatesHit.push({
+      gate_name: 'compliance_threshold',
+      triggered: true,
+      reason: `Compliance score ${result.dimension_scores.compliance} < 3`,
+      action_taken: 'BLOCK',
+    });
+  }
+
+  // Check qualification gate
+  if (result.dimension_scores?.qualification < 3) {
+    policyGatesHit.push({
+      gate_name: 'qualification_threshold',
+      triggered: true,
+      reason: `Qualification score ${result.dimension_scores.qualification} < 3`,
+      action_taken: 'BLOCK',
+    });
+  }
+
+  // Check CRS threshold gates
+  if (result.weighted_crs >= 0.60) {
+    policyGatesHit.push({
+      gate_name: 'crs_pass_threshold',
+      triggered: true,
+      reason: `CRS ${result.weighted_crs} >= 0.60`,
+      action_taken: 'PASS',
+    });
+  } else if (result.weighted_crs <= 0.40) {
+    policyGatesHit.push({
+      gate_name: 'crs_block_threshold',
+      triggered: true,
+      reason: `CRS ${result.weighted_crs} <= 0.40`,
+      action_taken: 'BLOCK',
+    });
+  }
+
+  // Build evidence used (data sources that informed the decision)
+  const evidenceUsed = [];
+
+  if (scenario.company_profile && Object.keys(scenario.company_profile).length > 0) {
+    evidenceUsed.push({
+      source: 'company_profile',
+      content_hash: computeHash(scenario.company_profile),
+      ttl_seconds: null, // Static data
+      fetched_at: new Date().toISOString(),
+    });
+  }
+
+  if (scenario.signal_context && Object.keys(scenario.signal_context).length > 0) {
+    evidenceUsed.push({
+      source: 'signal_context',
+      content_hash: computeHash(scenario.signal_context),
+      ttl_seconds: 86400, // Signals have 24h TTL
+      fetched_at: new Date().toISOString(),
+    });
+  }
+
+  if (scenario.persona_context && Object.keys(scenario.persona_context).length > 0) {
+    evidenceUsed.push({
+      source: 'persona_context',
+      content_hash: computeHash(scenario.persona_context),
+      ttl_seconds: null, // Static config
+      fetched_at: new Date().toISOString(),
+    });
+  }
+
+  // Tools for Sales-Bench scoring (internal scorer, no external tools yet)
+  const toolsAllowed = ['siva-scorer', 'crs-calculator', 'decision-engine'];
+  const toolsUsed = [
+    {
+      tool_name: 'siva-scorer',
+      input_hash: computeHash({ scenario_id: scenario.id, path_type: scenario.path_type }),
+      output_hash: computeHash({ outcome: result.outcome, weighted_crs: result.weighted_crs }),
+      duration_ms: result.latency_ms || 0,
+      success: result.success !== false,
+      error: result.error || null,
+    },
+  ];
+
+  // Compute risk score (0-1 scale)
+  // Higher risk for edge cases, compliance issues, or incorrect outcomes
+  let riskScore = 0.1; // Base risk
+  if (result.dimension_scores?.compliance < 3) riskScore += 0.3;
+  if (!result.outcome_correct) riskScore += 0.3;
+  if (result.weighted_crs > 0.40 && result.weighted_crs < 0.60) riskScore += 0.2; // Edge case
+  riskScore = Math.min(1.0, riskScore);
+
+  // Compute signature for tamper detection
+  const signature = computeSignature(interactionId, envelopeHash, result.outcome);
+
+  return {
+    interaction_id: interactionId,
+    envelope_sha256: envelopeHash,
+    envelope_version: '1.0.0',
+    persona_id: suiteContext.persona_id || null,
+    persona_version: '1.0.0',
+    policy_version: '1.0.0',
+    model_slug: 'siva-scorer-v1', // Internal deterministic scorer
+    model_provider: 'internal',
+    routing_decision: {
+      model_selected: 'siva-scorer-v1',
+      reason: 'Deterministic scoring for Sales-Bench validation',
+      alternatives_considered: [],
+      routing_score: 1.0,
+    },
+    tools_allowed: toolsAllowed,
+    tools_used: toolsUsed,
+    policy_gates_hit: policyGatesHit,
+    evidence_used: evidenceUsed,
+    tokens_in: 0, // Internal scorer, no tokens
+    tokens_out: 0,
+    cost_estimate: 0.0, // No LLM cost for internal scorer
+    cache_hit: false,
+    risk_score: riskScore,
+    escalation_triggered: riskScore > 0.7,
+    signature: signature,
+  };
+}
 
 const router = express.Router();
 
@@ -169,10 +341,21 @@ router.post('/commands/run-system-validation', async (req, res) => {
     try {
       await client2.query('BEGIN');
 
-      // Insert individual scenario results
+      // Insert individual scenario results WITH TRACE DATA
+      // Suite context for trace building
+      const suiteContext = {
+        persona_id: suite.persona_id || null, // TODO: Link to persona when available
+      };
+
       for (let i = 0; i < results.length; i++) {
         const r = results[i];
         const scenario = scenarios[i];
+
+        // Build envelope for this scenario
+        const envelope = buildEnvelope(scenario, suite_key, runNumber);
+
+        // Build complete trace data
+        const trace = buildTraceData(scenario, r, envelope, suiteContext);
 
         await client2.query(`
           INSERT INTO sales_bench_run_results (
@@ -181,8 +364,18 @@ router.post('/commands/run-system-validation', async (req, res) => {
             crs_qualification, crs_needs_discovery, crs_value_articulation,
             crs_objection_handling, crs_process_adherence, crs_compliance,
             crs_relationship_building, crs_next_step_secured, crs_weighted,
-            siva_response, latency_ms
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+            siva_response, latency_ms,
+            -- TRACE FIELDS (append-only, immutable)
+            interaction_id, envelope_sha256, envelope_version,
+            persona_id, persona_version, policy_version,
+            model_slug, model_provider, routing_decision,
+            tools_allowed, tools_used, policy_gates_hit, evidence_used,
+            tokens_in, tokens_out, cost_estimate, cache_hit,
+            risk_score, escalation_triggered, signature
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
+            $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38
+          )
         `, [
           runId, r.scenario_id, scenario.hash, r.path_type, i + 1,
           r.outcome || 'ERROR', r.expected_outcome,
@@ -197,6 +390,27 @@ router.post('/commands/run-system-validation', async (req, res) => {
           r.weighted_crs || null,
           r.outcome_reason || r.error || null,
           r.latency_ms || 0,
+          // TRACE FIELDS
+          trace.interaction_id,
+          trace.envelope_sha256,
+          trace.envelope_version,
+          trace.persona_id,
+          trace.persona_version,
+          trace.policy_version,
+          trace.model_slug,
+          trace.model_provider,
+          JSON.stringify(trace.routing_decision),
+          JSON.stringify(trace.tools_allowed),
+          JSON.stringify(trace.tools_used),
+          JSON.stringify(trace.policy_gates_hit),
+          JSON.stringify(trace.evidence_used),
+          trace.tokens_in,
+          trace.tokens_out,
+          trace.cost_estimate,
+          trace.cache_hit,
+          trace.risk_score,
+          trace.escalation_triggered,
+          trace.signature,
         ]);
       }
 

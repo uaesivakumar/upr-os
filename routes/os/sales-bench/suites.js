@@ -687,7 +687,7 @@ router.get('/:key/runs/:runId/results', async (req, res) => {
 
     const run = runResult.rows[0];
 
-    // Get scenario results with company/contact info
+    // Get scenario results with company/contact info AND TRACE DATA
     const resultsQuery = await pool.query(`
       SELECT
         rr.id,
@@ -709,6 +709,31 @@ router.get('/:key/runs/:runId/results', async (req, res) => {
         rr.siva_response,
         rr.latency_ms,
         rr.executed_at,
+        -- TRACE FIELDS (Phase 1: Trust Layer)
+        rr.interaction_id,
+        rr.envelope_sha256,
+        rr.envelope_version,
+        rr.persona_id,
+        rr.persona_version,
+        rr.policy_version,
+        rr.model_slug,
+        rr.model_provider,
+        rr.routing_decision,
+        rr.tools_allowed,
+        rr.tools_used,
+        rr.policy_gates_hit,
+        rr.evidence_used,
+        rr.tokens_in,
+        rr.tokens_out,
+        rr.cost_estimate,
+        rr.cache_hit,
+        rr.risk_score,
+        rr.escalation_triggered,
+        rr.signature,
+        rr.replay_of_interaction_id,
+        rr.replay_status,
+        rr.replay_deviation_reason,
+        -- Scenario data
         sc.company_profile,
         sc.contact_profile,
         sc.signal_context
