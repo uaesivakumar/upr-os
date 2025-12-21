@@ -51,6 +51,10 @@ import {
 } from '../../os/envelope/index.js';
 import { createEvidence } from '../../os/evidence/factory.js';
 
+// Phase 1.5: Import SINGLE production SIVA entrypoint
+// CRITICAL: Both discovery.js and Sales-Bench call the SAME scoreSIVA()
+import { scoreSIVA } from '../../os/siva/core-scorer.js';
+
 const router = express.Router();
 
 // Initialize live discovery tools
@@ -292,264 +296,70 @@ const SEED_DATA_TENANT_ID = 'e2d48fa8-f6d1-4b70-a939-29efb47b0dc9';
  *
  * PRD v1.2 COMPLIANT: Tool access gated by envelope (Law 2)
  *
- * IMPORTANT: Must match tool schema requirements:
- * - CompanyQualityTool: requires domain pattern, uae_signals, size_bucket
- * - TimingScoreTool: requires news_age_days, hiring_recency_days
- * - BankingProductMatchTool: requires employee_count, industry
+ * Phase 1.5: This function now calls scoreSIVA() from core-scorer.js
+ * CRITICAL: Both discovery.js and Sales-Bench call the SAME scoreSIVA()
  *
  * @param {Object} company - Company data to score
  * @param {Object} envelope - Sealed context envelope (REQUIRED for tool gating)
  */
 async function scoreCompanyWithSIVA(company, envelope) {
-  // PRD v1.2 §2: Validate envelope exists (Law 1)
-  if (!envelope || !envelope.allowed_tools) {
-    throw new Error('SIVA scoring requires sealed context envelope');
-  }
-  const scores = {
-    quality: 50,
-    timing: 50,
-    productFit: 50,
-    overall: 50,
-    tier: 'WARM',
-    reasoning: [],
-    edgeCases: null
-  };
-
+  // Transform company data to companyProfile format for scoreSIVA
   const headcount = company.headcount || estimateHeadcount(company);
-  const sizeBucket = getSizeBucket(headcount);
   const domain = normalizeDomain(company.domain);
-
-  // ===========================================================================
-  // Sprint 77: EB PERSONA - INTELLIGENT EDGE CASE DETECTION (Primitive 4)
-  //
-  // KEY PRINCIPLE: Don't EXCLUDE, apply score MULTIPLIERS based on signals
-  // - Enterprise WITH expansion signals → GOOD target (×1.0 - they need new PoC)
-  // - Enterprise WITHOUT signals → LOW priority (×0.3)
-  // - Government → Very low priority (×0.1)
-  // - Free Zone companies → BOOST (×1.3)
-  // - Recent expansion signals → BOOST (×1.5)
-  //
-  // The EdgeCasesTool provides INTELLIGENT detection using:
-  // - Heuristic scoring (size, revenue, market presence) for enterprises
-  // - Pattern matching (domain, name, ownership) for government entities
-  // ===========================================================================
-
-  // Detect if company has expansion/hiring signals (positive indicators)
-  const hasExpansionSignals = company.signals?.some(s => {
-    const type = (s.type || '').toLowerCase();
-    return type.includes('expansion') || type.includes('hiring') ||
-           type.includes('funding') || type.includes('market-entry') ||
-           type.includes('office') || type.includes('headcount');
-  }) || false;
-
-  const recentSignalAge = company.latestSignalDate
-    ? Math.floor((Date.now() - new Date(company.latestSignalDate).getTime()) / (1000 * 60 * 60 * 24))
-    : 999;
-  const hasRecentSignals = recentSignalAge < 30;
-
-  // Build company profile for EdgeCasesTool
-  // Schema requires sector to be enum: ['private', 'government', 'semi-government', 'unknown']
-  const sectorValue = (company.sector || company.industry || '').toLowerCase();
-  const mappedSector = sectorValue.includes('government') ? 'government' :
-                       sectorValue.includes('semi-gov') ? 'semi-government' :
-                       sectorValue.includes('public') ? 'government' : 'private';
+  const industry = company.industry || company.sector || '';
 
   const companyProfile = {
     name: company.name || '',
-    domain: domain || undefined, // Don't pass empty string
+    domain: domain || undefined,
     size: headcount,
-    sector: mappedSector,
+    sector: mapSectorValue(company.sector || industry),
+    industry: industry,
     revenue: estimateRevenue(company),
+    location: company.location || '',
+    license_type: company.licenseType || '',
     linkedin_followers: company.linkedin_followers || 0,
-    number_of_locations: company.locations?.length || 1
+    number_of_locations: company.locations?.length || 1,
   };
-  // Only add stock_exchange if it's a valid string
-  if (company.stock_exchange && typeof company.stock_exchange === 'string') {
-    companyProfile.stock_exchange = company.stock_exchange;
-  }
 
-  // Use EdgeCasesTool for intelligent detection
-  // PRD v1.2 §3: Tool gate check (Law 2 - Persona is policy)
-  let edgeCaseResult = null;
-  try {
-    if (!isToolAllowed(envelope, 'EdgeCasesTool')) {
-      console.warn(`[OS:Discovery] EdgeCasesTool not allowed for persona ${envelope.persona_id}, skipping`);
-      // Skip edge case detection if tool not allowed for this persona
-    } else {
-      edgeCaseResult = await edgeCasesTool.execute({
-        company_profile: companyProfile,
-        contact_profile: {},
-        historical_data: {}
-      });
-    }
-    scores.edgeCases = edgeCaseResult;
-  } catch (edgeError) {
-    console.warn(`[OS:Discovery] EdgeCases detection error for ${company.name}:`, edgeError.message);
-  }
+  // Build signals array
+  const signals = (company.signals || []).map(s => ({
+    type: s.type || '',
+    strength: s.strength || 0.5,
+  }));
 
-  // Determine entity type from EdgeCasesTool results
-  const isEnterprise = edgeCaseResult?.blockers?.some(b => b.type === 'ENTERPRISE_BRAND') || false;
-  const isGovernment = edgeCaseResult?.blockers?.some(b => b.type === 'GOVERNMENT_SECTOR') || false;
-  const isSemiGovernment = edgeCaseResult?.warnings?.some(w => w.type === 'SEMI_GOVERNMENT') || false;
+  // CRITICAL: Call the SAME scoreSIVA() that Sales-Bench uses
+  const result = await scoreSIVA(companyProfile, envelope, {
+    signals,
+    latestSignalDate: company.latestSignalDate,
+    contactProfile: {},
+    historicalData: {},
+  });
 
-  // Calculate edge case multiplier based on SIGNALS
-  let edgeCaseMultiplier = 1.0;
-  let edgeCaseReason = '';
+  // Transform result to expected format for discovery.js
+  const scores = result.scores;
 
-  if (isGovernment) {
-    // Government entities: Always low priority (policy restriction)
-    edgeCaseMultiplier = 0.1;
-    edgeCaseReason = `Government entity detected - reduced priority (policy restriction)`;
-  } else if (isSemiGovernment) {
-    // Semi-government: Moderate reduction
-    edgeCaseMultiplier = 0.4;
-    edgeCaseReason = `Semi-government affiliation - proceed with caution`;
-  } else if (isEnterprise) {
-    // Enterprise logic: WITH signals = good target, WITHOUT signals = low priority
-    if (hasExpansionSignals) {
-      edgeCaseMultiplier = 1.0; // Keep normal - they need new PoC
-      edgeCaseReason = `Enterprise WITH expansion signals - potential new PoC opportunity`;
-      if (hasRecentSignals) {
-        edgeCaseMultiplier = 1.2; // Slight boost for recent expansion
-        edgeCaseReason = `Enterprise with RECENT expansion (${recentSignalAge}d ago) - high priority opportunity`;
-      }
-    } else {
-      edgeCaseMultiplier = 0.3; // Reduce - established relationships, no new opportunity
-      edgeCaseReason = `Enterprise WITHOUT expansion signals - likely has established banking`;
-    }
-  }
-
-  // Free Zone boost (positive indicator for EB)
-  const isFreeZone = (company.licenseType || '').toLowerCase().includes('free zone') ||
-                     (company.location || '').toLowerCase().includes('jafza') ||
-                     (company.location || '').toLowerCase().includes('difc') ||
-                     (company.location || '').toLowerCase().includes('dafza') ||
-                     (company.location || '').toLowerCase().includes('free zone');
-  if (isFreeZone && edgeCaseMultiplier >= 1.0) {
-    edgeCaseMultiplier *= 1.3;
-    edgeCaseReason += (edgeCaseReason ? '. ' : '') + 'Free Zone company - higher conversion probability';
-  }
-
-  // Recent signal boost
-  if (hasRecentSignals && !isGovernment && edgeCaseMultiplier >= 0.5) {
-    edgeCaseMultiplier *= 1.2;
-    edgeCaseReason += (edgeCaseReason ? '. ' : '') + `Fresh signals (${recentSignalAge}d old) - active opportunity`;
-  }
-
-  if (edgeCaseReason) {
-    scores.reasoning.push(`Edge Cases: ${edgeCaseReason}`);
-  }
-
-  let detectedSector = company.sector || company.industry || '';
-  if (isGovernment) {
-    detectedSector = 'government';
-  }
-
-  try {
-    // Q-Score: Company Quality
-    // PRD v1.2 §3: Tool gate check (Law 2 - Persona is policy)
-    if (!isToolAllowed(envelope, 'CompanyQualityTool')) {
-      console.warn(`[OS:Discovery] CompanyQualityTool not allowed for persona ${envelope.persona_id}, using default quality score`);
-      // Use default score if tool not allowed
-    } else {
-      const qualityInput = {
-        company_name: company.name,
-        domain: domain || 'unknown.com',
-        industry: company.industry || company.sector || 'Business Services',
-        sector: detectedSector, // Sprint 77: Pass sector for government detection
-        uae_signals: {
-          has_ae_domain: domain?.endsWith('.ae') || false,
-          has_uae_address: (company.location || '').toLowerCase().includes('uae') ||
-                           (company.location || '').toLowerCase().includes('dubai') ||
-                           (company.location || '').toLowerCase().includes('abu dhabi')
-        },
-        size_bucket: sizeBucket,
-        size: headcount
-      };
-
-      const qualityResult = await companyQualityTool.execute(qualityInput);
-      scores.quality = qualityResult.quality_score || 50;
-      scores.qualityTier = mapScoreToTier(scores.quality);
-      if (qualityResult.reasoning) {
-        scores.reasoning.push(qualityResult.reasoning);
-      }
-    }
-  } catch (error) {
-    console.error(`[OS:Discovery] Quality scoring error for ${company.name}:`, error.message);
-  }
-
-  try {
-    // T-Score: Timing - use simple heuristic instead of strict schema
-    const hasFunding = company.signals?.some(s =>
-      s.type?.toLowerCase().includes('funding') || s.type?.toLowerCase().includes('investment')
-    ) || false;
-    const hasHiring = company.signals?.some(s =>
-      s.type?.toLowerCase().includes('hiring') || s.type?.toLowerCase().includes('expansion')
-    ) || false;
-    const signalRecency = company.latestSignalDate ?
-      Math.floor((Date.now() - new Date(company.latestSignalDate).getTime()) / (1000 * 60 * 60 * 24)) : 30;
-
-    // Calculate timing score based on signals
-    let timingScore = 50;
-    if (hasFunding) timingScore += 20;
-    if (hasHiring) timingScore += 15;
-    if (signalRecency < 7) timingScore += 15;
-    else if (signalRecency < 14) timingScore += 10;
-    else if (signalRecency < 30) timingScore += 5;
-    if (company.hiringLikelihoodScore >= 4) timingScore += 10;
-
-    scores.timing = Math.min(100, timingScore);
-    scores.urgency = scores.timing >= 75 ? 'High' : scores.timing >= 50 ? 'Medium' : 'Low';
-    scores.reasoning.push(`Timing: ${hasFunding ? 'Recent funding detected. ' : ''}${hasHiring ? 'Active hiring signals. ' : ''}Signal age: ${signalRecency} days.`);
-  } catch (error) {
-    console.error(`[OS:Discovery] Timing scoring error for ${company.name}:`, error.message);
-  }
-
-  try {
-    // Product Fit Score - use heuristic based on company profile
-    let productFitScore = 50;
-    const industry = (company.industry || company.sector || '').toLowerCase();
-
-    // Industry fit for Employee Banking
-    if (industry.includes('tech') || industry.includes('fintech')) productFitScore += 15;
-    if (industry.includes('bank') || industry.includes('financial')) productFitScore += 20;
-    if (industry.includes('healthcare') || industry.includes('pharma')) productFitScore += 10;
-
-    // Size fit for payroll banking
-    if (headcount >= 100 && headcount <= 1000) productFitScore += 15; // Sweet spot
-    else if (headcount > 1000) productFitScore += 10;
-    else if (headcount >= 50) productFitScore += 5;
-
-    // Signal-based fit
-    if (company.signalCount >= 3) productFitScore += 10;
-    else if (company.signalCount >= 2) productFitScore += 5;
-
-    scores.productFit = Math.min(100, productFitScore);
-    scores.recommendedProducts = getRecommendedProducts(headcount, industry);
-    scores.reasoning.push(`Product Fit: ${sizeBucket} company in ${industry || 'general'} sector. ${company.signalCount || 0} active signals.`);
-  } catch (error) {
-    console.error(`[OS:Discovery] Product fit scoring error for ${company.name}:`, error.message);
-  }
-
-  // Calculate base score (weighted average)
-  const baseScore = Math.round((scores.quality * 0.35 + scores.timing * 0.35 + scores.productFit * 0.30));
-
-  // Apply edge case multiplier (Primitive 4: CHECK_EDGE_CASES)
-  // This implements persona rules: enterprise/government reduce, signals boost
-  scores.overall = Math.round(Math.min(100, Math.max(5, baseScore * edgeCaseMultiplier)));
-  scores.edgeCaseMultiplier = edgeCaseMultiplier;
-
-  // Determine tier based on overall score
-  if (scores.overall >= 70) scores.tier = 'HOT';
-  else if (scores.overall >= 45) scores.tier = 'WARM';
-  else scores.tier = 'COOL';
+  // Add extra fields that discovery.js consumers expect
+  scores.qualityTier = mapScoreToTier(scores.quality);
+  scores.urgency = scores.timing >= 75 ? 'High' : scores.timing >= 50 ? 'Medium' : 'Low';
+  scores.recommendedProducts = getRecommendedProducts(headcount, industry);
 
   // Log edge case adjustment for transparency
-  if (edgeCaseMultiplier !== 1.0) {
-    console.log(`[OS:Discovery] ${company.name}: Base=${baseScore}, Multiplier=${edgeCaseMultiplier.toFixed(2)}, Final=${scores.overall} (${scores.tier})`);
+  if (scores.edgeCaseMultiplier !== 1.0) {
+    console.log(`[OS:Discovery] ${company.name}: Multiplier=${scores.edgeCaseMultiplier.toFixed(2)}, Final=${scores.overall} (${scores.tier})`);
   }
 
   return scores;
+}
+
+/**
+ * Map sector value to enum
+ */
+function mapSectorValue(sector) {
+  const lower = (sector || '').toLowerCase();
+  if (lower.includes('government')) return 'government';
+  if (lower.includes('semi-gov')) return 'semi-government';
+  if (lower.includes('public')) return 'government';
+  return 'private';
 }
 
 /**

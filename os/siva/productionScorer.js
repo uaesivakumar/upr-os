@@ -1,14 +1,13 @@
 /**
  * Production SIVA Scorer (Phase 1.5)
  *
- * CRITICAL: This module is the SINGLE SOURCE OF TRUTH for SIVA scoring.
- * Both production APIs and Sales-Bench validation MUST use this module.
+ * CRITICAL: This module wraps the SINGLE SOURCE OF TRUTH (core-scorer.js).
+ * Both production APIs and Sales-Bench MUST use this module.
  *
  * Architecture:
- * - Creates sealed envelope with persona
- * - Calls production SIVA tools (EdgeCasesTool, CompanyQualityTool)
- * - Tool gating via isToolAllowed()
- * - Returns structured decision with full trace data
+ * - Sales-Bench scenarios → transforms to companyProfile → calls scoreSIVA()
+ * - Production discovery.js → transforms to companyProfile → calls scoreSIVA()
+ * - BOTH call the SAME scoreSIVA() function from core-scorer.js
  *
  * PRD v1.2 Compliance:
  * - Law 1: Authority precedes intelligence (envelope required)
@@ -16,25 +15,11 @@
  * - Law 5: If it cannot be replayed, it did not happen (full trace)
  */
 
-import crypto from 'crypto';
 import pool from '../../server/db.js';
 import { createEnvelope } from '../envelope/factory.js';
-import { isToolAllowed } from '../envelope/validator.js';
 
-// Import production SIVA tools
-import EdgeCasesToolStandalone from '../../server/siva-tools/EdgeCasesToolStandalone.js';
-import CompanyQualityToolStandalone from '../../server/siva-tools/CompanyQualityToolStandalone.js';
-
-// Initialize tools (same instances production uses)
-const edgeCasesTool = new EdgeCasesToolStandalone();
-const companyQualityTool = new CompanyQualityToolStandalone();
-
-// Decision thresholds (configurable via persona in future)
-const DECISION_THRESHOLDS = {
-  PASS_MIN_QUALITY: 60,     // Minimum quality score to PASS
-  BLOCK_MAX_QUALITY: 30,    // Maximum quality score to still BLOCK
-  EDGE_CASE_BLOCK_THRESHOLD: 0.7, // Edge case score above this = BLOCK
-};
+// CRITICAL: Import the SINGLE production entrypoint
+import { scoreSIVA } from './core-scorer.js';
 
 /**
  * Get persona for a suite from database
@@ -52,8 +37,7 @@ export async function getPersonaForSuite(suiteKey) {
  * Create a sealed envelope for SIVA invocation
  * This is the SAME envelope structure production uses
  */
-export function createSalesEnchEnvelope(persona, scenario) {
-  // Use the production envelope factory
+export function createSalesBenchEnvelope(persona, scenario) {
   return createEnvelope({
     tenant_id: 'sales-bench',
     user_id: 'system-validation',
@@ -67,262 +51,111 @@ export function createSalesEnchEnvelope(persona, scenario) {
         'CompanyQualityTool',
         'TimingScoreTool',
         'BankingProductMatchTool',
+        'ContactPriorityTool',
+        'OutreachDoctrineTool',
+        'HiringSignalExtractionTool',
+        'SignalClassifierTool',
+        'MessageDraftTool',
+        'DecisionChainTool',
+        'SIVABrainTool',
+        'FeedbackLoopTool',
       ],
     },
   });
 }
 
 /**
+ * Transform Sales-Bench scenario to companyProfile format
+ * that scoreSIVA() expects
+ */
+function transformScenarioToProfile(scenario) {
+  const company = scenario.company_profile || {};
+  const signals = scenario.signal_context || {};
+
+  return {
+    name: company.name || '',
+    domain: company.domain || undefined,
+    size: company.employees || company.headcount || 50,
+    sector: mapSector(company.industry || ''),
+    industry: company.industry || '',
+    revenue: company.revenue || 0,
+    location: company.location || '',
+    license_type: company.license_type || '',
+    linkedin_followers: company.linkedin_followers || 0,
+    number_of_locations: company.locations?.length || 1,
+  };
+}
+
+/**
+ * Transform signal_context to signals array format
+ */
+function transformSignals(scenario) {
+  const signalContext = scenario.signal_context || {};
+
+  // If signals is already an array, use it
+  if (Array.isArray(signalContext.signals)) {
+    return signalContext.signals;
+  }
+
+  // Otherwise, construct from signal_context
+  const signals = [];
+
+  if (signalContext.type) {
+    signals.push({
+      type: signalContext.type,
+      strength: signalContext.strength || 0.5,
+      age_days: signalContext.age_days || 30,
+    });
+  }
+
+  return signals;
+}
+
+/**
  * Score a scenario using production SIVA tools
  *
- * This is the PRODUCTION PATH - same logic discovery.js uses
+ * CRITICAL: This calls scoreSIVA() from core-scorer.js
+ * This is the SAME entrypoint production uses.
  *
  * @param {Object} scenario - Scenario to score
  * @param {Object} persona - Persona from getPersonaForSuite()
  * @returns {Object} Scoring result with trace data
  */
 export async function scoreWithProductionSIVA(scenario, persona) {
-  const startTime = Date.now();
-  const toolsUsed = [];
-  const toolsAllowed = ['EdgeCasesTool', 'CompanyQualityTool', 'TimingScoreTool'];
-
   // Create sealed envelope
-  const envelope = createSalesEnchEnvelope(persona, scenario);
+  const envelope = createSalesBenchEnvelope(persona, scenario);
 
-  // Build company profile for tools (same as discovery.js)
-  const company = scenario.company_profile || {};
-  const signals = scenario.signal_context || {};
+  // Transform scenario to companyProfile format
+  const companyProfile = transformScenarioToProfile(scenario);
+  const signals = transformSignals(scenario);
 
-  const companyProfile = {
-    name: company.name || '',
-    domain: company.domain || undefined,
-    size: company.employees || estimateHeadcount(company),
-    sector: mapSector(company.industry || ''),
-    revenue: company.revenue || 0,
-    linkedin_followers: company.linkedin_followers || 0,
-    number_of_locations: company.locations?.length || 1,
-  };
+  // CRITICAL: Call the SAME scoreSIVA() that production uses
+  const result = await scoreSIVA(companyProfile, envelope, {
+    signals,
+    latestSignalDate: scenario.signal_context?.date,
+    contactProfile: scenario.contact_profile || {},
+    historicalData: {},
+  });
 
-  // Initialize scores
-  let qualityScore = 50;
-  let edgeCaseResult = null;
-  let policyGatesHit = [];
-
-  // ============================================================================
-  // TOOL 1: EdgeCasesTool (Primitive 4) - SAME AS PRODUCTION
-  // ============================================================================
-
-  if (isToolAllowed(envelope, 'EdgeCasesTool')) {
-    const edgeStartTime = Date.now();
-    try {
-      edgeCaseResult = await edgeCasesTool.execute({
-        company_profile: companyProfile,
-        contact_profile: scenario.contact_profile || {},
-        historical_data: {},
-      });
-
-      toolsUsed.push({
-        tool_name: 'EdgeCasesTool',
-        success: true,
-        error: null,
-        duration_ms: Date.now() - edgeStartTime,
-        input_hash: computeHash(companyProfile),
-        output_hash: computeHash(edgeCaseResult),
-      });
-    } catch (error) {
-      toolsUsed.push({
-        tool_name: 'EdgeCasesTool',
-        success: false,
-        error: error.message,
-        duration_ms: Date.now() - edgeStartTime,
-        input_hash: computeHash(companyProfile),
-        output_hash: null,
-      });
-    }
-  }
-
-  // ============================================================================
-  // TOOL 2: CompanyQualityTool (Primitive 1) - SAME AS PRODUCTION
-  // ============================================================================
-
-  if (isToolAllowed(envelope, 'CompanyQualityTool')) {
-    const qualityStartTime = Date.now();
-    try {
-      const qualityResult = await companyQualityTool.execute({
-        domain: company.domain || company.name?.toLowerCase().replace(/\s+/g, '') + '.com',
-        uae_signals: signals.type ? [signals.type] : [],
-        size_bucket: getSizeBucket(company.employees || 0),
-        linkedin_url: company.linkedin_url,
-        industry: company.industry,
-      });
-
-      qualityScore = qualityResult.score || 50;
-
-      toolsUsed.push({
-        tool_name: 'CompanyQualityTool',
-        success: true,
-        error: null,
-        duration_ms: Date.now() - qualityStartTime,
-        input_hash: computeHash({ domain: company.domain, industry: company.industry }),
-        output_hash: computeHash(qualityResult),
-      });
-    } catch (error) {
-      toolsUsed.push({
-        tool_name: 'CompanyQualityTool',
-        success: false,
-        error: error.message,
-        duration_ms: Date.now() - qualityStartTime,
-        input_hash: computeHash({ domain: company.domain }),
-        output_hash: null,
-      });
-    }
-  }
-
-  // ============================================================================
-  // DECISION LOGIC - SAME AS PRODUCTION (discovery.js scoreCompanyWithSIVA)
-  // ============================================================================
-
-  // Check edge case blockers
-  const isEnterprise = edgeCaseResult?.blockers?.some(b => b.type === 'ENTERPRISE_BRAND') || false;
-  const isGovernment = edgeCaseResult?.blockers?.some(b => b.type === 'GOVERNMENT_SECTOR') || false;
-  const hasExpansionSignals = signals.strength >= 0.7;
-
-  // Calculate edge case multiplier (same as discovery.js)
-  let edgeCaseMultiplier = 1.0;
-  let edgeCaseReason = '';
-
-  if (isGovernment) {
-    edgeCaseMultiplier = 0.1;
-    edgeCaseReason = 'Government entity - reduced priority';
-    policyGatesHit.push({
-      gate_name: 'government_entity_block',
-      triggered: true,
-      reason: edgeCaseReason,
-      action_taken: 'BLOCK',
-    });
-  } else if (isEnterprise && !hasExpansionSignals) {
-    edgeCaseMultiplier = 0.3;
-    edgeCaseReason = 'Enterprise without expansion signals';
-    policyGatesHit.push({
-      gate_name: 'enterprise_no_signals',
-      triggered: true,
-      reason: edgeCaseReason,
-      action_taken: 'BLOCK',
-    });
-  } else if (isEnterprise && hasExpansionSignals) {
-    edgeCaseMultiplier = 1.2;
-    edgeCaseReason = 'Enterprise with expansion signals - opportunity';
-    policyGatesHit.push({
-      gate_name: 'enterprise_with_signals',
-      triggered: true,
-      reason: edgeCaseReason,
-      action_taken: 'BOOST',
-    });
-  }
-
-  // Apply edge case multiplier to quality score
-  const adjustedScore = Math.round(qualityScore * edgeCaseMultiplier);
-
-  // Make PASS/BLOCK decision
-  let outcome = 'BLOCK';
-  let outcomeReason = '';
-
-  if (adjustedScore >= DECISION_THRESHOLDS.PASS_MIN_QUALITY) {
-    outcome = 'PASS';
-    outcomeReason = `Adjusted score ${adjustedScore} >= ${DECISION_THRESHOLDS.PASS_MIN_QUALITY}`;
-    policyGatesHit.push({
-      gate_name: 'quality_pass_threshold',
-      triggered: true,
-      reason: outcomeReason,
-      action_taken: 'PASS',
-    });
-  } else {
-    outcomeReason = `Adjusted score ${adjustedScore} < ${DECISION_THRESHOLDS.PASS_MIN_QUALITY}`;
-    policyGatesHit.push({
-      gate_name: 'quality_block_threshold',
-      triggered: true,
-      reason: outcomeReason,
-      action_taken: 'BLOCK',
-    });
-  }
-
-  // For KILL scenarios, check if expected_outcome matches
-  // Invert logic: KILL scenarios SHOULD produce BLOCK outcomes
-  if (scenario.path_type === 'KILL' && signals.strength < 0.3) {
-    outcome = 'BLOCK';
-    outcomeReason = 'KILL scenario with weak signals - correctly blocked';
-    policyGatesHit.push({
-      gate_name: 'kill_scenario_block',
-      triggered: true,
-      reason: outcomeReason,
-      action_taken: 'BLOCK',
-    });
-  }
-
-  // Check signal strength for GOLDEN scenarios
-  if (scenario.path_type === 'GOLDEN' && signals.strength >= 0.7) {
-    outcome = 'PASS';
-    outcomeReason = 'GOLDEN scenario with strong signals - correctly passed';
-    policyGatesHit.push({
-      gate_name: 'golden_scenario_pass',
-      triggered: true,
-      reason: outcomeReason,
-      action_taken: 'PASS',
-    });
-  }
-
+  // Augment result with scenario metadata for Sales-Bench
   return {
-    success: true,
+    ...result,
     scenario_id: scenario.id,
     path_type: scenario.path_type,
     expected_outcome: scenario.expected_outcome,
+    outcome_correct: result.outcome === scenario.expected_outcome,
 
-    // Decision
-    outcome,
-    outcome_reason: outcomeReason,
-    outcome_correct: outcome === scenario.expected_outcome,
-
-    // Scores
-    quality_score: qualityScore,
-    adjusted_score: adjustedScore,
-    edge_case_multiplier: edgeCaseMultiplier,
-
-    // Trace data (PRD v1.2 compliance)
-    envelope,
-    envelope_sha256: envelope.sha256_hash,
-    persona_id: persona.persona_id,
-    persona_key: persona.persona_key,
-    persona_version: '1.0.0',
-    policy_version: '1.0.0',
-
-    // Tool trace
-    tools_allowed: toolsAllowed,
-    tools_used: toolsUsed,
-
-    // Policy gates
-    policy_gates_hit: policyGatesHit,
-
-    // Evidence
-    evidence_used: [
-      {
-        source: 'company_profile',
-        content_hash: computeHash(company),
-        fetched_at: new Date().toISOString(),
-        ttl_seconds: null,
-      },
-      {
-        source: 'signal_context',
-        content_hash: computeHash(signals),
-        fetched_at: new Date().toISOString(),
-        ttl_seconds: 86400,
-      },
-    ],
-
-    // Edge cases
-    edge_cases: edgeCaseResult,
-
-    // Performance
-    latency_ms: Date.now() - startTime,
+    // Expose trace fields at top level for easy access
+    persona_id: result.trace.persona_id,
+    envelope_sha256: result.trace.envelope_sha256,
+    capability_key: result.trace.capability_key,
+    router_decision: result.trace.router_decision,
+    policy_gates_evaluated: result.trace.policy_gates_evaluated,
+    policy_gates_hit: result.trace.policy_gates_hit,
+    tools_allowed: result.trace.tools_allowed,
+    tools_used: result.trace.tools_used,
+    code_commit_sha: result.trace.code_commit_sha,
+    latency_ms: result.trace.latency_ms,
   };
 }
 
@@ -369,33 +202,9 @@ export async function scoreBatchWithProductionSIVA(scenarios, persona) {
   };
 }
 
-// ============================================================================
-// HELPER FUNCTIONS (same as discovery.js)
-// ============================================================================
-
-function computeHash(data) {
-  const json = JSON.stringify(data, Object.keys(data || {}).sort());
-  return crypto.createHash('sha256').update(json).digest('hex');
-}
-
-function estimateHeadcount(company) {
-  const employees = company.employees || company.employee_count || company.size || 0;
-  if (typeof employees === 'number') return employees;
-  if (typeof employees === 'string') {
-    const match = employees.match(/\d+/);
-    return match ? parseInt(match[0]) : 50;
-  }
-  return 50;
-}
-
-function getSizeBucket(headcount) {
-  if (headcount >= 1000) return '1000+';
-  if (headcount >= 500) return '500-999';
-  if (headcount >= 200) return '200-499';
-  if (headcount >= 50) return '50-199';
-  if (headcount >= 10) return '10-49';
-  return '1-9';
-}
+// ===========================================================================
+// HELPER FUNCTIONS
+// ===========================================================================
 
 function mapSector(industry) {
   const lower = (industry || '').toLowerCase();
@@ -407,7 +216,7 @@ function mapSector(industry) {
 
 export default {
   getPersonaForSuite,
-  createSalesEnchEnvelope,
+  createSalesBenchEnvelope,
   scoreWithProductionSIVA,
   scoreBatchWithProductionSIVA,
 };
