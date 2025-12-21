@@ -9,6 +9,10 @@ SERVICE="upr-os-service"
 PROJECT="applied-algebra-474804-e6"
 IMAGE="us-central1-docker.pkg.dev/$PROJECT/cloud-run-source-deploy/$SERVICE:latest"
 
+# Phase 1.5: Capture git commit for Sales-Bench trace code_commit_sha
+GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+echo "Git commit: $GIT_COMMIT"
+
 echo "=========================================="
 echo "Deploying UPR OS Service"
 echo "=========================================="
@@ -94,7 +98,7 @@ SERPAPI_KEY=SERPAPI_KEY:latest,\
 OPENAI_API_KEY=OPENAI_API_KEY:latest,\
 ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest,\
 PR_OS_TOKEN=PR_OS_TOKEN:latest" \
-  --set-env-vars="NODE_ENV=production"
+  --set-env-vars="NODE_ENV=production,GIT_COMMIT=$GIT_COMMIT"
 
 echo ""
 echo "Deployment complete!"

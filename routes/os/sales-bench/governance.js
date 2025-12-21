@@ -16,6 +16,16 @@
 import express from 'express';
 import { randomBytes, createHash, createHmac, randomUUID } from 'crypto';
 import pool from '../../../server/db.js';
+
+// Phase 1.5: Use production SIVA scorer instead of deterministic siva-scorer.js
+// CRITICAL: This is the SAME path production uses (PRD v1.2 compliance)
+import {
+  getPersonaForSuite,
+  scoreWithProductionSIVA,
+  scoreBatchWithProductionSIVA,
+} from '../../../os/siva/productionScorer.js';
+
+// Keep legacy scorer as fallback (for comparison runs only)
 import { scoreScenario, scoreBatch } from '../../../os/sales-bench/engine/siva-scorer.js';
 
 // ============================================================================
@@ -331,7 +341,23 @@ router.post('/commands/run-system-validation', async (req, res) => {
     // --- SIVA SCORING (outside transaction for responsiveness) ---
     console.log(`[SALES_BENCH] Run #${runNumber}: Scoring ${scenarios.length} scenarios...`);
 
-    const batchResult = await scoreBatch(scenarios);
+    // Phase 1.5: Get persona for suite (CRITICAL for production path)
+    const persona = await getPersonaForSuite(suite_key);
+    if (!persona) {
+      console.warn(`[SALES_BENCH] No persona found for suite ${suite_key}, using legacy scorer`);
+    }
+
+    // Phase 1.5: Use production SIVA scorer with persona (PRD v1.2 compliance)
+    // This is the SAME path production uses - no parallel intelligence paths
+    let batchResult;
+    if (persona) {
+      console.log(`[SALES_BENCH] Using PRODUCTION SIVA scorer with persona: ${persona.persona_key}`);
+      batchResult = await scoreBatchWithProductionSIVA(scenarios, persona);
+    } else {
+      // Fallback to legacy scorer (for suites without persona binding)
+      console.log(`[SALES_BENCH] Fallback to LEGACY deterministic scorer`);
+      batchResult = await scoreBatch(scenarios);
+    }
     const { results, metrics } = batchResult;
 
     console.log(`[SALES_BENCH] Run #${runNumber}: Scoring complete. Golden Pass: ${metrics.golden_pass_rate}%, Kill Containment: ${metrics.kill_containment_rate}%`);
@@ -342,9 +368,10 @@ router.post('/commands/run-system-validation', async (req, res) => {
       await client2.query('BEGIN');
 
       // Insert individual scenario results WITH TRACE DATA
-      // Suite context for trace building
+      // Suite context for trace building - now with persona_id from production path
       const suiteContext = {
-        persona_id: suite.persona_id || null, // TODO: Link to persona when available
+        persona_id: persona?.persona_id || null,
+        persona_key: persona?.persona_key || null,
       };
 
       for (let i = 0; i < results.length; i++) {

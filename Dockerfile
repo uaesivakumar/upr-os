@@ -84,6 +84,12 @@ EXPOSE 8080
 ENV NODE_ENV=production
 ENV PORT=8080
 
+# Phase 1.5: GIT_COMMIT for Sales-Bench trace code_commit_sha field
+# Set at build time via: docker build --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+# Or via Cloud Build substitution
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=$GIT_COMMIT
+
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:8080/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
