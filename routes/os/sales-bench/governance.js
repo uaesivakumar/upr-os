@@ -349,10 +349,16 @@ router.post('/commands/run-system-validation', async (req, res) => {
 
     // Phase 1.5: Use production SIVA scorer with persona (PRD v1.2 compliance)
     // This is the SAME path production uses - no parallel intelligence paths
+    // Detect discovery suites for ACT/WAIT/IGNORE/BLOCK outcomes
+    const isDiscoverySuite = suite_key.includes('discovery') || suite_key.includes('pre-entry-opportunity');
+
     let batchResult;
     if (persona) {
       console.log(`[SALES_BENCH] Using PRODUCTION SIVA scorer with persona: ${persona.persona_key}`);
-      batchResult = await scoreBatchWithProductionSIVA(scenarios, persona);
+      console.log(`[SALES_BENCH] Discovery mode: ${isDiscoverySuite ? 'ENABLED (ACT/WAIT/IGNORE/BLOCK)' : 'DISABLED (PASS/BLOCK)'}`);
+      batchResult = await scoreBatchWithProductionSIVA(scenarios, persona, {
+        discovery_mode: isDiscoverySuite,
+      });
     } else {
       // Fallback to legacy scorer (for suites without persona binding)
       console.log(`[SALES_BENCH] Fallback to LEGACY deterministic scorer`);
@@ -378,11 +384,71 @@ router.post('/commands/run-system-validation', async (req, res) => {
         const r = results[i];
         const scenario = scenarios[i];
 
-        // Build envelope for this scenario
-        const envelope = buildEnvelope(scenario, suite_key, runNumber);
+        // Phase 1.5: Use PRODUCTION trace from scoreSIVA() if available
+        // Production path returns trace at top level from productionScorer.js
+        const hasProductionTrace = r.trace && r.envelope_sha256;
 
-        // Build complete trace data
-        const trace = buildTraceData(scenario, r, envelope, suiteContext);
+        let trace;
+        if (hasProductionTrace) {
+          // PRODUCTION PATH: Use actual trace from core-scorer.js
+          const interactionId = randomUUID();
+          const signature = computeSignature(interactionId, r.envelope_sha256, r.outcome);
+
+          // Compute refusal reason code from policy gates
+          let refusalReasonCode = null;
+          if (r.outcome === 'BLOCK' && r.trace.policy_gates_hit?.length > 0) {
+            const blockGate = r.trace.policy_gates_hit.find(g => g.action_taken === 'BLOCK');
+            refusalReasonCode = blockGate?.refusal_reason_code || blockGate?.gate_name || 'POLICY_BLOCK';
+          }
+
+          trace = {
+            interaction_id: interactionId,
+            envelope_sha256: r.envelope_sha256,
+            envelope_version: '1.0.0',
+            persona_id: r.persona_id,
+            persona_version: '1.0.0',
+            policy_version: '1.0.0',
+            model_slug: 'core-scorer-v1',
+            model_provider: 'internal',
+            capability_key: r.capability_key || 'score_company',
+            router_decision: r.router_decision || r.trace.router_decision,
+            routing_decision: {
+              model_selected: 'core-scorer-v1',
+              reason: 'Production SIVA path via core-scorer.js',
+              alternatives_considered: [],
+              routing_score: 1.0,
+            },
+            tools_allowed: r.tools_allowed || r.trace.tools_allowed,
+            tools_used: r.tools_used || r.trace.tools_used,
+            policy_gates_evaluated: r.policy_gates_evaluated || r.trace.policy_gates_evaluated,
+            policy_gates_hit: r.policy_gates_hit || r.trace.policy_gates_hit,
+            evidence_used: r.trace.evidence_used || [],
+            tokens_in: 0,
+            tokens_out: 0,
+            cost_estimate: 0.0,
+            cache_hit: false,
+            risk_score: r.outcome === 'BLOCK' ? 0.7 : 0.2,
+            escalation_triggered: false,
+            refusal_reason_code: refusalReasonCode,
+            decision_summary: r.outcome_reason || r.trace.router_decision?.outcome_reason,
+            signature: signature,
+            signature_status: 'VALID',
+            code_commit_sha: r.code_commit_sha || r.trace.code_commit_sha || process.env.GIT_COMMIT || 'unknown',
+            siva_version: '1.0.0',
+          };
+        } else {
+          // LEGACY PATH: Build trace from deterministic scorer results
+          const envelope = buildEnvelope(scenario, suite_key, runNumber);
+          trace = buildTraceData(scenario, r, envelope, suiteContext);
+          trace.capability_key = 'score_company';
+          trace.router_decision = null;
+          trace.policy_gates_evaluated = [];
+          trace.refusal_reason_code = null;
+          trace.decision_summary = r.outcome_reason || null;
+          trace.signature_status = 'VALID';
+          trace.code_commit_sha = process.env.GIT_COMMIT || 'unknown';
+          trace.siva_version = '1.0.0';
+        }
 
         await client2.query(`
           INSERT INTO sales_bench_run_results (
@@ -392,16 +458,18 @@ router.post('/commands/run-system-validation', async (req, res) => {
             crs_objection_handling, crs_process_adherence, crs_compliance,
             crs_relationship_building, crs_next_step_secured, crs_weighted,
             siva_response, latency_ms,
-            -- TRACE FIELDS (append-only, immutable)
+            -- TRACE FIELDS (append-only, immutable) - Phase 1.5 Compliance
             interaction_id, envelope_sha256, envelope_version,
             persona_id, persona_version, policy_version,
-            model_slug, model_provider, routing_decision,
-            tools_allowed, tools_used, policy_gates_hit, evidence_used,
+            model_slug, model_provider, capability_key, router_decision, routing_decision,
+            tools_allowed, tools_used, policy_gates_evaluated, policy_gates_hit, evidence_used,
             tokens_in, tokens_out, cost_estimate, cache_hit,
-            risk_score, escalation_triggered, signature
+            risk_score, escalation_triggered, refusal_reason_code, decision_summary,
+            signature, signature_status, code_commit_sha, siva_version
           ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
-            $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38
+            $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34,
+            $35, $36, $37, $38, $39, $40, $41, $42, $43, $44, $45, $46
           )
         `, [
           runId, r.scenario_id, scenario.hash, r.path_type, i + 1,
@@ -414,10 +482,13 @@ router.post('/commands/run-system-validation', async (req, res) => {
           r.dimension_scores?.compliance || null,
           r.dimension_scores?.relationship_building || null,
           r.dimension_scores?.next_step_secured || null,
-          r.weighted_crs || null,
+          // crs_weighted is DECIMAL(4,3) - range 0.000 to 9.999
+          // Legacy CRS is 0-1, production SIVA scores.overall is 0-100
+          // Normalize: divide by 100 if > 1 to convert to 0-1 range
+          r.weighted_crs != null ? r.weighted_crs : (r.scores?.overall != null ? r.scores.overall / 100 : null),
           r.outcome_reason || r.error || null,
-          r.latency_ms || 0,
-          // TRACE FIELDS
+          r.latency_ms || trace.latency_ms || 0,
+          // TRACE FIELDS - Phase 1.5 Compliance
           trace.interaction_id,
           trace.envelope_sha256,
           trace.envelope_version,
@@ -426,9 +497,12 @@ router.post('/commands/run-system-validation', async (req, res) => {
           trace.policy_version,
           trace.model_slug,
           trace.model_provider,
+          trace.capability_key,
+          JSON.stringify(trace.router_decision),
           JSON.stringify(trace.routing_decision),
           JSON.stringify(trace.tools_allowed),
           JSON.stringify(trace.tools_used),
+          JSON.stringify(trace.policy_gates_evaluated),
           JSON.stringify(trace.policy_gates_hit),
           JSON.stringify(trace.evidence_used),
           trace.tokens_in,
@@ -437,7 +511,12 @@ router.post('/commands/run-system-validation', async (req, res) => {
           trace.cache_hit,
           trace.risk_score,
           trace.escalation_triggered,
+          trace.refusal_reason_code,
+          trace.decision_summary,
           trace.signature,
+          trace.signature_status,
+          trace.code_commit_sha,
+          trace.siva_version,
         ]);
       }
 

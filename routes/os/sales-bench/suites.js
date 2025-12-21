@@ -1035,7 +1035,7 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
       });
     }
 
-    // Get complete trace data for this result
+    // Get complete trace data for this result (Phase 1.5 Compliance)
     const result = await pool.query(`
       SELECT
         rr.id,
@@ -1061,11 +1061,14 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
         -- Model routing
         rr.model_slug,
         rr.model_provider,
+        rr.capability_key,
+        rr.router_decision,
         rr.routing_decision,
         -- Tool trace
         rr.tools_allowed,
         rr.tools_used,
-        -- Policy trace
+        -- Policy trace (Phase 1.5: evaluated + hit)
+        rr.policy_gates_evaluated,
         rr.policy_gates_hit,
         -- Evidence trace
         rr.evidence_used,
@@ -1079,12 +1082,19 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
         -- Risk
         rr.risk_score,
         rr.escalation_triggered,
+        -- Decision (Phase 1.5)
+        rr.refusal_reason_code,
+        rr.decision_summary,
         -- Replay
         rr.replay_of_interaction_id,
         rr.replay_status,
         rr.replay_deviation_reason,
-        -- Integrity
+        -- Integrity (Phase 1.5: signature + status)
         rr.signature,
+        rr.signature_status,
+        -- Version tracking (Phase 1.5)
+        rr.code_commit_sha,
+        rr.siva_version,
         -- Timestamps
         rr.executed_at,
         -- Scenario context
@@ -1111,7 +1121,7 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
 
     const row = result.rows[0];
 
-    // Build structured trace response
+    // Build structured trace response (Phase 1.5 Compliance)
     const trace = {
       // Identity
       interaction_id: row.interaction_id,
@@ -1122,12 +1132,14 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
       run_number: row.run_number,
       execution_order: row.execution_order,
 
-      // Decision
+      // Decision (Phase 1.5: includes refusal_reason_code)
       decision: {
         path_type: row.path_type,
         outcome: row.outcome,
         expected_outcome: row.expected_outcome,
         outcome_correct: row.outcome_correct,
+        refusal_reason_code: row.refusal_reason_code,
+        decision_summary: row.decision_summary,
       },
 
       // Envelope provenance
@@ -1145,24 +1157,28 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
         policy_version: row.policy_version,
       },
 
-      // Model routing
+      // Model routing (Phase 1.5: capability_key + router_decision)
       routing: {
         model_slug: row.model_slug,
         model_provider: row.model_provider,
-        decision: row.routing_decision,
+        capability_key: row.capability_key,
+        router_decision: row.router_decision,
+        routing_decision: row.routing_decision,
       },
 
-      // Tool execution trace
+      // Tool execution trace (Phase 1.5: 12-tools coverage)
       tools: {
         allowed: row.tools_allowed || [],
         used: row.tools_used || [],
         call_count: Array.isArray(row.tools_used) ? row.tools_used.length : 0,
       },
 
-      // Policy gates trace
+      // Policy gates trace (Phase 1.5: evaluated + hit)
       policy_gates: {
+        gates_evaluated: row.policy_gates_evaluated || [],
         gates_hit: row.policy_gates_hit || [],
-        gates_count: Array.isArray(row.policy_gates_hit) ? row.policy_gates_hit.length : 0,
+        evaluated_count: Array.isArray(row.policy_gates_evaluated) ? row.policy_gates_evaluated.length : 0,
+        hit_count: Array.isArray(row.policy_gates_hit) ? row.policy_gates_hit.length : 0,
       },
 
       // Evidence provenance
@@ -1196,10 +1212,17 @@ router.get('/:key/runs/:runId/results/:resultId/trace', async (req, res) => {
         replay_url: `/api/os/sales-bench/replay/${row.interaction_id}`,
       },
 
-      // Integrity verification
+      // Integrity verification (Phase 1.5: signature + status)
       integrity: {
         signature: row.signature,
+        signature_status: row.signature_status,
         verification_url: `/api/os/sales-bench/verify/${row.interaction_id}`,
+      },
+
+      // Version tracking (Phase 1.5: code_commit_sha + siva_version)
+      versions: {
+        code_commit_sha: row.code_commit_sha,
+        siva_version: row.siva_version,
       },
 
       // Timestamps

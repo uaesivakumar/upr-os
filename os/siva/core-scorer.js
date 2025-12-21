@@ -359,15 +359,56 @@ export async function scoreSIVA(companyProfile, envelope, options = {}) {
   else if (scores.overall >= 45) scores.tier = 'WARM';
   else scores.tier = 'COOL';
 
-  // Make PASS/BLOCK decision
+  // Make decision based on mode
+  // Discovery mode: ACT/WAIT/IGNORE/BLOCK (Pre-Entry Opportunity Discovery)
+  // Standard mode: PASS/BLOCK (Post-Entry Conversion)
+  const discoveryMode = options.discovery_mode === true;
+
   let outcome = 'BLOCK';
   let outcomeReason = '';
 
-  if (scores.overall >= THRESHOLDS.PASS_MIN_SCORE) {
-    outcome = 'PASS';
-    outcomeReason = `Overall score ${scores.overall} >= ${THRESHOLDS.PASS_MIN_SCORE}`;
+  if (discoveryMode) {
+    // ===========================================================================
+    // PRE-ENTRY DISCOVERY MODE: ACT / WAIT / IGNORE / BLOCK
+    // Per PRE_ENTRY_EB_DECISION_FRAMEWORK.md
+    // ===========================================================================
+
+    // BLOCK: Compliance/policy restrictions (government, sanctioned, etc.)
+    if (isGovernment || (edgeCaseMultiplier <= 0.15)) {
+      outcome = 'BLOCK';
+      outcomeReason = `Policy restriction: ${edgeCaseReason || 'Compliance block'}`;
+    }
+    // IGNORE: Not EB-eligible (too small, poor profile, no relevance)
+    else if (headcount < 20 || scores.quality < 35) {
+      outcome = 'IGNORE';
+      outcomeReason = headcount < 20
+        ? `Not EB-eligible: headcount ${headcount} < 20 minimum`
+        : `Not EB-eligible: quality score ${scores.quality} < 35 threshold`;
+    }
+    // WAIT: Potential exists but timing/signals are weak
+    else if (scores.overall < 55 || scores.timing < 45 || !hasRecentSignals) {
+      outcome = 'WAIT';
+      outcomeReason = !hasRecentSignals
+        ? `Potential exists but signals stale (${recentSignalAge}d old)`
+        : scores.timing < 45
+          ? `Potential exists but timing weak (T-score: ${scores.timing})`
+          : `Potential exists but overall score ${scores.overall} < 55`;
+    }
+    // ACT: Clear EB opportunity, pursue now
+    else {
+      outcome = 'ACT';
+      outcomeReason = `Clear EB opportunity: score ${scores.overall}, timing ${scores.timing}, recent signals`;
+    }
   } else {
-    outcomeReason = `Overall score ${scores.overall} < ${THRESHOLDS.PASS_MIN_SCORE}`;
+    // ===========================================================================
+    // STANDARD MODE: PASS / BLOCK (Post-Entry Conversion)
+    // ===========================================================================
+    if (scores.overall >= THRESHOLDS.PASS_MIN_SCORE) {
+      outcome = 'PASS';
+      outcomeReason = `Overall score ${scores.overall} >= ${THRESHOLDS.PASS_MIN_SCORE}`;
+    } else {
+      outcomeReason = `Overall score ${scores.overall} < ${THRESHOLDS.PASS_MIN_SCORE}`;
+    }
   }
 
   // Record router decision

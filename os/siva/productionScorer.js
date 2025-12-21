@@ -119,9 +119,10 @@ function transformSignals(scenario) {
  *
  * @param {Object} scenario - Scenario to score
  * @param {Object} persona - Persona from getPersonaForSuite()
+ * @param {Object} options - Additional options (discovery_mode, etc.)
  * @returns {Object} Scoring result with trace data
  */
-export async function scoreWithProductionSIVA(scenario, persona) {
+export async function scoreWithProductionSIVA(scenario, persona, options = {}) {
   // Create sealed envelope
   const envelope = createSalesBenchEnvelope(persona, scenario);
 
@@ -130,11 +131,13 @@ export async function scoreWithProductionSIVA(scenario, persona) {
   const signals = transformSignals(scenario);
 
   // CRITICAL: Call the SAME scoreSIVA() that production uses
+  // Pass discovery_mode for Pre-Entry Opportunity Discovery suites
   const result = await scoreSIVA(companyProfile, envelope, {
     signals,
     latestSignalDate: scenario.signal_context?.date,
     contactProfile: scenario.contact_profile || {},
     historicalData: {},
+    discovery_mode: options.discovery_mode || false,
   });
 
   // Augment result with scenario metadata for Sales-Bench
@@ -161,13 +164,16 @@ export async function scoreWithProductionSIVA(scenario, persona) {
 
 /**
  * Score a batch of scenarios
+ * @param {Array} scenarios - Scenarios to score
+ * @param {Object} persona - Persona from getPersonaForSuite()
+ * @param {Object} options - Additional options (discovery_mode, etc.)
  */
-export async function scoreBatchWithProductionSIVA(scenarios, persona) {
+export async function scoreBatchWithProductionSIVA(scenarios, persona, options = {}) {
   const results = [];
   const startTime = Date.now();
 
   for (const scenario of scenarios) {
-    const result = await scoreWithProductionSIVA(scenario, persona);
+    const result = await scoreWithProductionSIVA(scenario, persona, options);
     results.push(result);
   }
 
