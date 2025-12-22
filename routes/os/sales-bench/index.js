@@ -25,6 +25,7 @@ import calibrationRouter from './calibration.js';
 import suitesRouter from './suites.js';
 import governanceRouter from './governance.js';
 import evaluatorRouter from './evaluator.js';
+import shadowModeRouter from './shadow-mode.js';
 import { SALES_BENCH_META, PRD_V13_COMPLIANCE } from '../../../os/sales-bench/index.js';
 
 const router = express.Router();
@@ -137,5 +138,8 @@ router.use('/calibration', calibrationRouter);
 
 // Evaluator API: Token-based access for human scoring (no auth required)
 router.use('/evaluator', evaluatorRouter);
+
+// Silent Shadow Mode: Observe SIVA behavior, log only, no action
+router.use('/shadow', shadowModeRouter);
 
 export default router;
