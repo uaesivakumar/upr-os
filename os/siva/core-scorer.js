@@ -241,15 +241,23 @@ export async function scoreSIVA(companyProfile, envelope, options = {}) {
   } else {
     const toolStartTime = Date.now();
     try {
+      // BUG FIX: Pass license_type to quality tool for Free Zone detection
+      // Also compute has_uae_address from multiple location fields
+      const location = (companyProfile.location || companyProfile.hq || '').toLowerCase();
+      const hasUaeAddress = location.includes('uae') || location.includes('dubai') ||
+                            location.includes('abu dhabi') || location.includes('sharjah') ||
+                            location.includes('ajman') || location.includes('ras al') ||
+                            location.includes('fujairah') || location.includes('umm al');
+
       const qualityInput = {
         company_name: companyProfile.name,
         domain: companyProfile.domain || 'unknown.com',
         industry: companyProfile.industry || 'Business Services',
         sector: companyProfile.sector || 'private',
+        license_type: companyProfile.license_type || null,
         uae_signals: {
           has_ae_domain: companyProfile.domain?.endsWith('.ae') || false,
-          has_uae_address: (companyProfile.location || '').toLowerCase().includes('uae') ||
-                           (companyProfile.location || '').toLowerCase().includes('dubai'),
+          has_uae_address: hasUaeAddress,
         },
         size_bucket: getSizeBucket(headcount),
         size: headcount,

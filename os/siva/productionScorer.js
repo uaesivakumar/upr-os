@@ -112,6 +112,37 @@ function transformSignals(scenario) {
 }
 
 /**
+ * Compute latestSignalDate from signals' age_days
+ * Scenarios have age_days, not date - convert to actual date
+ */
+function computeLatestSignalDate(scenario) {
+  const signalContext = scenario.signal_context || {};
+  const signals = transformSignals(scenario);
+
+  // Find minimum age_days across all signals
+  let minAgeDays = 999;
+
+  // Check signals array
+  if (signals.length > 0) {
+    const ages = signals.map(s => s.age_days || 999);
+    minAgeDays = Math.min(minAgeDays, ...ages);
+  }
+
+  // Also check top-level age_days in signal_context
+  if (signalContext.age_days != null) {
+    minAgeDays = Math.min(minAgeDays, signalContext.age_days);
+  }
+
+  // Convert age_days to ISO date string
+  if (minAgeDays < 999) {
+    const date = new Date(Date.now() - minAgeDays * 24 * 60 * 60 * 1000);
+    return date.toISOString();
+  }
+
+  return null; // No valid signal date
+}
+
+/**
  * Score a scenario using production SIVA tools
  *
  * CRITICAL: This calls scoreSIVA() from core-scorer.js
@@ -130,11 +161,14 @@ export async function scoreWithProductionSIVA(scenario, persona, options = {}) {
   const companyProfile = transformScenarioToProfile(scenario);
   const signals = transformSignals(scenario);
 
+  // Compute latestSignalDate from signals' age_days (BUG FIX: scenarios have age_days, not date)
+  const latestSignalDate = computeLatestSignalDate(scenario);
+
   // CRITICAL: Call the SAME scoreSIVA() that production uses
   // Pass discovery_mode for Pre-Entry Opportunity Discovery suites
   const result = await scoreSIVA(companyProfile, envelope, {
     signals,
-    latestSignalDate: scenario.signal_context?.date,
+    latestSignalDate,
     contactProfile: scenario.contact_profile || {},
     historicalData: {},
     discovery_mode: options.discovery_mode || false,
