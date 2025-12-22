@@ -1,0 +1,718 @@
+{
+  "certification_id": "901cde4a-4930-42e1-b86c-58648e8154f1",
+  "timestamp": "2025-12-22T04:49:06.705Z",
+  "total_tests": 5,
+  "passed": 5,
+  "failed": 0,
+  "certified": true,
+  "results": [
+    {
+      "test_id": "3e87a5a5-f94b-4048-a51b-76cfd8962444",
+      "test_case": "CASE_1_TECH_STARTUP",
+      "timestamp": "2025-12-22T04:49:04.407Z",
+      "parity": "PASS",
+      "path_a": {
+        "path": "A_FRONTEND_DISCOVERY",
+        "outcome": "PASS",
+        "outcome_reason": "Overall score 73 >= 60",
+        "scores": {
+          "quality": 65,
+          "timing": 75,
+          "productFit": 80,
+          "overall": 73,
+          "tier": "HOT",
+          "reasoning": [
+            "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+            "Timing: Active hiring. Signal age: 10d.",
+            "Product Fit: scaleup company in technology sector."
+          ],
+          "edgeCases": {
+            "decision": "WARN",
+            "confidence": 0.75,
+            "blockers": [],
+            "warnings": [
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Proceed with caution: Year-end period - budget decisions frozen until Q1.",
+            "timestamp": "2025-12-22T04:49:02.930Z",
+            "metadata": {
+              "blockers_count": 0,
+              "warnings_count": 1,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 1
+        },
+        "trace": {
+          "envelope_sha256": "7d9d9d1a4d2e38a66252e035316fd08d48ba5d2ed0fffa843e3432ea911c77e6",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [],
+          "code_commit_sha": "unknown",
+          "latency_ms": 1477
+        }
+      },
+      "path_b": {
+        "path": "B_SALES_BENCH",
+        "outcome": "PASS",
+        "outcome_reason": "Overall score 73 >= 60",
+        "scores": {
+          "quality": 65,
+          "timing": 75,
+          "productFit": 80,
+          "overall": 73,
+          "tier": "HOT",
+          "reasoning": [
+            "Strong UAE operational presence with verified local footprint. Company size aligns well with relationship banking model. technology sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration.",
+            "Timing: Active hiring. Signal age: 10d.",
+            "Product Fit: scaleup company in technology sector."
+          ],
+          "edgeCases": {
+            "decision": "WARN",
+            "confidence": 0.75,
+            "blockers": [],
+            "warnings": [
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Proceed with caution: Year-end period - budget decisions frozen until Q1.",
+            "timestamp": "2025-12-22T04:49:04.406Z",
+            "metadata": {
+              "blockers_count": 0,
+              "warnings_count": 1,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 1
+        },
+        "trace": {
+          "envelope_sha256": "7d9d9d1a4d2e38a66252e035316fd08d48ba5d2ed0fffa843e3432ea911c77e6",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [],
+          "code_commit_sha": "unknown",
+          "latency_ms": 1
+        }
+      },
+      "diffs": [],
+      "latency_ms": 1479
+    },
+    {
+      "test_id": "1e9bc2f6-6f4e-424f-a0be-35a352e24a70",
+      "test_case": "CASE_2_ENTERPRISE_NO_SIGNALS",
+      "timestamp": "2025-12-22T04:49:05.768Z",
+      "parity": "PASS",
+      "path_a": {
+        "path": "A_FRONTEND_DISCOVERY",
+        "outcome": "BLOCK",
+        "outcome_reason": "Overall score 11 < 60",
+        "scores": {
+          "quality": 1,
+          "timing": 50,
+          "productFit": 60,
+          "overall": 11,
+          "tier": "COOL",
+          "reasoning": [
+            "Edge Cases: Enterprise WITHOUT expansion signals - likely has established banking",
+            "UAE presence confirmed through available signals. Large organization with potentially complex procurement processes. Large enterprise scale (15000+ employees) - existing banking relationships likely, conversion probability low.",
+            "Timing: Signal age: 999d.",
+            "Product Fit: enterprise company in conglomerate sector."
+          ],
+          "edgeCases": {
+            "decision": "BLOCK",
+            "confidence": 0.75,
+            "blockers": [
+              {
+                "type": "ENTERPRISE_BRAND",
+                "severity": "MEDIUM",
+                "message": "Large enterprise brand detected: very large organization (10,000+ employees), high revenue ($1B+ annual). Existing banking relationships likely, low conversion probability",
+                "can_override": true,
+                "metadata": {
+                  "enterprise_score": 70,
+                  "confidence": 0.7
+                }
+              }
+            ],
+            "warnings": [
+              {
+                "type": "COMPANY_TOO_LARGE",
+                "severity": "LOW",
+                "message": "Company has 15000 employees - complex org structure, lower accessibility to decision makers",
+                "can_override": true
+              },
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Outreach not recommended: Large enterprise brand detected: very large organization (10,000+ employees), high revenue ($1B+ annual). Existing banking relationships likely, low conversion probability. Can be overridden with justification.",
+            "timestamp": "2025-12-22T04:49:05.767Z",
+            "metadata": {
+              "blockers_count": 1,
+              "warnings_count": 2,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 0.3
+        },
+        "trace": {
+          "envelope_sha256": "6bd6c2088236edae2de00f72b0916e6bbb10a40c733947c0fa1df322e4e411e8",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [
+            "enterprise_no_signals_block"
+          ],
+          "code_commit_sha": "unknown",
+          "latency_ms": 0
+        }
+      },
+      "path_b": {
+        "path": "B_SALES_BENCH",
+        "outcome": "BLOCK",
+        "outcome_reason": "Overall score 11 < 60",
+        "scores": {
+          "quality": 1,
+          "timing": 50,
+          "productFit": 60,
+          "overall": 11,
+          "tier": "COOL",
+          "reasoning": [
+            "Edge Cases: Enterprise WITHOUT expansion signals - likely has established banking",
+            "UAE presence confirmed through available signals. Large organization with potentially complex procurement processes. Large enterprise scale (15000+ employees) - existing banking relationships likely, conversion probability low.",
+            "Timing: Signal age: 999d.",
+            "Product Fit: enterprise company in conglomerate sector."
+          ],
+          "edgeCases": {
+            "decision": "BLOCK",
+            "confidence": 0.75,
+            "blockers": [
+              {
+                "type": "ENTERPRISE_BRAND",
+                "severity": "MEDIUM",
+                "message": "Large enterprise brand detected: very large organization (10,000+ employees), high revenue ($1B+ annual). Existing banking relationships likely, low conversion probability",
+                "can_override": true,
+                "metadata": {
+                  "enterprise_score": 70,
+                  "confidence": 0.7
+                }
+              }
+            ],
+            "warnings": [
+              {
+                "type": "COMPANY_TOO_LARGE",
+                "severity": "LOW",
+                "message": "Company has 15000 employees - complex org structure, lower accessibility to decision makers",
+                "can_override": true
+              },
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Outreach not recommended: Large enterprise brand detected: very large organization (10,000+ employees), high revenue ($1B+ annual). Existing banking relationships likely, low conversion probability. Can be overridden with justification.",
+            "timestamp": "2025-12-22T04:49:05.767Z",
+            "metadata": {
+              "blockers_count": 1,
+              "warnings_count": 2,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 0.3
+        },
+        "trace": {
+          "envelope_sha256": "6bd6c2088236edae2de00f72b0916e6bbb10a40c733947c0fa1df322e4e411e8",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [
+            "enterprise_no_signals_block"
+          ],
+          "code_commit_sha": "unknown",
+          "latency_ms": 1
+        }
+      },
+      "diffs": [],
+      "latency_ms": 1
+    },
+    {
+      "test_id": "bfda7dfa-262a-4c80-9f93-8a8d11d0007f",
+      "test_case": "CASE_3_GOVERNMENT_ENTITY",
+      "timestamp": "2025-12-22T04:49:05.993Z",
+      "parity": "PASS",
+      "path_a": {
+        "path": "A_FRONTEND_DISCOVERY",
+        "outcome": "BLOCK",
+        "outcome_reason": "Overall score 6 < 60",
+        "scores": {
+          "quality": 50,
+          "timing": 80,
+          "productFit": 60,
+          "overall": 6,
+          "tier": "COOL",
+          "reasoning": [
+            "Edge Cases: Government entity - reduced priority (policy restriction)",
+            "UAE presence confirmed through available signals. Large organization with potentially complex procurement processes. Large enterprise scale (10000+ employees) - existing banking relationships likely, conversion probability low. Government sector entity - ENBD policy restricts direct employee banking outreach.",
+            "Timing: Active hiring. Signal age: 5d.",
+            "Product Fit: enterprise company in government sector."
+          ],
+          "edgeCases": {
+            "decision": "BLOCK",
+            "confidence": 0.75,
+            "blockers": [
+              {
+                "type": "GOVERNMENT_SECTOR",
+                "severity": "CRITICAL",
+                "message": "Government entity detected: government-related name pattern, classified as government/semi-government sector. ENBD policy prohibits direct employee banking outreach to government entities",
+                "can_override": false
+              },
+              {
+                "type": "ENTERPRISE_BRAND",
+                "severity": "MEDIUM",
+                "message": "Large enterprise brand detected: large organization (5,000+ employees), high revenue ($1B+ annual). Existing banking relationships likely, low conversion probability",
+                "can_override": true,
+                "metadata": {
+                  "enterprise_score": 60,
+                  "confidence": 0.6
+                }
+              }
+            ],
+            "warnings": [
+              {
+                "type": "COMPANY_TOO_LARGE",
+                "severity": "LOW",
+                "message": "Company has 10000 employees - complex org structure, lower accessibility to decision makers",
+                "can_override": true
+              },
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Outreach blocked: Government entity detected: government-related name pattern, classified as government/semi-government sector. ENBD policy prohibits direct employee banking outreach to government entities.",
+            "timestamp": "2025-12-22T04:49:05.991Z",
+            "metadata": {
+              "blockers_count": 2,
+              "warnings_count": 2,
+              "critical_issues": [
+                "GOVERNMENT_SECTOR"
+              ],
+              "overridable": false
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 0.1
+        },
+        "trace": {
+          "envelope_sha256": "ddfea6a4646b91c70c024545ad1aa220da114a47ba9015d25957d10de6a6b71c",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [
+            "government_entity_block"
+          ],
+          "code_commit_sha": "unknown",
+          "latency_ms": 1
+        }
+      },
+      "path_b": {
+        "path": "B_SALES_BENCH",
+        "outcome": "BLOCK",
+        "outcome_reason": "Overall score 6 < 60",
+        "scores": {
+          "quality": 50,
+          "timing": 80,
+          "productFit": 60,
+          "overall": 6,
+          "tier": "COOL",
+          "reasoning": [
+            "Edge Cases: Government entity - reduced priority (policy restriction)",
+            "Timing: Active hiring. Signal age: 5d.",
+            "Product Fit: enterprise company in government sector."
+          ],
+          "edgeCases": {
+            "decision": "BLOCK",
+            "confidence": 0.75,
+            "blockers": [
+              {
+                "type": "GOVERNMENT_SECTOR",
+                "severity": "CRITICAL",
+                "message": "Government entity detected: government domain (.gov.ae), government-related name pattern, classified as government/semi-government sector. ENBD policy prohibits direct employee banking outreach to government entities",
+                "can_override": false
+              },
+              {
+                "type": "ENTERPRISE_BRAND",
+                "severity": "MEDIUM",
+                "message": "Large enterprise brand detected: large organization (5,000+ employees), high revenue ($1B+ annual). Existing banking relationships likely, low conversion probability",
+                "can_override": true,
+                "metadata": {
+                  "enterprise_score": 60,
+                  "confidence": 0.6
+                }
+              }
+            ],
+            "warnings": [
+              {
+                "type": "COMPANY_TOO_LARGE",
+                "severity": "LOW",
+                "message": "Company has 10000 employees - complex org structure, lower accessibility to decision makers",
+                "can_override": true
+              },
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Outreach blocked: Government entity detected: government domain (.gov.ae), government-related name pattern, classified as government/semi-government sector. ENBD policy prohibits direct employee banking outreach to government entities.",
+            "timestamp": "2025-12-22T04:49:05.992Z",
+            "metadata": {
+              "blockers_count": 2,
+              "warnings_count": 2,
+              "critical_issues": [
+                "GOVERNMENT_SECTOR"
+              ],
+              "overridable": false
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 0.1
+        },
+        "trace": {
+          "envelope_sha256": "ddfea6a4646b91c70c024545ad1aa220da114a47ba9015d25957d10de6a6b71c",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [
+            "government_entity_block"
+          ],
+          "code_commit_sha": "unknown",
+          "latency_ms": 1
+        }
+      },
+      "diffs": [],
+      "latency_ms": 2
+    },
+    {
+      "test_id": "efeabba0-9390-4a1a-b3d7-734a8b7d2ec2",
+      "test_case": "CASE_4_FREE_ZONE_FINTECH",
+      "timestamp": "2025-12-22T04:49:06.230Z",
+      "parity": "PASS",
+      "path_a": {
+        "path": "A_FRONTEND_DISCOVERY",
+        "outcome": "PASS",
+        "outcome_reason": "Overall score 91 >= 60",
+        "scores": {
+          "quality": 59,
+          "timing": 80,
+          "productFit": 70,
+          "overall": 91,
+          "tier": "HOT",
+          "reasoning": [
+            "Edge Cases: . Free Zone company - higher conversion probability",
+            "UAE presence confirmed through available signals. Company size aligns well with relationship banking model. fintech sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+            "Timing: Recent funding. Signal age: 7d.",
+            "Product Fit: scaleup company in fintech sector."
+          ],
+          "edgeCases": {
+            "decision": "WARN",
+            "confidence": 0.75,
+            "blockers": [],
+            "warnings": [
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Proceed with caution: Year-end period - budget decisions frozen until Q1.",
+            "timestamp": "2025-12-22T04:49:06.229Z",
+            "metadata": {
+              "blockers_count": 0,
+              "warnings_count": 1,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 1.3
+        },
+        "trace": {
+          "envelope_sha256": "546ce756495f07e82b21217edafdfb56145772b67d3975c15693cd2170f22710",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [],
+          "code_commit_sha": "unknown",
+          "latency_ms": 1
+        }
+      },
+      "path_b": {
+        "path": "B_SALES_BENCH",
+        "outcome": "PASS",
+        "outcome_reason": "Overall score 91 >= 60",
+        "scores": {
+          "quality": 59,
+          "timing": 80,
+          "productFit": 70,
+          "overall": 91,
+          "tier": "HOT",
+          "reasoning": [
+            "Edge Cases: . Free Zone company - higher conversion probability",
+            "UAE presence confirmed through available signals. Company size aligns well with relationship banking model. fintech sector demonstrates high engagement potential and quality hiring needs. Domain verification confirms UAE business registration. Free zone license provides favorable business environment.",
+            "Timing: Recent funding. Signal age: 7d.",
+            "Product Fit: scaleup company in fintech sector."
+          ],
+          "edgeCases": {
+            "decision": "WARN",
+            "confidence": 0.75,
+            "blockers": [],
+            "warnings": [
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Proceed with caution: Year-end period - budget decisions frozen until Q1.",
+            "timestamp": "2025-12-22T04:49:06.230Z",
+            "metadata": {
+              "blockers_count": 0,
+              "warnings_count": 1,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 1.3
+        },
+        "trace": {
+          "envelope_sha256": "546ce756495f07e82b21217edafdfb56145772b67d3975c15693cd2170f22710",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [],
+          "code_commit_sha": "unknown",
+          "latency_ms": 0
+        }
+      },
+      "diffs": [],
+      "latency_ms": 1
+    },
+    {
+      "test_id": "f7be67cd-c292-4d56-a6c9-1b5eaba4818b",
+      "test_case": "CASE_5_SMALL_COMPANY",
+      "timestamp": "2025-12-22T04:49:06.454Z",
+      "parity": "PASS",
+      "path_a": {
+        "path": "A_FRONTEND_DISCOVERY",
+        "outcome": "BLOCK",
+        "outcome_reason": "Overall score 38 < 60",
+        "scores": {
+          "quality": 15,
+          "timing": 50,
+          "productFit": 50,
+          "overall": 38,
+          "tier": "COOL",
+          "reasoning": [
+            "UAE presence confirmed through available signals. Small company size provides good accessibility to decision makers.",
+            "Timing: Signal age: 30d.",
+            "Product Fit: startup company in consulting sector."
+          ],
+          "edgeCases": {
+            "decision": "WARN",
+            "confidence": 0.75,
+            "blockers": [],
+            "warnings": [
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Proceed with caution: Year-end period - budget decisions frozen until Q1.",
+            "timestamp": "2025-12-22T04:49:06.454Z",
+            "metadata": {
+              "blockers_count": 0,
+              "warnings_count": 1,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 1
+        },
+        "trace": {
+          "envelope_sha256": "7415bd6efa5396e640c9c41c804b62ac48f2cb4d5af446c290887f9ddb9e052a",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [],
+          "code_commit_sha": "unknown",
+          "latency_ms": 0
+        }
+      },
+      "path_b": {
+        "path": "B_SALES_BENCH",
+        "outcome": "BLOCK",
+        "outcome_reason": "Overall score 38 < 60",
+        "scores": {
+          "quality": 15,
+          "timing": 50,
+          "productFit": 50,
+          "overall": 38,
+          "tier": "COOL",
+          "reasoning": [
+            "UAE presence confirmed through available signals. Small company size provides good accessibility to decision makers.",
+            "Timing: Signal age: 30d.",
+            "Product Fit: startup company in consulting sector."
+          ],
+          "edgeCases": {
+            "decision": "WARN",
+            "confidence": 0.75,
+            "blockers": [],
+            "warnings": [
+              {
+                "type": "YEAR_END_FREEZE",
+                "severity": "HIGH",
+                "message": "Year-end period - budget decisions frozen until Q1",
+                "can_override": true,
+                "impact": "×0.6 timing multiplier"
+              }
+            ],
+            "reasoning": "Proceed with caution: Year-end period - budget decisions frozen until Q1.",
+            "timestamp": "2025-12-22T04:49:06.454Z",
+            "metadata": {
+              "blockers_count": 0,
+              "warnings_count": 1,
+              "critical_issues": [],
+              "overridable": true
+            },
+            "_meta": {
+              "latency_ms": 0,
+              "tool_name": "check_edge_cases",
+              "tool_type": "STRICT",
+              "policy_version": "v2.0"
+            }
+          },
+          "edgeCaseMultiplier": 1
+        },
+        "trace": {
+          "envelope_sha256": "7415bd6efa5396e640c9c41c804b62ac48f2cb4d5af446c290887f9ddb9e052a",
+          "persona_id": "ebf50a00-0001-4000-8000-000000000001",
+          "tools_used": [
+            "CompanyQualityTool",
+            "EdgeCasesTool"
+          ],
+          "policy_gates_hit": [],
+          "code_commit_sha": "unknown",
+          "latency_ms": 0
+        }
+      },
+      "diffs": [],
+      "latency_ms": 1
+    }
+  ],
+  "summary": "CERTIFIED: Frontend and Sales-Bench use identical SIVA path."
+}

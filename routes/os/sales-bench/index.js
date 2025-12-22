@@ -26,6 +26,7 @@ import suitesRouter from './suites.js';
 import governanceRouter from './governance.js';
 import evaluatorRouter from './evaluator.js';
 import shadowModeRouter from './shadow-mode.js';
+import parityRouter from './parity.js';
 import { SALES_BENCH_META, PRD_V13_COMPLIANCE } from '../../../os/sales-bench/index.js';
 
 const router = express.Router();
@@ -141,5 +142,8 @@ router.use('/evaluator', evaluatorRouter);
 
 // Silent Shadow Mode: Observe SIVA behavior, log only, no action
 router.use('/shadow', shadowModeRouter);
+
+// Wiring Parity Tests: Certify frontend and Sales-Bench use same SIVA path
+router.use('/parity', parityRouter);
 
 export default router;
